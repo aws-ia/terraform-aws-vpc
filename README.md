@@ -7,7 +7,7 @@ To deploy this quickstart you need to
 2. signup for Terraform Cloud (there is a free tier)
 3. get TFC credentials into your shell using
    
-## terrafrom login
+ terraform login
 
 # Step 2
 
