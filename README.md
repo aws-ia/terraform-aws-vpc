@@ -20,7 +20,7 @@ terrafrom apply
 
 # Run these commands in order:
 
- 1. terraform output | terraform output | sed  -e '1,11d' >> ./VPC/backend.hcl.json
+1. terraform output | sed  -e '1,11d' >> ./VPC/backend.hcl.json
 
 ## Then to create your VPC run these commands:
 
