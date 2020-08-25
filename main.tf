@@ -23,6 +23,7 @@ resource "tfe_workspace" "quickstart-workspace" {
 
 output "To_create_backend_file" {
   value = <<README
+
 # Run these commands in order:
 #
 # 1. terraform output | cut -d '=' -f 2 >> ./VPC/backend.hcl.json
