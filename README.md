@@ -1,8 +1,14 @@
 # tf-quickstart-amazon-vpc
-
-git clone this directory
-
 # Step 1
+## pre-reqs:
+
+To deploy this quickstart you need to
+1. git clone this directory
+2. signup for Terraform Cloud (there is a free tier)
+3. get TFC credentials into your shell using
+   terrafrom login
+
+# Step 2
 
 in the main directory perform the following commnads 
 
@@ -10,7 +16,7 @@ terrafrom init
 
 terrafrom apply
 
-# Step 2
+# Step 3
 
 # Run these commands in order:
 
