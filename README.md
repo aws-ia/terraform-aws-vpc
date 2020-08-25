@@ -6,7 +6,8 @@ To deploy this quickstart you need to
 1. git clone this directory
 2. signup for Terraform Cloud (there is a free tier)
 3. get TFC credentials into your shell using
-   terrafrom login
+   
+   ##terrafrom login
 
 # Step 2
 
