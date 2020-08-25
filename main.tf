@@ -33,7 +33,6 @@ output "To_create_backend_file" {
 # 3. terraform init -backend-config=backend.hcl.json
 $ 4. apply your AWS key and Secrets key to the terraform workspace created in step 1
 # 5. terraform apply to deploy your VPC
-$
 {
   "workspaces": [
     {
@@ -43,6 +42,5 @@ $
   "hostname": "app.terraform.io",
   "organization": "${tfe_organization.quickstart-org.name}"
 }
-
 README
 }
