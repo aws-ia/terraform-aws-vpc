@@ -22,12 +22,6 @@ terrafrom apply
 
 # Run these commands in order:
 
-1. terraform output | sed  -e '1,11d' >> ./VPC/backend.hcl.json
-
-## Then to create your VPC run these commands:
-
- 2. cd ./VPC
- 3. terraform init -backend-config=backend.hcl.json
- 4. apply your AWS key and Secrets key to the terraform workspace created in step 1
- 5. terraform apply to deploy your VPC
+ 1. cd ./module/quickstart-vpc
+ 2. terraform apply 
 
