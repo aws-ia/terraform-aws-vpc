@@ -1,5 +1,7 @@
 ###########
-# Defaults
+# pre-reqs
+# terraform login
+# export TERRAFORM_CONFIG=$HOME/.terraform.d/credentials.tfrc.json"
 ##########
 terraform {
   required_version = ">= 0.13"
@@ -21,27 +23,32 @@ resource "tfe_workspace" "quickstart-workspace" {
   organization = tfe_organization.quickstart-org.name
 }
 
-output "To_create_backend_file" {
+resource  "null_resource" "backend_file" {
+  depends_on = [tfe_workspace.quickstart-workspace]
+  provisioner "local-exec" {
+  command =  "echo  workspaces '{' name = \\\"${tfe_workspace.quickstart-workspace.name}\\\" '}' >> ./module/quickstart-vpc/backend.hcl"
+  }
+  provisioner "local-exec" {
+  command =  "echo hostname = \\\"app.terraform.io\\\" >> ./module/quickstart-vpc/backend.hcl"
+  }
+  provisioner "local-exec" {
+  command =  "echo  organization = \\\"${tfe_organization.quickstart-org.name}\\\" >> ./module/quickstart-vpc/backend.hcl"
+  }
+}
+
+resource  "null_resource" "remote_init" {
+  depends_on = [null_resource.backend_file]
+  provisioner "local-exec" {
+  working_dir = "./module/quickstart-vpc/"
+  command =  "terraform init -backend-config=backend.hcl"
+  }
+}
+
+output "User instructions" {
   value = <<README
 
 # Run these commands in order:
-#
-# 1. terraform output | sed  -e '1,11d' >> ./VPC/backend.hcl.json
-#
-# Then to create your VPC run these commands:
-#
-# 2. cd ./VPC
-# 3. terraform init -backend-config=backend.hcl.json
-$ 4. apply your AWS key and Secrets key to the terraform workspace created in step 1
-# 5. terraform apply to deploy your VPC
-{
-  "workspaces": [
-    {
-      "name": "${tfe_workspace.quickstart-workspace.name}"
-    }
-  ],
-  "hostname": "app.terraform.io",
-  "organization": "${tfe_organization.quickstart-org.name}"
-}
+# 1. cd ./module/quickstart-vpc
+# 2. terraform apply
 README
 }
