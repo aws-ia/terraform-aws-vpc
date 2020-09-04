@@ -61,9 +61,8 @@ resource  "null_resource" "remote_init" {
 output "user_instructions" {
   value = <<README
 
- your org name        = ${tfe_organization.quickstart-org.name}
- your workspace for new vpc is      = ${tfe_workspace.quickstart-workspace-1.name}
-your workspace for existing vpc is  = ${tfe_workspace.quickstart-workspace-2.name}
+ your org name                                 = ${tfe_organization.quickstart-org.name}
+ your workspace for creating a new vpc is      = ${tfe_workspace.quickstart-workspace-1.name}
 # Run these commands in order:
 #    cd ../deploy_new_vpc
 #then
