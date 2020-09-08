@@ -3,6 +3,12 @@
 # PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
+variable "name" {
+  type        = string
+  description = "The name of the resources"
+  default     = "aws-quickstart"
+}
+
 variable "region" {
   type        = string
   description = "The name of the region you wish to deploy into"

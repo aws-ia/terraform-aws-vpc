@@ -17,15 +17,6 @@ data "aws_availability_zones" "available" {
 }
 
 ######
-# Create Uniquie name
-######
-
-resource "random_pet" "name" {
-  prefix = "aws-quickstart"
-  length = 1
-}
-
-######
 # VPC
 ######
 resource "aws_vpc" "main" {
@@ -36,7 +27,7 @@ resource "aws_vpc" "main" {
 
   tags = {
     Terraform = "true"
-    Name      = "${random_pet.name.id}_vpc"
+    Name      = "${var.name}_vpc"
   }
 }
 
@@ -46,7 +37,7 @@ resource "aws_vpc_endpoint" "s3" {
 
   tags = {
     Terraform = "true"
-    Name      = "${random_pet.name.id}_vpc_endpoint"
+    Name      = "${var.name}_vpc_endpoint"
   }
 }
 
@@ -71,7 +62,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${random_pet.name.id}_iGW"
+    Name = "${var.name}_iGW"
   }
 
 }
@@ -83,7 +74,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
  tags = {
-    Name = "${random_pet.name.id}_quickstart_public_routes"
+    Name = "${var.name}_quickstart_public_routes"
   }
 
 }
@@ -107,7 +98,7 @@ resource "aws_route_table" "private_A" {
   vpc_id = aws_vpc.main.id
 
  tags = {
-    Name = "${random_pet.name.id}_private_routes_A"
+    Name = "${var.name}_private_routes_A"
   }
 }
 
@@ -120,7 +111,7 @@ resource "aws_route_table" "private_B" {
   vpc_id = aws_vpc.main.id
 
  tags = {
-    Name = "${random_pet.name.id}_private_routes_B"
+    Name = "${var.name}_private_routes_B"
   }
 }
 
@@ -135,7 +126,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch         = true 
 
 tags = {
-    Name = "${random_pet.name.id}_public_subnets"
+    Name = "${var.name}_public_subnets"
   }
 }
 
@@ -149,7 +140,7 @@ resource "aws_subnet" "private_A" {
   availability_zone               = data.aws_availability_zones.available.names[count.index]
 
  tags = {
-    Name = "${random_pet.name.id}_private_subnets_A"
+    Name = "${var.name}_private_subnets_A"
   }
 }
 
@@ -163,7 +154,7 @@ resource "aws_subnet" "private_B" {
   availability_zone               = data.aws_availability_zones.available.names[count.index]
 
  tags = {
-    Name = "${random_pet.name.id}_private_subnets_B"
+    Name = "${var.name}_private_subnets_B"
   }
 }
 
@@ -176,7 +167,7 @@ resource "aws_network_acl" "public" {
   subnet_ids = concat(aws_subnet.private_A.*.id, aws_subnet.public.*.id)
 
   tags = {
-    Name = "${random_pet.name.id}_shared_default_nework_acl"
+    Name = "${var.name}_shared_default_nework_acl"
   }
 }
 
@@ -217,7 +208,7 @@ resource "aws_network_acl" "custom" {
   subnet_ids = aws_subnet.private_B.*.id
 
   tags = {
-    Name = "${random_pet.name.id}_dedicated_custom_nework_acl"
+    Name = "${var.name}_dedicated_custom_nework_acl"
   }
 }
 
@@ -258,7 +249,7 @@ resource "aws_eip" "nat" {
   vpc = true
 
 tags = {
-    Name = "${random_pet.name.id}_EIP_nat"
+    Name = "${var.name}_EIP_nat"
   }
 }
 
@@ -268,7 +259,7 @@ resource "aws_nat_gateway" "nat_gw" {
   subnet_id = aws_subnet.public[count.index].id
 
 tags = {
-    Name = "${random_pet.name.id}_EIP_nat_gateway"
+    Name = "${var.name}_EIP_nat_gateway"
   }
   depends_on = [aws_internet_gateway.gw]
 }

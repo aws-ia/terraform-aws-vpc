@@ -12,7 +12,7 @@ in the main directory perform the following commands:
 
 terraform login
 
-export TERRAFORM_CONFIG=$HOME/.terraform.d/credentials.tfrc.json"
+export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"
 
 terrafrom init
 
