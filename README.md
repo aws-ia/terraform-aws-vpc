@@ -1,4 +1,4 @@
-# terraform-aws-vpc
+# terraform-aws-quickstart-vpc
 # Step 1
 ## pre-reqs:
 
