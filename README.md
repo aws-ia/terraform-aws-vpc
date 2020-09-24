@@ -1,4 +1,4 @@
-# tf-quickstart-amazon-vpc
+# terraform-aws-vpc
 # Step 1
 ## pre-reqs:
 
