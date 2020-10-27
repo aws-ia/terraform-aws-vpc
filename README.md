@@ -22,6 +22,9 @@ terrafrom apply
 
 # Run these commands in order:
 
- 1. cd ./module/quickstart-vpc
- 2. terraform apply 
+ 1. cd ./setup_env
+ 2. terraform init
+ 3. terraform apply
+ 
+ Then follow the command prompts
 
