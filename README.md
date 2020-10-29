@@ -7,7 +7,7 @@ To deploy, do the following:
         terraform login
         export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"
         terrafrom init
-        terrafrom apply'''
+        terrafrom apply
 
 4. Run the following commands in the order they appear below:
    
