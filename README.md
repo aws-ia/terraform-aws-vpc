@@ -1,5 +1,5 @@
 # terraform-aws-vpc
-To deploy, do the following:
+To deploy this module, do the following:
 1. Sign up for [Terraform Cloud](https://app.terraform.io/signup/account). (There is a free tier available.)
 2. Clone this **aws-quickstart/terraform-aws-vpc** directory.
 3. In the main directory, run the following commands:
