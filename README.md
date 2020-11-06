@@ -13,8 +13,9 @@ To deploy this module, do the following:
 
 4. Run `terraform login` to ensure you are authenticated into Terraform Cloud.
 5. Run `export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"`.
-6. Run `terraform init`.
-7. Run `terraform apply`.
-8. Change directory by running `cd ./setup_env`.
-9. Run `terraform init`.
-10. Run `terraform apply`.
+6. Change directory by running `cd ./setup_env`.
+7. Run `terraform init`.
+8. Run `terraform apply`.
+9. To deploy a VPC, change directory by running `cd ../deploy_new_vpc`.
+10. Run `terraform init`.
+11. Run `terraform apply`.
