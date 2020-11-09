@@ -17,8 +17,8 @@ resource "tfe_organization" "quickstart-org" {
 }
 
 resource "tfe_workspace" "quickstart-workspace-1" {
-  name         = "${random_pet.name.id}-workspace-1"
-  organization = tfe_organization.quickstart-org.name
+  name              = "${random_pet.name.id}-workspace-1"
+  organization      = tfe_organization.quickstart-org.name
   working_directory = "./deploy_new_vpc"
 }
 resource "tfe_variable" "AWS_SECRET_ACCESS_KEY" {
@@ -37,24 +37,24 @@ resource "tfe_variable" "AWS_ACCESS_KEY_ID" {
   description  = "AWS_ACCESS_KEY_ID"
 }
 
-resource  "null_resource" "backend_file" {
+resource "null_resource" "backend_file" {
   depends_on = [tfe_workspace.quickstart-workspace-1]
   provisioner "local-exec" {
-  command =  "echo  workspaces '{' name = \\\"${tfe_workspace.quickstart-workspace-1.name}\\\" '}' >> ../deploy_new_vpc/backend.hcl"
+    command = "echo  workspaces '{' name = \\\"${tfe_workspace.quickstart-workspace-1.name}\\\" '}' >> ../deploy_new_vpc/backend.hcl"
   }
   provisioner "local-exec" {
-  command =  "echo hostname = \\\"app.terraform.io\\\" >> ../deploy_new_vpc/backend.hcl"
+    command = "echo hostname = \\\"app.terraform.io\\\" >> ../deploy_new_vpc/backend.hcl"
   }
   provisioner "local-exec" {
-  command =  "echo  organization = \\\"${tfe_organization.quickstart-org.name}\\\" >> ../deploy_new_vpc/backend.hcl"
+    command = "echo  organization = \\\"${tfe_organization.quickstart-org.name}\\\" >> ../deploy_new_vpc/backend.hcl"
   }
 }
 
-resource  "null_resource" "remote_init" {
+resource "null_resource" "remote_init" {
   depends_on = [null_resource.backend_file]
   provisioner "local-exec" {
-  working_dir = "../deploy_new_vpc"
-  command =  "terraform init -backend-config=backend.hcl"
+    working_dir = "../deploy_new_vpc"
+    command     = "terraform init -backend-config=backend.hcl"
   }
 }
 
@@ -63,6 +63,7 @@ output "user_instructions" {
 
  your org name                                 = ${tfe_organization.quickstart-org.name}
  your workspace for creating a new vpc is      = ${tfe_workspace.quickstart-workspace-1.name}
+ configure you AWS Creds in you newly created workspace https://learn.hashicorp.com/tutorials/terraform/cloud-workspace-configure
 # Run these commands in order:
 #    cd ../deploy_new_vpc
 #then
