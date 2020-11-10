@@ -1,4 +1,4 @@
-# terraform-aws-vpc
+# terraform-aws-vpc (Developer Preview)
 Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.com)  
 
 To deploy this module, do the following:
