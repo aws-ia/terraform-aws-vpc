@@ -9,12 +9,12 @@ output  "vpc_id" {
 }
 output "NAT1EIP" {
     description = "NAT 1 IP address"
-    value = aws_eip.nat[0].public_ip
+    value = try(aws_eip.nat[0].public_ip,"")
 }
 
 output "NAT2EIP" {
     description = " NAT 2 IP address"
-    value =  aws_eip.nat[1].public_ip
+    value =  try(aws_eip.nat[1].public_ip,"")
   }
 
 output "NAT3EIP" {
@@ -29,42 +29,42 @@ output "NAT4EIP" {
 
 output "PrivateSubnet1ACIDR" {
     description = " Private subnet 1A CIDR in Availability Zone 1"
-    value = aws_subnet.private_A[0].cidr_block
+    value = try(aws_subnet.private_A[0].cidr_block,"")
   }
 
 output "PrivateSubnet1AID" {
     description = " Private subnet 1A ID in Availability Zone 1"
-    value =  aws_subnet.private_A[0].id
+    value =  try(aws_subnet.private_A[0].id,"")
   }
 
 output "PrivateSubnet1BCIDR" {
     description = " Private subnet 1B CIDR in Availability Zone 1"
-    value = aws_subnet.private_B[0].cidr_block
+    value = try(aws_subnet.private_B[0].cidr_block,"")
   }
 
 output "PrivateSubnet1BID" {
     description = " Private subnet 1B ID in Availability Zone 1"
-    value =  aws_subnet.private_B[0].id 
+    value =  try(aws_subnet.private_B[0].id,"")
   }
 
 output "PrivateSubnet2ACIDR" {
     description = " Private subnet 2A CIDR in Availability Zone 2"
-    value = aws_subnet.private_A[1].cidr_block
+    value = try(aws_subnet.private_A[1].cidr_block,"")
   }
 
 output "PrivateSubnet2AID" {
     description = " Private subnet 2A ID in Availability Zone 2"
-    value = aws_subnet.private_A[1].id
+    value = try(aws_subnet.private_A[1].id,"")
   }
 
 output "PrivateSubnet2BCIDR" {
     description = " Private subnet 2B CIDR in Availability Zone 2"
-    value = aws_subnet.private_B[1].cidr_block
+    value = try(aws_subnet.private_B[1].cidr_block,"")
   }
 
 output "PrivateSubnet2BID" {
     description = " Private subnet 2B ID in Availability Zone 2"
-    value =   aws_subnet.private_B[1].id
+    value =   try(aws_subnet.private_B[1].id,"")
   }
 
 output "PrivateSubnet3ACIDR" {
@@ -109,22 +109,22 @@ output "PrivateSubnet4BID" {
 
 output "PublicSubnet1CIDR" {
     description = " Public subnet 1 CIDR in Availability Zone 1"
-    value = aws_subnet.public[0].cidr_block
+    value = try(aws_subnet.public[0].cidr_block,"")
   }
 
 output "PublicSubnet1ID" {
     description = " Public subnet 1 ID in Availability Zone 1"
-    value = aws_subnet.public[0].id
+    value = try(aws_subnet.public[0].id,"")
   }
 
 output "PublicSubnet2CIDR" {
     description = " Public subnet 2 CIDR in Availability Zone 2"
-    value =  aws_subnet.public[1].cidr_block
+    value =  try(aws_subnet.public[1].cidr_block,"")
   }
 
 output "PublicSubnet2ID" {
     description = " Public subnet 2 ID in Availability Zone 2"
-    value = aws_subnet.public[1].id
+    value = try(aws_subnet.public[1].id,"")
   }
 
 output "PublicSubnet3CIDR" {
@@ -154,22 +154,22 @@ output "S3VPCEndpoint" {
 
 output "PrivateSubnet1ARouteTable" {
     description = " Private subnet 1A route table"
-    value = aws_route_table.private_A[0].id
+    value = try(aws_route_table.private_A[0].id,"")
   }
 
 output "PrivateSubnet1BRouteTable" {
     description = " Private subnet 1B route table"
-    value = aws_route_table.private_B[0].id
+    value = try(aws_route_table.private_B[0].id,"")
   }
 
 output "PrivateSubnet2ARouteTable" {
     description = " Private subnet 2A route table"
-    value = aws_route_table.private_A[1].id
+    value = try(aws_route_table.private_A[1].id,"")
   }
 
 output "PrivateSubnet2BRouteTable" {
     description = " Private subnet 2B route table"
-    value =  aws_route_table.private_B[1].id
+    value =  try(aws_route_table.private_B[1].id,"")
   }
 
 output "PrivateSubnet3ARouteTable" {
