@@ -26,16 +26,26 @@ resource "null_resource" "setup_backend_file" {
   }
 }
 
+
+resource "null_resource" "remote_init" {
+  depends_on = [null_resource.setup_backend_file]
+  provisioner "local-exec" {
+    command = "cd ../deploy_demo && terraform init -backend-config=backend.hcl"
+  }
+}
+
 output "user_instructions" {
   value = <<README
-# your org name                                 = ${module.tfc_workspace.tfm-aws-org-name}
-# your workspace for creating a new vpc is      = ${module.tfc_workspace.tfm-aws-workspace-name}
-# caution: make sure your credential are secured ourside version control (and follow secrets mangement bestpractices)
+# org name    = ${module.tfc_workspace.tfm-aws-org-name}
+# workspace   = ${module.tfc_workspace.tfm-aws-workspace-name}
+#
 # Run these commands in order:
-#   terraform init
-#then
-#   terraform apply
-#   or
-#   terraform apply  -var-file="/Users/username/.aws/terraform.tfvars"
+   cd ../deploy_demo
+# Configure your tfvars file
+  AWS_SECRET_ACCESS_KEY = "*****************"
+  AWS_ACCESS_KEY_ID     = "*****************"
+# !!!!CAUTION!!!!: Make sure your credential are secured ourside version control (and follow secrets mangement bestpractices)
+#   
+   terraform apply  -var-file="/Users/username/.aws/terraform.tfvars"
 README
 }
