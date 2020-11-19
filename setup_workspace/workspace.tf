@@ -19,6 +19,13 @@ module "tfc_workspace" {
 }
 
 
+resource "null_resource" "setup_backend_file" {
+  depends_on = [module.tfc_workspace]
+  provisioner "local-exec" {
+    command = "mv backend.hcl ../deploy_demo/backend.hcl"
+  }
+}
+
 output "user_instructions" {
   value = <<README
 # your org name                                 = ${module.tfc_workspace.tfm-aws-org-name}
