@@ -35,13 +35,13 @@ Export TERRAFORM_CONFIG
 
 > !!!!WARNING!!!!: Run these commands in order:
 
-Clone the **aws-quickstart/terraform-tfc_workspace** repository.
+Clone the **aws-quickstart/terraform-aws-vpc** repository.
 
 `git clone https://github.com/aws-quickstart/terraform-aws-vpc`
 
 Change directory to the root directory.
 
-`cd terraform-aws-tfc_workspace.git`
+`cd terraform-aws-vpc.git`
 
 Set up the workspace
 
