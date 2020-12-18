@@ -41,7 +41,7 @@ Clone the **aws-quickstart/terraform-aws-vpc** repository.
 
 Change directory to the root directory.
 
-`cd terraform-aws-vpc.git`
+`cd terraform-aws-vpc`
 
 Set up the workspace
 
