@@ -14,12 +14,9 @@ Install Terraform. (See [Install Terraform](https://learn.hashicorp.com/tutorial
 aws_access_key_id=AKIAIOSFODNN7EXAMPLE
 aws_secret_access_key=wJalrXUtnSAMPLESECRETKEY
 ```
-(See [Guide] for more info (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
+See [Guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) for more info
 
-Local execution
 ## Clone the repo (requires git client)
-
-> !!!!WARNING!!!!: Run these commands in order:
 
 Clone the **aws-quickstart/terraform-aws-vpc** repository.
 
@@ -33,11 +30,31 @@ Change to deploy directory
 
 `cd deploy`
 
-Initalize terrafrom module
+### Local execution
+
+Initialize terraform module
 
 `terraform init`
 
 Run terraform apply
 
-`terraform apply 
+`terraform apply` 
+
+### Remote execution using Terraform Cloud 
+
+`terraform init -backend-config=/path/to/backend.hcl`
+
+Example: backend.hcl
+
+```
+terraform {
+  backend "remote" {
+    organization = "your-organization"
+
+    workspaces {
+      name = "your-workspace"
+    } 
+  } 
+}
+```
 
