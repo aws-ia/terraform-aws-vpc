@@ -27,7 +27,11 @@ Clone the **aws-quickstart/terraform-aws-vpc** repository.
 
 Change directory to the root directory.
 
-`cd terraform-aws-vpc`
+`cd terraform-aws-vpc/`
+
+Change to deploy directory
+
+`cd deploy`
 
 Initalize terrafrom module
 
