@@ -6,34 +6,17 @@ Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.c
 To deploy this module, do the following:
 Install Terraform. (See [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) for a tutorial.) 
 
-# Sign up for Terraform Cloud
-Sign up and log into [Terraform Cloud](https://app.terraform.io/signup/account). (There is a free tier available.)
+# Configure AWS CLI 
+> ~/.aws/credentials (Linux & Mac)
 
-## Configure Terraform Cloud API Access
-
-Generate terraform cloud token
-
-`terraform login` 
-
-Export TERRAFORM_CONFIG
-
-`export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"`
-
-# Configure your tfvars file
-
-**Example tfvas file (replace *** with AKEY and SKEY)**
-
-`AWS_SECRET_ACCESS_KEY` = "*****************"
-
-`AWS_ACCESS_KEY_ID`     = "*****************"
-
-> !!!!CAUTION!!!!: Make sure your credential are secured ourside version control (and follow secrets mangement bestpractices)
-
-# Deploy this module (instruction for linux or mac)
+```
+[default]
+aws_access_key_id=AKIAIOSFODNN7EXAMPLE
+aws_secret_access_key=wJalrXUtnSAMPLESECRETKEY
+```
+See [Guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) for more info
 
 ## Clone the repo (requires git client)
-
-> !!!!WARNING!!!!: Run these commands in order:
 
 Clone the **aws-quickstart/terraform-aws-vpc** repository.
 
@@ -41,25 +24,37 @@ Clone the **aws-quickstart/terraform-aws-vpc** repository.
 
 Change directory to the root directory.
 
-`cd terraform-aws-vpc`
+`cd terraform-aws-vpc/`
 
-Set up the workspace
+Change to deploy directory
 
-`cd ./setup_workspace`
+`cd deploy`
 
-Initalize terrafrom module
+### Local execution
+
+Initialize terraform module
 
 `terraform init`
 
-Run terraform apply with tfvars file
+Run terraform apply
 
-`terraform apply  -var-file="/Users/username/.aws/terraform.tfvars"`
+`terraform apply` 
 
-Change to the deploy_demo directory.
+### Remote execution using Terraform Cloud 
 
-`cd ../deploy_demo`
+`terraform init -backend-config=/path/to/backend.hcl`
 
-Run terraform apply (Credential in your terraform cloud will be used to run the apply)
+Example: backend.hcl
 
-`terraform apply`
+```
+terraform {
+  backend "remote" {
+    organization = "your-organization"
+
+    workspaces {
+      name = "your-workspace"
+    } 
+  } 
+}
+```
 
