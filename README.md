@@ -6,8 +6,15 @@ Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.c
 To deploy this module, do the following:
 Install Terraform. (See [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) for a tutorial.) 
 
-# Sign up for Terraform Cloud
-Sign up and log into [Terraform Cloud](https://app.terraform.io/signup/account). (There is a free tier available.)
+# Configure AWS CLI 
+> ~/.aws/credentials (Linux & Mac)
+
+```
+[default]
+aws_access_key_id=AKIAIOSFODNN7EXAMPLE
+aws_secret_access_key=wJalrXUtnSAMPLESECRETKEY
+```
+(See [Guide] for more info (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
 
 Local execution
 ## Clone the repo (requires git client)
