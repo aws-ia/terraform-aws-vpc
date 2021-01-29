@@ -11,7 +11,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-east-1"
+  region  = var.region
   profile = "default"
 }
 
@@ -26,7 +26,7 @@ resource "random_pet" "name" {
 
 module "tfm-aws-vpc" {
   source            = "./modules/vpc"
-  region            = "us-east-1"
+  region            = var.region
   name              = random_pet.name.id
   cidr              = "10.0.0.0/16"
   public_subnets    = ["10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20", "10.0.176.0/20", "10.0.240.0/22", "10.0.244.0/22"]

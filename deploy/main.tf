@@ -7,7 +7,6 @@
 ######################################
 terraform {
   required_version = ">= 0.13.5"
-  backend "local" {}
 }
 
 provider "aws" {
@@ -23,5 +22,6 @@ resource "random_pet" "name" {
 # Create VPC
 ######################################
 module "quickstart_vpc" {
-  source = "aws-quickstart/vpc/aws"
+  source = "../modules/vpc"
+  region = var.region
 }
