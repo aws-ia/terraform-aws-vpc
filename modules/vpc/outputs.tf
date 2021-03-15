@@ -1,11 +1,13 @@
 # VPC
 output "vpc_cidr" {
   description = "VPC_CIDR "
-  value       = aws_vpc.main.cidr_block
+  #value       = aws_vpc.main[count.index].cidr_block
+  value        = concat(aws_vpc.main.*.cidr_block, [""])[0]
 }
 output  "vpc_id" {
   description = "The ID of the VPC"
-  value       = aws_vpc.main.id
+  #value       = aws_vpc.main[count.index].id
+  value      = concat(aws_vpc.main.*.id, [""])[0]
 }
 output "NAT1EIP" {
     description = "NAT 1 IP address"
