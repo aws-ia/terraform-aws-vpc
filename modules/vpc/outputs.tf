@@ -9,6 +9,18 @@ output  "vpc_id" {
   #value       = aws_vpc.main[count.index].id
   value      = concat(aws_vpc.main.*.id, [""])[0]
 }
+output "private_subnets_A" {
+  description = "List of IDs of privateA subnets"
+  value       = aws_subnet.private_A.*.id
+}
+output "private_subnets_B" {
+  description = "List of IDs of privateB subnets"
+  value       = aws_subnet.private_B.*.id
+}
+output "public_subnets" {
+  description = "List of IDs of privateB subnets"
+  value       = aws_subnet.public.*.id
+}
 output "NAT1EIP" {
     description = "NAT 1 IP address"
     value = try(aws_eip.nat[0].public_ip,"")

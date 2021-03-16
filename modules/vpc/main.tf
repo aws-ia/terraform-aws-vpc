@@ -156,9 +156,14 @@ resource "aws_subnet" "public" {
   availability_zone       = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "${var.name}_public_subnets"
-  }
+  #tags = {
+  #  Name = "${var.name}_public_subnets"
+  #}
+  tags = merge(
+  var.tags,
+  var.public_subnet_tags,
+ )
+
 }
 
 #################
@@ -171,9 +176,13 @@ resource "aws_subnet" "private_A" {
   #availability_zone = data.aws_availability_zones.available.names[length(data.aws_availability_zones.available.names)]
   availability_zone       = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
 
-  tags = {
-    Name = "${var.name}_private_subnets_A"
-  }
+  #tags = {
+  #  Name = "${var.name}_private_subnets_A"
+  #}
+  tags = merge(
+  var.tags,
+  var.private_subnet_tags,
+ )
 }
 
 #################
@@ -186,9 +195,13 @@ resource "aws_subnet" "private_B" {
   #availability_zone = data.aws_availability_zones.available.names[length(data.aws_availability_zones.available.names)]
   availability_zone       = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
 
-  tags = {
-    Name = "${var.name}_private_subnets_B"
-  }
+  #tags = {
+  #  Name = "${var.name}_private_subnets_B"
+  #}
+  tags = merge(
+  var.tags,
+  var.private_subnet_tags,
+ )
 }
 
 

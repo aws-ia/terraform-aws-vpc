@@ -27,6 +27,18 @@ variable "tags" {
   description = "tags, which could be used for additional tags"
 }
 
+variable "private_subnet_tags" {
+  description = "Additional tags for the private subnets"
+  type        = map(string)
+  default     = {}
+}
+
+variable "public_subnet_tags" {
+  description = "Additional tags for the public subnets"
+  type        = map(string)
+  default     = {}
+}
+
 variable "enable_dns_hostnames" {
   description = "Should be true to enable DNS hostnames in the VPC"
   type        = bool
