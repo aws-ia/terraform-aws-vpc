@@ -20,7 +20,7 @@ provider "aws" {
 #}
 
 module "quickstart_vpc_label" {
-  source    = "git@github.com:SushantJagdale/terraform-aws-label-1.git?ref=develop"
+  source    = "git@github.com:aws-quickstart/terraform-aws-label.git"
   region    = var.region
   namespace = var.namespace
   env       = var.env
