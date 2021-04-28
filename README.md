@@ -1,60 +1,70 @@
 # Terraform AWS VPC
-This module configures your Terraform organization and workspace.  
+This module is designed to deploy into Terraform Cloud
 Authors: David Wright (dwright@hashicorp.com) and Tony Vattahil (tonynv@amazon.com)
+
 
 # Install Terraform
 To deploy this module, do the following:
 Install Terraform. (See [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) for a tutorial.) 
 
-# Configure AWS CLI 
-> ~/.aws/credentials (Linux & Mac)
+# Sign up for Terraform Cloud
+Sign up and log into [Terraform Cloud](https://app.terraform.io/signup/account). (There is a free tier available.)
+
+## Configure Terraform Cloud API Access
+
+Generate terraform cloud token
+
+`terraform login` 
+
+Export TERRAFORM_CONFIG
+
+`export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"`
+
+# Configure your tfvars file
+
+_Example filepath_ = `$HOME/.aws/terraform.tfvars`
+
+_Example tfvars file contents_ 
 
 ```
-[default]
-aws_access_key_id=AKIAIOSFODNN7EXAMPLE
-aws_secret_access_key=wJalrXUtnSAMPLESECRETKEY
+AWS_SECRET_ACCESS_KEY = "*****************"
+AWS_ACCESS_KEY_ID = "*****************"
+AWS_SESSION_TOKEN = "*****************"
 ```
-See [Guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) for more info
+> (replace *** with AKEY and SKEY)
 
-## Clone the repo (requires git client)
+Note: STS-based credentials _are optional_ but *highly recommended*. 
 
-Clone the **aws-quickstart/terraform-aws-vpc** repository.
+> !!!!CAUTION!!!!: Make sure your credential are secured ourside version control (and follow secrets mangement bestpractices)
 
-`git clone https://github.com/aws-quickstart/terraform-aws-vpc`
+# Deploy this module (instruction for linux or mac)
+
+Clone the aws-quickstart/terraform-aws-vpc repository.
+
+git clone https://github.com/aws-quickstart/terraform-aws-vpc
 
 Change directory to the root directory.
 
-`cd terraform-aws-vpc/`
+cd terraform-aws-vpc/
 
 Change to deploy directory
 
-`cd deploy`
+`cd setup_workspace`. 
 
-### Local execution
 
-Initialize terraform module
+Run to following commands in order:
 
 `terraform init`
 
-Run terraform apply
+`terraform apply`  or `terraform apply  -var-file="$HOME/.aws/terraform.tfvars"`.
 
-`terraform apply` 
+Change directory to deploy dir (previous command auto generates backend.hcl)
 
-### Remote execution using Terraform Cloud 
+`cd ../deploy`
 
-`terraform init -backend-config=/path/to/backend.hcl`
+`terraform apply` or `terraform apply  -var-file="$HOME/.aws/terraform.tfvars"`. 
 
-Example: backend.hcl
+Terraform apply is run remotely in Terraform Cloud 
 
-```
-terraform {
-  backend "remote" {
-    organization = "your-organization"
 
-    workspaces {
-      name = "your-workspace"
-    } 
-  } 
-}
-```
 
