@@ -14,6 +14,12 @@ provider "aws" {
   region = var.region
 }
 
+resource "random_string" "rand4" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
 module "vpc_label" {
   source    = "aws-quickstart/label/aws"
   version   = "0.0.1"
@@ -21,9 +27,9 @@ module "vpc_label" {
   namespace = var.namespace
   env       = var.env
   #account = var.account_name
-  name      = var.name
+  name      = "${var.name}-${random_string.rand4.result}"
   delimiter = var.delimiter
-  tags      = map("propogate_at_launch", "true", "terraform", "true")
+  tags      = tomap({ propogate_at_launch = "true", "terraform" = "true" })
 }
 
 ######################################
