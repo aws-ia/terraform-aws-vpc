@@ -6,7 +6,7 @@ variable "region" {
 
 variable "namespace" {
   description = "namespace, which could be your organiation name, e.g. amazon"
-  default     = "proserve"
+  default     = "myorg"
 }
 variable "env" {
   description = "environment, e.g. 'sit', 'uat', 'prod' etc"
