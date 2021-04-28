@@ -14,13 +14,9 @@ provider "aws" {
   region = var.region
 }
 
-#resource "random_pet" "name" {
-#  prefix = "tfm-aws"
-#  length = 1
-#}
-
-module "quickstart_vpc_label" {
-  source    = "git@github.com:aws-quickstart/terraform-aws-label.git"
+module "vpc_label" {
+  source    = "aws-quickstart/label/aws"
+  version   = "0.0.1"
   region    = var.region
   namespace = var.namespace
   env       = var.env
@@ -36,11 +32,11 @@ module "quickstart_vpc_label" {
 module "quickstart_vpc" {
   source            = "../modules/vpc"
   create_vpc        = var.create_vpc
-  name              = module.quickstart_vpc_label.id
+  name              = module.vpc_label.id
   region            = var.region
   cidr              = var.cidr
   public_subnets    = var.public_subnets
   private_subnets_A = var.private_subnets_A
   private_subnets_B = var.private_subnets_B
-  tags              = module.quickstart_vpc_label.tags
+  tags              = module.vpc_label.tags
 }
