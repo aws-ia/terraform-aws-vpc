@@ -27,6 +27,11 @@ variable "enable_dns_support" {
   default     = true
 }
 
+variable "tags" {
+  default     = {}
+  description = "Vpc Tags"
+}
+
 variable "instance_tenancy" {
   description = "A tenancy option for instances launched into the VPC"
   type        = string
