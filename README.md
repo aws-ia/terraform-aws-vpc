@@ -39,9 +39,9 @@ Note: STS-based credentials _are optional_ but *highly recommended*.
 
 # Deploy this module (instruction for linux or mac)
 
-Clone the aws-quickstart/terraform-aws-vpc repository.
+Clone the aws-ia/terraform-aws-vpc repository.
 
-git clone https://github.com/aws-quickstart/terraform-aws-vpc
+git clone https://github.com/aws-ia/terraform-aws-vpc
 
 Change directory to the root directory.
 
