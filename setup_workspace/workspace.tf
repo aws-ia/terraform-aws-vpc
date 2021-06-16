@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.15.1"
+  required_version = ">= 1.0.0"
 }
 
 resource "random_pet" "name" {
@@ -10,8 +10,8 @@ resource "random_pet" "name" {
 # Generate new terraform org and workspace
 
 module "tfc_workspace" {
-  source                = "aws-quickstart/tfc_workspace/aws"
-  version               = "0.0.12"
+  source                = "aws-ia/cloud_workspace/hashicorp"
+  version               = "0.0.1"
   tfe_email             = var.tfe_email
   tfe_organization      = var.tfe_organization
   tfe_workspace         = var.tfe_workspace

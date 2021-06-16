@@ -16,7 +16,7 @@ Generate terraform cloud token
 
 `terraform login` 
 
-Export TERRAFORM_CONFIG
+Export the TERRAFORM_CONFIG variable
 
 `export TERRAFORM_CONFIG="$HOME/.terraform.d/credentials.tfrc.json"`
 
@@ -41,7 +41,7 @@ Note: STS-based credentials _are optional_ but *highly recommended*.
 
 Clone the aws-ia/terraform-aws-vpc repository.
 
-git clone https://github.com/aws-ia/terraform-aws-vpc
+`git clone https://github.com/aws-ia/terraform-aws-vpc`
 
 Change directory to the root directory.
 

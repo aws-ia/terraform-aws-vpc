@@ -21,7 +21,7 @@ resource "random_string" "rand4" {
 }
 
 module "vpc_label" {
-  source    = "aws-quickstart/label/aws"
+  source    = "aws-ia/label/aws"
   version   = "0.0.1"
   region    = var.region
   namespace = var.namespace
@@ -35,7 +35,7 @@ module "vpc_label" {
 ######################################
 # Create VPC
 ######################################
-module "quickstart_vpc" {
+module "aws-ia_vpc" {
   source            = "../modules/vpc"
   create_vpc        = var.create_vpc
   name              = module.vpc_label.id
