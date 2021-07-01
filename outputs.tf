@@ -1,198 +1,198 @@
 # VPC
 output "vpc_cidr" {
   description = "VPC_CIDR "
-  value       = module.tfm-aws-vpc.vpc_cidr
+  value       = module.aws-vpc.vpc_cidr
 }
 output "vpc_id" {
   description = "The ID of the VPC"
-  value       = module.tfm-aws-vpc.vpc_id
+  value       = module.aws-vpc.vpc_id
 }
 output "NAT1EIP" {
   description = "NAT 1 IP address"
-  value       = module.tfm-aws-vpc.NAT1EIP
+  value       = module.aws-vpc.NAT1EIP
 }
 
 output "NAT2EIP" {
   description = " NAT 2 IP address"
-  value       = module.tfm-aws-vpc.NAT2EIP
+  value       = module.aws-vpc.NAT2EIP
 }
 
 output "NAT3EIP" {
   description = " NAT 3 IP address"
-  value       = module.tfm-aws-vpc.NAT3EIP
+  value       = module.aws-vpc.NAT3EIP
 }
 
 output "NAT4EIP" {
   description = " NAT 4 IP address"
-  value       = module.tfm-aws-vpc.NAT4EIP
+  value       = module.aws-vpc.NAT4EIP
 }
 
 output "PrivateSubnet1ACIDR" {
   description = " Private subnet 1A CIDR in Availability Zone 1"
-  value       = module.tfm-aws-vpc.PrivateSubnet1ACIDR
+  value       = module.aws-vpc.PrivateSubnet1ACIDR
 }
 
 output "PrivateSubnet1AID" {
   description = " Private subnet 1A ID in Availability Zone 1"
-  value       = module.tfm-aws-vpc.PrivateSubnet1AID
+  value       = module.aws-vpc.PrivateSubnet1AID
 }
 
 output "PrivateSubnet1BCIDR" {
   description = " Private subnet 1B CIDR in Availability Zone 1"
-  value       = module.tfm-aws-vpc.PrivateSubnet1BCIDR
+  value       = module.aws-vpc.PrivateSubnet1BCIDR
 }
 
 output "PrivateSubnet1BID" {
   description = " Private subnet 1B ID in Availability Zone 1"
-  value       = module.tfm-aws-vpc.PrivateSubnet1BID
+  value       = module.aws-vpc.PrivateSubnet1BID
 }
 
 output "PrivateSubnet2ACIDR" {
   description = " Private subnet 2A CIDR in Availability Zone 2"
-  value       = module.tfm-aws-vpc.PrivateSubnet2ACIDR
+  value       = module.aws-vpc.PrivateSubnet2ACIDR
 }
 
 output "PrivateSubnet2AID" {
   description = " Private subnet 2A ID in Availability Zone 2"
-  value       = module.tfm-aws-vpc.PrivateSubnet2AID
+  value       = module.aws-vpc.PrivateSubnet2AID
 }
 
 output "PrivateSubnet2BCIDR" {
   description = " Private subnet 2B CIDR in Availability Zone 2"
-  value       = module.tfm-aws-vpc.PrivateSubnet2BCIDR
+  value       = module.aws-vpc.PrivateSubnet2BCIDR
 }
 
 output "PrivateSubnet2BID" {
   description = " Private subnet 2B ID in Availability Zone 2"
-  value       = module.tfm-aws-vpc.PrivateSubnet2BID
+  value       = module.aws-vpc.PrivateSubnet2BID
 }
 
 output "PrivateSubnet3ACIDR" {
   description = " Private subnet 3A CIDR in Availability Zone 3"
-  value       = module.tfm-aws-vpc.PrivateSubnet3ACIDR
+  value       = module.aws-vpc.PrivateSubnet3ACIDR
 }
 
 output "PrivateSubnet3AID" {
   description = " Private subnet 3A ID in Availability Zone 3"
-  value       = module.tfm-aws-vpc.PrivateSubnet3AID
+  value       = module.aws-vpc.PrivateSubnet3AID
 }
 
 output "PrivateSubnet3BCIDR" {
   description = " Private subnet 3B CIDR in Availability Zone 3"
-  value       = module.tfm-aws-vpc.PrivateSubnet3BCIDR
+  value       = module.aws-vpc.PrivateSubnet3BCIDR
 }
 
 output "PrivateSubnet3BID" {
   description = " Private subnet 3B ID in Availability Zone 3"
-  value       = module.tfm-aws-vpc.PrivateSubnet3BID
+  value       = module.aws-vpc.PrivateSubnet3BID
 }
 
 output "PrivateSubnet4ACIDR" {
   description = " Private subnet 4A CIDR in Availability Zone 4"
-  value       = module.tfm-aws-vpc.PrivateSubnet4ACIDR
+  value       = module.aws-vpc.PrivateSubnet4ACIDR
 }
 
 output "PrivateSubnet4AID" {
   description = " Private subnet 4A ID in Availability Zone 4"
-  value       = module.tfm-aws-vpc.PrivateSubnet4AID
+  value       = module.aws-vpc.PrivateSubnet4AID
 }
 
 output "PrivateSubnet4BCIDR" {
   description = " Private subnet 4B CIDR in Availability Zone 4"
-  value       = module.tfm-aws-vpc.PrivateSubnet4BCIDR
+  value       = module.aws-vpc.PrivateSubnet4BCIDR
 }
 
 output "PrivateSubnet4BID" {
   description = " Private subnet 4B ID in Availability Zone 4"
-  value       = module.tfm-aws-vpc.PrivateSubnet4BID
+  value       = module.aws-vpc.PrivateSubnet4BID
 }
 
 output "PublicSubnet1CIDR" {
   description = " Public subnet 1 CIDR in Availability Zone 1"
-  value       = module.tfm-aws-vpc.PublicSubnet1CIDR
+  value       = module.aws-vpc.PublicSubnet1CIDR
 }
 
 output "PublicSubnet1ID" {
   description = " Public subnet 1 ID in Availability Zone 1"
-  value       = module.tfm-aws-vpc.PublicSubnet1ID
+  value       = module.aws-vpc.PublicSubnet1ID
 }
 
 output "PublicSubnet2CIDR" {
   description = " Public subnet 2 CIDR in Availability Zone 2"
-  value       = module.tfm-aws-vpc.PublicSubnet2CIDR
+  value       = module.aws-vpc.PublicSubnet2CIDR
 }
 
 output "PublicSubnet2ID" {
   description = " Public subnet 2 ID in Availability Zone 2"
-  value       = module.tfm-aws-vpc.PublicSubnet2ID
+  value       = module.aws-vpc.PublicSubnet2ID
 }
 
 output "PublicSubnet3CIDR" {
   description = " Public subnet 3 CIDR in Availability Zone 3"
-  value       = module.tfm-aws-vpc.PublicSubnet3CIDR
+  value       = module.aws-vpc.PublicSubnet3CIDR
 }
 
 output "PublicSubnet3ID" {
   description = " Public subnet 3 ID in Availability Zone 3"
-  value       = module.tfm-aws-vpc.PublicSubnet3ID
+  value       = module.aws-vpc.PublicSubnet3ID
 }
 
 output "PublicSubnet4CIDR" {
   description = " Public subnet 4 CIDR in Availability Zone 4"
-  value       = module.tfm-aws-vpc.PublicSubnet4CIDR
+  value       = module.aws-vpc.PublicSubnet4CIDR
 }
 
 output "PublicSubnet4ID" {
   description = " Public subnet 4 ID in Availability Zone 4"
-  value       = module.tfm-aws-vpc.PublicSubnet4ID
+  value       = module.aws-vpc.PublicSubnet4ID
 }
 
 output "S3VPCEndpoint" {
   description = " S3 VPC Endpoint"
-  value       = module.tfm-aws-vpc.S3VPCEndpoint
+  value       = module.aws-vpc.S3VPCEndpoint
 }
 
 output "PrivateSubnet1ARouteTable" {
   description = " Private subnet 1A route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet1ARouteTable
+  value       = module.aws-vpc.PrivateSubnet1ARouteTable
 }
 
 output "PrivateSubnet1BRouteTable" {
   description = " Private subnet 1B route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet1BRouteTable
+  value       = module.aws-vpc.PrivateSubnet1BRouteTable
 }
 
 output "PrivateSubnet2ARouteTable" {
   description = " Private subnet 2A route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet2ARouteTable
+  value       = module.aws-vpc.PrivateSubnet2ARouteTable
 }
 
 output "PrivateSubnet2BRouteTable" {
   description = " Private subnet 2B route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet2BRouteTable
+  value       = module.aws-vpc.PrivateSubnet2BRouteTable
 }
 
 output "PrivateSubnet3ARouteTable" {
   description = " Private subnet 3A route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet3ARouteTable
+  value       = module.aws-vpc.PrivateSubnet3ARouteTable
 }
 
 output "PrivateSubnet3BRouteTable" {
   description = " Private subnet 3B route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet3BRouteTable
+  value       = module.aws-vpc.PrivateSubnet3BRouteTable
 }
 
 output "PrivateSubnet4ARouteTable" {
   description = " Private subnet 4A route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet4ARouteTable
+  value       = module.aws-vpc.PrivateSubnet4ARouteTable
 }
 
 output "PrivateSubnet4BRouteTable" {
   description = " Private subnet 4B route table"
-  value       = module.tfm-aws-vpc.PrivateSubnet4BRouteTable
+  value       = module.aws-vpc.PrivateSubnet4BRouteTable
 }
 
 output "PublicSubnetRouteTable" {
   description = " Public subnet route table"
-  value       = module.tfm-aws-vpc.PublicSubnetRouteTable
+  value       = module.aws-vpc.PublicSubnetRouteTable
 }

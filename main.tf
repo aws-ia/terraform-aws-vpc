@@ -24,7 +24,7 @@ resource "random_pet" "name" {
 # Create VPC
 ######################################
 
-module "tfm-aws-vpc" {
+module "aws-vpc" {
   source            = "./modules/vpc"
   region            = var.region
   name              = random_pet.name.id
