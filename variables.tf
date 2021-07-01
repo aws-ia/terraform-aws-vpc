@@ -125,3 +125,13 @@ variable "custom_outbound_acl_rules" {
     },
   ]
 }
+
+variable "public_subnet_tags" {
+  default     = { Name = "Public Subnet" }
+  description = "Public Subnet Tags"
+}
+
+variable "private_subnet_tags" {
+  default     = { Name = "Private Subnet" }
+  description = "Private Subnet Tags"
+}
