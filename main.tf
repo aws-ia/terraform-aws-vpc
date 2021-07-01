@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 resource "random_pet" "name" {
-  prefix = "tfm-aws"
+  prefix = "id"
   length = 1
 }
 
