@@ -15,9 +15,10 @@ provider "aws" {
   profile = "default"
 }
 
-resource "random_pet" "name" {
-  prefix = "id"
-  length = 1
+resource "random_string" "rand4" {
+  length  = 4
+  special = false
+  upper   = false
 }
 
 ######################################
@@ -27,7 +28,7 @@ resource "random_pet" "name" {
 module "aws-vpc" {
   source                    = "./modules/vpc"
   region                    = var.region
-  name                      = random_pet.name.id
+  name                      = "${var.name}-${random_string.rand4.result}"
   cidr                      = var.cidr
   public_subnets            = var.public_subnets
   private_subnets_A         = var.private_subnets_A
