@@ -75,5 +75,81 @@ variable "private_subnets_A" {
 variable "private_subnets_B" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
-  default     = ["10.0.216.0/21", "10.0.224.0/22", "10.0.228.0/22"]
+  default     = []
+}
+
+variable "public_inbound_acl_rules" {
+  description = "Public subnets inbound network ACLs"
+  type        = list(map(string))
+
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+}
+
+variable "public_outbound_acl_rules" {
+  description = "Public subnets outbound network ACLs"
+  type        = list(map(string))
+
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+}
+
+variable "custom_inbound_acl_rules" {
+  description = "Custom subnets inbound network ACLs"
+  type        = list(map(string))
+
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+}
+
+variable "custom_outbound_acl_rules" {
+  description = "Custom subnets outbound network ACLs"
+  type        = list(map(string))
+
+  default = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_block  = "0.0.0.0/0"
+    },
+  ]
+}
+
+variable "public_subnet_tags" {
+  type        = map(string)
+  default     = { "Name" = "Public Subnet" }
+  description = "Public Subnet Tags"
+}
+
+variable "private_subnet_tags" {
+  type        = map(string)
+  default     = { "Name" = "Private Subnet" }
+  description = "Private Subnet Tags"
 }
