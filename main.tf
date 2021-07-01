@@ -41,7 +41,7 @@ module "aws-vpc" {
   public_outbound_acl_rules = var.public_inbound_acl_rules
   custom_inbound_acl_rules  = var.custom_inbound_acl_rules
   custom_outbound_acl_rules = var.custom_outbound_acl_rules
-  public_subnet_tags        = var.public_subnet_tags
-  private_subnet_tags       = var.private_subnet_tags
+  public_subnet_tags        = tomap(var.public_subnet_tags, { "terraform" = "true" })
+  private_subnet_tags       = tomap(var.private_subnet_tags, { "terraform" = "true" })
 
 }
