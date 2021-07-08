@@ -36,13 +36,22 @@ module "vpc_label" {
 # Create VPC
 ######################################
 module "aws-ia_vpc" {
-  source            = "../modules/vpc"
-  create_vpc        = var.create_vpc
-  name              = module.vpc_label.id
-  region            = var.region
-  cidr              = var.cidr
-  public_subnets    = var.public_subnets
-  private_subnets_A = var.private_subnets_A
-  private_subnets_B = var.private_subnets_B
-  tags              = module.vpc_label.tags
+  source                    = "../modules/vpc"
+  create_vpc                = var.create_vpc
+  name                      = module.vpc_label.id
+  region                    = var.region
+  cidr                      = var.cidr
+  public_subnets            = var.public_subnets
+  private_subnets_A         = var.private_subnets_A
+  private_subnets_B         = var.private_subnets_B
+  tags                      = module.vpc_label.tags
+  enable_dns_hostnames      = var.enable_dns_hostnames
+  enable_dns_support        = var.enable_dns_support
+  instance_tenancy          = var.instance_tenancy
+  public_inbound_acl_rules  = var.public_inbound_acl_rules
+  public_outbound_acl_rules = var.public_inbound_acl_rules
+  custom_inbound_acl_rules  = var.custom_inbound_acl_rules
+  custom_outbound_acl_rules = var.custom_outbound_acl_rules
+  public_subnet_tags        = tomap(var.public_subnet_tags, { "terraform" = "true" })
+  private_subnet_tags       = tomap(var.private_subnet_tags, { "terraform" = "true" })
 }

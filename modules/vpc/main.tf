@@ -32,9 +32,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
 
-  tags = merge(
-    var.tags,
-  )
+  tags = merge(var.tags)
 }
 
 resource "aws_vpc_endpoint" "s3" {
@@ -43,9 +41,7 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.main[count.index].id
   service_name = "com.amazonaws.${var.region}.s3"
 
-  tags = merge(
-    var.tags,
-  )
+  tags = merge(var.tags)
 }
 
 resource "aws_vpc_endpoint_route_table_association" "private_A" {
@@ -135,10 +131,7 @@ resource "aws_subnet" "public" {
   availability_zone       = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
   map_public_ip_on_launch = true
 
-  tags = merge(
-    var.tags,
-    var.public_subnet_tags,
-  )
+  tags = merge(var.public_subnet_tags)
 
 }
 
@@ -151,10 +144,7 @@ resource "aws_subnet" "private_A" {
   cidr_block        = var.private_subnets_A[count.index]
   availability_zone = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
 
-  tags = merge(
-    var.tags,
-    var.private_subnet_tags,
-  )
+  tags = merge(var.private_subnet_tags)
 }
 
 #################
@@ -167,10 +157,7 @@ resource "aws_subnet" "private_B" {
   #availability_zone = data.aws_availability_zones.available.names[length(data.aws_availability_zones.available.names)]
   availability_zone = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
 
-  tags = merge(
-    var.tags,
-    var.private_subnet_tags,
-  )
+  tags = merge(var.private_subnet_tags)
 }
 
 

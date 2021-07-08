@@ -12,19 +12,17 @@ variable "create_vpc" {
 variable "name" {
   type        = string
   description = "The name of the resources"
-  default     = "tfm-aws"
 }
 
 variable "region" {
   type        = string
   description = "The name of the region you wish to deploy into"
-  default     = "us-east-1"
 }
 
 variable "tags" {
-  #type        = map(string)
-  default     = {}
+  type        = map(string)
   description = "tags, which could be used for additional tags"
+  default     = {}
 }
 
 variable "private_subnet_tags" {
@@ -60,25 +58,21 @@ variable "instance_tenancy" {
 variable "cidr" {
   description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
   type        = string
-  default     = "10.0.0.0/16"
 }
 
 variable "public_subnets" {
-  description = "A list of private subnets inside the VPC"
+  description = "A list of public subnets inside the VPC"
   type        = list(string)
-  #  default     = ["10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20", "10.0.176.0/20", "10.0.240.0/22", "10.0.244.0/22"]
 }
 
 variable "private_subnets_A" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
-  #  default     = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19", "10.0.96.0/19", "10.0.232.0/22", "10.0.236.0/22"]
 }
 
 variable "private_subnets_B" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
-  #  default     = ["10.0.192.0/21", "10.0.200.0/21", "10.0.208.0/21", "10.0.216.0/21", "10.0.224.0/22", "10.0.228.0/22"]
 }
 
 variable "public_inbound_acl_rules" {
