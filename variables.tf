@@ -6,19 +6,16 @@
 variable "name" {
   type        = string
   description = "The name of the resources"
-  default     = "tfm-aws"
 }
 
 variable "region" {
   type        = string
   description = "The name of the region you wish to deploy into"
-  default     = "us-east-1"
 }
 
 variable "enable_dns_hostnames" {
   description = "Should be true to enable DNS hostnames in the VPC"
   type        = bool
-  default     = true
 }
 
 variable "enable_dns_support" {
@@ -56,7 +53,6 @@ variable "private_subnets_A" {
   default     = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19", "10.0.96.0/19", "10.0.232.0/22", "10.0.236.0/22"]
 }
 
-#  default     = ["10.0.192.0/21", "10.0.200.0/21", "10.0.208.0/21", "10.0.216.0/21", "10.0.224.0/22", "10.0.228.0/22"]
 variable "private_subnets_B" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
@@ -142,6 +138,5 @@ variable "private_subnet_tags" {
 
 variable "create_vpc" {
   type        = bool
-  default     = true
   description = "Allow you to create vpc based on condition"
 }
