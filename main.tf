@@ -43,5 +43,5 @@ module "aws-vpc" {
   custom_outbound_acl_rules = var.custom_outbound_acl_rules
   public_subnet_tags        = tomap(var.public_subnet_tags)
   private_subnet_tags       = tomap(var.private_subnet_tags)
-
+  create_vpc                = var.create_vpc
 }

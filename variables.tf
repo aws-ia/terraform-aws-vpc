@@ -138,3 +138,10 @@ variable "private_subnet_tags" {
   default     = { "Name" = "Private Subnet" }
   description = "Private Subnet Tags"
 }
+
+
+variable "create_vpc" {
+  type        = bool
+  default     = true
+  description = "Allow you to create vpc based on condition"
+}
