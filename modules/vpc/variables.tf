@@ -1,12 +1,6 @@
-
-# ---------------------------------------------------------------------------------------------------------------------
-# PARAMETERS
-# These parameters have reasonable defaults.
-# ---------------------------------------------------------------------------------------------------------------------
 variable "create_vpc" {
   description = "Controls if VPC should be created (it affects almost all resources)"
   type        = bool
-  default     = true
 }
 
 variable "name" {
@@ -40,19 +34,16 @@ variable "public_subnet_tags" {
 variable "enable_dns_hostnames" {
   description = "Should be true to enable DNS hostnames in the VPC"
   type        = bool
-  default     = true
 }
 
 variable "enable_dns_support" {
   description = "Should be true to enable DNS support in the VPC"
   type        = bool
-  default     = true
 }
 
 variable "instance_tenancy" {
   description = "A tenancy option for instances launched into the VPC"
   type        = string
-  default     = "default"
 }
 
 variable "cidr" {
@@ -78,63 +69,17 @@ variable "private_subnets_B" {
 variable "public_inbound_acl_rules" {
   description = "Public subnets inbound network ACLs"
   type        = list(map(string))
-
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
 }
 
 variable "public_outbound_acl_rules" {
   description = "Public subnets outbound network ACLs"
   type        = list(map(string))
-
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
 }
-
 variable "custom_inbound_acl_rules" {
   description = "Custom subnets inbound network ACLs"
   type        = list(map(string))
-
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
 }
-
 variable "custom_outbound_acl_rules" {
   description = "Custom subnets outbound network ACLs"
   type        = list(map(string))
-
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
 }
