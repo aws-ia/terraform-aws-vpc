@@ -2,11 +2,6 @@ terraform {
   required_version = ">= 1.0.0"
 }
 
-resource "random_pet" "name" {
-  prefix = "tfm-aws"
-  length = 1
-}
-
 # Generate new terraform org and workspace
 
 module "tfc_workspace" {
