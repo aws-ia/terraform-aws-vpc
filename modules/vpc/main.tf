@@ -44,14 +44,14 @@ resource "aws_vpc_endpoint" "s3" {
 }
 
 resource "aws_vpc_endpoint_route_table_association" "private_A" {
-  count = var.create_vpc == true && length(var.private_subnets_A) > 0 ? 1 : 0
+  count = var.create_vpc == true && length(var.private_subnets_a) > 0 ? 1 : 0
 
   route_table_id  = aws_route_table.private_A[count.index].id
   vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
 }
 
 resource "aws_vpc_endpoint_route_table_association" "private_B" {
-  count = var.create_vpc == true && length(var.private_subnets_B) > 0 ? 1 : 0
+  count = var.create_vpc == true && length(var.private_subnets_b) > 0 ? 1 : 0
 
   route_table_id  = aws_route_table.private_B[count.index].id
   vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
@@ -99,7 +99,7 @@ resource "aws_route" "public_internet_gateway" {
 # There are as many routing tables as the number of NAT gateways
 #################
 resource "aws_route_table" "private_A" {
-  count  = var.create_vpc == true && length(var.private_subnets_A) > 0 ? 1 : 0
+  count  = var.create_vpc == true && length(var.private_subnets_a) > 0 ? 1 : 0
   vpc_id = aws_vpc.main[0].id
 
   tags = {
@@ -112,7 +112,7 @@ resource "aws_route_table" "private_A" {
 # There are as many routing tables as the number of NAT gateways
 #################
 resource "aws_route_table" "private_B" {
-  count  = var.create_vpc == true && length(var.private_subnets_B) > 0 ? 1 : 0
+  count  = var.create_vpc == true && length(var.private_subnets_b) > 0 ? 1 : 0
   vpc_id = aws_vpc.main[0].id
 
   tags = {
@@ -138,9 +138,9 @@ resource "aws_subnet" "public" {
 # Private subnet A
 #################
 resource "aws_subnet" "private_A" {
-  count             = var.create_vpc == true && length(var.private_subnets_A) > 0 ? length(var.private_subnets_A) : 0
+  count             = var.create_vpc == true && length(var.private_subnets_a) > 0 ? length(var.private_subnets_a) : 0
   vpc_id            = aws_vpc.main[0].id
-  cidr_block        = var.private_subnets_A[count.index]
+  cidr_block        = var.private_subnets_a[count.index]
   availability_zone = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
 
   tags = merge(var.private_subnet_tags)
@@ -150,9 +150,9 @@ resource "aws_subnet" "private_A" {
 # Private subnet B
 #################
 resource "aws_subnet" "private_B" {
-  count      = var.create_vpc == true && length(var.private_subnets_B) > 0 ? length(var.private_subnets_B) : 0
+  count      = var.create_vpc == true && length(var.private_subnets_b) > 0 ? length(var.private_subnets_b) : 0
   vpc_id     = aws_vpc.main[0].id
-  cidr_block = var.private_subnets_B[count.index]
+  cidr_block = var.private_subnets_b[count.index]
   #availability_zone = data.aws_availability_zones.available.names[length(data.aws_availability_zones.available.names)]
   availability_zone = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
 
@@ -208,7 +208,7 @@ resource "aws_network_acl_rule" "public_outbound" {
 # Dedicated  Custom Network ACLs
 #######################
 resource "aws_network_acl" "custom" {
-  count      = var.create_vpc == true && length(var.private_subnets_B) > 0 ? 1 : 0
+  count      = var.create_vpc == true && length(var.private_subnets_b) > 0 ? 1 : 0
   vpc_id     = aws_vpc.main[count.index].id
   subnet_ids = aws_subnet.private_B.*.id
 
@@ -218,7 +218,7 @@ resource "aws_network_acl" "custom" {
 }
 
 resource "aws_network_acl_rule" "custom_inbound" {
-  count          = var.create_vpc == true && length(var.private_subnets_B) > 0 ? 1 : 0
+  count          = var.create_vpc == true && length(var.private_subnets_b) > 0 ? 1 : 0
   network_acl_id = aws_network_acl.custom[0].id
 
   egress      = false
@@ -233,7 +233,7 @@ resource "aws_network_acl_rule" "custom_inbound" {
 }
 
 resource "aws_network_acl_rule" "custom_outbound" {
-  count          = var.create_vpc == true && length(var.private_subnets_B) > 0 ? 1 : 0
+  count          = var.create_vpc == true && length(var.private_subnets_b) > 0 ? 1 : 0
   network_acl_id = aws_network_acl.custom[0].id
 
   egress      = true
@@ -252,7 +252,7 @@ resource "aws_network_acl_rule" "custom_outbound" {
 ##############
 
 resource "aws_eip" "nat" {
-  count = var.create_vpc == true && length(var.private_subnets_A) > 0 ? 1 : 0
+  count = var.create_vpc == true && length(var.private_subnets_a) > 0 ? 1 : 0
   vpc   = true
 
   tags = {
@@ -262,7 +262,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat_gw" {
   #count         = length(data.aws_availability_zones.available.names)
-  count         = var.create_vpc == true && length(var.private_subnets_A) > 0 ? 1 : 0
+  count         = var.create_vpc == true && length(var.private_subnets_a) > 0 ? 1 : 0
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
 
@@ -273,7 +273,7 @@ resource "aws_nat_gateway" "nat_gw" {
 }
 
 resource "aws_route" "private_A_nat_gateway" {
-  count                  = var.create_vpc == true && length(var.private_subnets_A) > 0 ? 1 : 0
+  count                  = var.create_vpc == true && length(var.private_subnets_a) > 0 ? 1 : 0
   route_table_id         = aws_route_table.private_A[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
@@ -284,7 +284,7 @@ resource "aws_route" "private_A_nat_gateway" {
 }
 
 resource "aws_route" "private_B_nat_gateway" {
-  count                  = var.create_vpc == true && length(var.private_subnets_B) > 0 ? 1 : 0
+  count                  = var.create_vpc == true && length(var.private_subnets_b) > 0 ? 1 : 0
   route_table_id         = aws_route_table.private_B[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
@@ -298,13 +298,13 @@ resource "aws_route" "private_B_nat_gateway" {
 # Route table association
 ##########################
 resource "aws_route_table_association" "private_A" {
-  count          = var.create_vpc == true && length(var.private_subnets_A) > 0 ? length(var.private_subnets_A) : 0
+  count          = var.create_vpc == true && length(var.private_subnets_a) > 0 ? length(var.private_subnets_a) : 0
   subnet_id      = aws_subnet.private_A[count.index].id
   route_table_id = aws_route_table.private_A[0].id
 }
 
 resource "aws_route_table_association" "private_B" {
-  count          = var.create_vpc == true && length(var.private_subnets_B) > 0 ? length(var.private_subnets_B) : 0
+  count          = var.create_vpc == true && length(var.private_subnets_b) > 0 ? length(var.private_subnets_b) : 0
   subnet_id      = aws_subnet.private_B[count.index].id
   route_table_id = aws_route_table.private_B[0].id
 }

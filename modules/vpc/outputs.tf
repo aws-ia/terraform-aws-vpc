@@ -9,11 +9,11 @@ output "vpc_id" {
   #value       = aws_vpc.main[count.index].id
   value = concat(aws_vpc.main.*.id, [""])[0]
 }
-output "private_subnets_A" {
+output "private_subnets_a" {
   description = "List of IDs of privateA subnets"
   value       = aws_subnet.private_A.*.id
 }
-output "private_subnets_B" {
+output "private_subnets_b" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.private_B.*.id
 }
@@ -37,192 +37,192 @@ output "public_subnets" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.public.*.id
 }
-output "NAT1EIP" {
+output "nat_eip_1" {
   description = "NAT 1 IP address"
   value       = try(aws_eip.nat[0].public_ip, "")
 }
 
-output "NAT2EIP" {
+output "nat_eip_2" {
   description = " NAT 2 IP address"
   value       = try(aws_eip.nat[1].public_ip, "")
 }
 
-output "NAT3EIP" {
+output "nat_eip_3" {
   description = " NAT 3 IP address"
   value       = length(aws_eip.nat.*.public_ip) > 2 ? aws_eip.nat[2].public_ip : null
 }
 
-output "NAT4EIP" {
+output "nat_eip_4" {
   description = " NAT 4 IP address"
   value       = length(aws_eip.nat.*.public_ip) > 3 ? aws_eip.nat[3].public_ip : null
 }
 
-output "PrivateSubnet1ACIDR" {
+output "private_subnet_1a_cidr" {
   description = " Private subnet 1A CIDR in Availability Zone 1"
   value       = try(aws_subnet.private_A[0].cidr_block, "")
 }
 
-output "PrivateSubnet1AID" {
+output "private_subnet_1a_id" {
   description = " Private subnet 1A ID in Availability Zone 1"
   value       = try(aws_subnet.private_A[0].id, "")
 }
 
-output "PrivateSubnet1BCIDR" {
+output "private_subnet_1b_cidr" {
   description = " Private subnet 1B CIDR in Availability Zone 1"
   value       = try(aws_subnet.private_B[0].cidr_block, "")
 }
 
-output "PrivateSubnet1BID" {
+output "private_subnet_1b_id" {
   description = " Private subnet 1B ID in Availability Zone 1"
   value       = try(aws_subnet.private_B[0].id, "")
 }
 
-output "PrivateSubnet2ACIDR" {
+output "private_subnet_2a_cidr" {
   description = " Private subnet 2A CIDR in Availability Zone 2"
   value       = try(aws_subnet.private_A[1].cidr_block, "")
 }
 
-output "PrivateSubnet2AID" {
+output "private_subnet_2a_id" {
   description = " Private subnet 2A ID in Availability Zone 2"
   value       = try(aws_subnet.private_A[1].id, "")
 }
 
-output "PrivateSubnet2BCIDR" {
+output "private_subnet_2b_cidr" {
   description = " Private subnet 2B CIDR in Availability Zone 2"
   value       = try(aws_subnet.private_B[1].cidr_block, "")
 }
 
-output "PrivateSubnet2BID" {
+output "private_subnet_2b_id" {
   description = " Private subnet 2B ID in Availability Zone 2"
   value       = try(aws_subnet.private_B[1].id, "")
 }
 
-output "PrivateSubnet3ACIDR" {
+output "private_subnet_3a_cidr" {
   description = " Private subnet 3A CIDR in Availability Zone 3"
   value       = length(aws_subnet.private_A.*.cidr_block) > 2 ? aws_subnet.private_A[2].cidr_block : null
 }
 
-output "PrivateSubnet3AID" {
+output "private_subnet_3a_id" {
   description = " Private subnet 3A ID in Availability Zone 3"
   value       = length(aws_subnet.private_A.*.id) > 2 ? aws_subnet.private_A[2].id : null
 }
 
-output "PrivateSubnet3BCIDR" {
+output "private_subnet_3b_cidr" {
   description = " Private subnet 3B CIDR in Availability Zone 3"
   value       = length(aws_subnet.private_B.*.cidr_block) > 2 ? aws_subnet.private_B[2].cidr_block : null
 }
 
-output "PrivateSubnet3BID" {
+output "private_subnet_3b_id" {
   description = " Private subnet 3B ID in Availability Zone 3"
   value       = length(aws_subnet.private_B.*.id) > 2 ? aws_subnet.private_B[2].id : null
 }
 
-output "PrivateSubnet4ACIDR" {
+output "private_subnet_4a_cidr" {
   description = " Private subnet 4A CIDR in Availability Zone 4"
   value       = length(aws_subnet.private_A.*.cidr_block) > 3 ? aws_subnet.private_A[3].cidr_block : null
 }
 
-output "PrivateSubnet4AID" {
+output "private_subnet_4a_id" {
   description = " Private subnet 4A ID in Availability Zone 4"
   value       = length(aws_subnet.private_A.*.id) > 3 ? aws_subnet.private_A[3].id : null
 }
 
-output "PrivateSubnet4BCIDR" {
+output "private_subnet_4b_cidr" {
   description = " Private subnet 4B CIDR in Availability Zone 4"
   value       = length(aws_subnet.private_B.*.cidr_block) > 3 ? aws_subnet.private_B[3].cidr_block : null
 }
 
-output "PrivateSubnet4BID" {
+output "private_subnet_4b_id" {
   description = " Private subnet 4B ID in Availability Zone 4"
   value       = length(aws_subnet.private_B.*.id) > 3 ? aws_subnet.private_B[3].id : null
 }
 
-output "PublicSubnet1CIDR" {
+output "public_subnet_1_cidr" {
   description = " Public subnet 1 CIDR in Availability Zone 1"
   value       = try(aws_subnet.public[0].cidr_block, "")
 }
 
-output "PublicSubnet1ID" {
+output "public_subnet_1_id" {
   description = " Public subnet 1 ID in Availability Zone 1"
   value       = try(aws_subnet.public[0].id, "")
 }
 
-output "PublicSubnet2CIDR" {
+output "public_subnet_2_cidr" {
   description = " Public subnet 2 CIDR in Availability Zone 2"
   value       = try(aws_subnet.public[1].cidr_block, "")
 }
 
-output "PublicSubnet2ID" {
+output "public_subnet_2_id" {
   description = " Public subnet 2 ID in Availability Zone 2"
   value       = try(aws_subnet.public[1].id, "")
 }
 
-output "PublicSubnet3CIDR" {
+output "public_subnet_3_cidr" {
   description = " Public subnet 3 CIDR in Availability Zone 3"
   value       = length(aws_subnet.public.*.cidr_block) > 2 ? aws_subnet.public[2].cidr_block : null
 }
 
-output "PublicSubnet3ID" {
+output "public_subnet_3_id" {
   description = " Public subnet 3 ID in Availability Zone 3"
   value       = length(aws_subnet.public.*.id) > 2 ? aws_subnet.public[2].id : null
 }
 
-output "PublicSubnet4CIDR" {
+output "public_subnet_4_cidr" {
   description = " Public subnet 4 CIDR in Availability Zone 4"
   value       = length(aws_subnet.public.*.cidr_block) > 3 ? aws_subnet.public[3].cidr_block : null
 }
 
-output "PublicSubnet4ID" {
+output "public_subnet_4_id" {
   description = " Public subnet 4 ID in Availability Zone 4"
   value       = length(aws_subnet.public.*.id) > 3 ? aws_subnet.public[3].id : null
 }
 
-output "S3VPCEndpoint" {
+output "s3_vpc_endpoint" {
   description = " S3 VPC Endpoint"
   value       = aws_vpc_endpoint.s3.*.id
 }
 
-output "PrivateSubnet1ARouteTable" {
+output "private_subnet_1a_route_table" {
   description = " Private subnet 1A route table"
   value       = try(aws_route_table.private_A[0].id, "")
 }
 
-output "PrivateSubnet1BRouteTable" {
+output "private_subnet_1b_route_table" {
   description = " Private subnet 1B route table"
   value       = try(aws_route_table.private_B[0].id, "")
 }
 
-output "PrivateSubnet2ARouteTable" {
+output "private_subnet_2a_route_table" {
   description = " Private subnet 2A route table"
   value       = try(aws_route_table.private_A[1].id, "")
 }
 
-output "PrivateSubnet2BRouteTable" {
+output "private_subnet_2b_route_table" {
   description = " Private subnet 2B route table"
   value       = try(aws_route_table.private_B[1].id, "")
 }
 
-output "PrivateSubnet3ARouteTable" {
+output "private_subnet_3a_route_table" {
   description = " Private subnet 3A route table"
   value       = length(aws_route_table.private_A.*.id) > 2 ? aws_route_table.private_A[2].id : null
 }
 
-output "PrivateSubnet3BRouteTable" {
+output "private_subnet_3b_route_table" {
   description = " Private subnet 3B route table"
   value       = length(aws_route_table.private_B.*.id) > 2 ? aws_route_table.private_B[2].id : null
 }
 
-output "PrivateSubnet4ARouteTable" {
+output "private_subnet_4a_route_table" {
   description = " Private subnet 4A route table"
   value       = length(aws_route_table.private_A.*.id) > 3 ? aws_route_table.private_A[3].id : null
 }
 
-output "PrivateSubnet4BRouteTable" {
+output "private_subnet_4b_route_table" {
   description = " Private subnet 4B route table"
   value       = length(aws_route_table.private_B.*.id) > 3 ? aws_route_table.private_B[3].id : null
 }
 
-output "PublicSubnetRouteTable" {
+output "public_subnet_route_table" {
   description = " Public subnet route table"
   value       = aws_route_table.public.*.id
 }

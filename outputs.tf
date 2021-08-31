@@ -7,24 +7,24 @@ output "vpc_id" {
   description = "The ID of the VPC"
   value       = module.aws-vpc.vpc_id
 }
-output "NAT1EIP" {
+output "nat_eip_1" {
   description = "NAT 1 IP address"
-  value       = module.aws-vpc.NAT1EIP
+  value       = module.aws-vpc.nat_eip_1
 }
 
-output "NAT2EIP" {
+output "nat_eip_2" {
   description = " NAT 2 IP address"
-  value       = module.aws-vpc.NAT2EIP
+  value       = module.aws-vpc.nat_eip_2
 }
 
-output "NAT3EIP" {
+output "nat_eip_3" {
   description = " NAT 3 IP address"
-  value       = module.aws-vpc.NAT3EIP
+  value       = module.aws-vpc.nat_eip_3
 }
 
-output "NAT4EIP" {
+output "nat_eip_4" {
   description = " NAT 4 IP address"
-  value       = module.aws-vpc.NAT4EIP
+  value       = module.aws-vpc.nat_eip_4
 }
 
 output "private_subnet_route_tables" {
@@ -42,172 +42,172 @@ output "availability_zones" {
   value       = module.aws-vpc.availability_zones
 }
 
-output "PrivateSubnet1ACIDR" {
+output "private_subnet_1a_cidr" {
   description = " Private subnet 1A CIDR in Availability Zone 1"
-  value       = module.aws-vpc.PrivateSubnet1ACIDR
+  value       = module.aws-vpc.private_subnet_1a_cidr
 }
 
-output "PrivateSubnet1AID" {
+output "private_subnet_1a_id" {
   description = " Private subnet 1A ID in Availability Zone 1"
-  value       = module.aws-vpc.PrivateSubnet1AID
+  value       = module.aws-vpc.private_subnet_1a_id
 }
 
-output "PrivateSubnet1BCIDR" {
+output "private_subnet_1b_cidr" {
   description = " Private subnet 1B CIDR in Availability Zone 1"
-  value       = module.aws-vpc.PrivateSubnet1BCIDR
+  value       = module.aws-vpc.private_subnet_1b_cidr
 }
 
-output "PrivateSubnet1BID" {
+output "private_subnet_1b_id" {
   description = " Private subnet 1B ID in Availability Zone 1"
-  value       = module.aws-vpc.PrivateSubnet1BID
+  value       = module.aws-vpc.private_subnet_1b_id
 }
 
-output "PrivateSubnet2ACIDR" {
+output "private_subnet_2a_cidr" {
   description = " Private subnet 2A CIDR in Availability Zone 2"
-  value       = module.aws-vpc.PrivateSubnet2ACIDR
+  value       = module.aws-vpc.private_subnet_2a_cidr
 }
 
-output "PrivateSubnet2AID" {
+output "private_subnet_2a_id" {
   description = " Private subnet 2A ID in Availability Zone 2"
-  value       = module.aws-vpc.PrivateSubnet2AID
+  value       = module.aws-vpc.private_subnet_2a_id
 }
 
-output "PrivateSubnet2BCIDR" {
+output "private_subnet_2b_cidr" {
   description = " Private subnet 2B CIDR in Availability Zone 2"
-  value       = module.aws-vpc.PrivateSubnet2BCIDR
+  value       = module.aws-vpc.private_subnet_2b_cidr
 }
 
-output "PrivateSubnet2BID" {
+output "private_subnet_2b_id" {
   description = " Private subnet 2B ID in Availability Zone 2"
-  value       = module.aws-vpc.PrivateSubnet2BID
+  value       = module.aws-vpc.private_subnet_2b_id
 }
 
-output "PrivateSubnet3ACIDR" {
+output "private_subnet_3a_cidr" {
   description = " Private subnet 3A CIDR in Availability Zone 3"
-  value       = module.aws-vpc.PrivateSubnet3ACIDR
+  value       = module.aws-vpc.private_subnet_3a_cidr
 }
 
-output "PrivateSubnet3AID" {
+output "private_subnet_3a_id" {
   description = " Private subnet 3A ID in Availability Zone 3"
-  value       = module.aws-vpc.PrivateSubnet3AID
+  value       = module.aws-vpc.private_subnet_3a_id
 }
 
-output "PrivateSubnet3BCIDR" {
+output "private_subnet_3b_cidr" {
   description = " Private subnet 3B CIDR in Availability Zone 3"
-  value       = module.aws-vpc.PrivateSubnet3BCIDR
+  value       = module.aws-vpc.private_subnet_3b_cidr
 }
 
-output "PrivateSubnet3BID" {
+output "private_subnet_3b_id" {
   description = " Private subnet 3B ID in Availability Zone 3"
-  value       = module.aws-vpc.PrivateSubnet3BID
+  value       = module.aws-vpc.private_subnet_3b_id
 }
 
-output "PrivateSubnet4ACIDR" {
+output "private_subnet_4a_cidr" {
   description = " Private subnet 4A CIDR in Availability Zone 4"
-  value       = module.aws-vpc.PrivateSubnet4ACIDR
+  value       = module.aws-vpc.private_subnet_4a_cidr
 }
 
-output "PrivateSubnet4AID" {
+output "private_subnet_4a_id" {
   description = " Private subnet 4A ID in Availability Zone 4"
-  value       = module.aws-vpc.PrivateSubnet4AID
+  value       = module.aws-vpc.private_subnet_4a_id
 }
 
-output "PrivateSubnet4BCIDR" {
+output "private_subnet_4b_cidr" {
   description = " Private subnet 4B CIDR in Availability Zone 4"
-  value       = module.aws-vpc.PrivateSubnet4BCIDR
+  value       = module.aws-vpc.private_subnet_4b_cidr
 }
 
-output "PrivateSubnet4BID" {
+output "private_subnet_4b_id" {
   description = " Private subnet 4B ID in Availability Zone 4"
-  value       = module.aws-vpc.PrivateSubnet4BID
+  value       = module.aws-vpc.private_subnet_4b_id
 }
 
-output "PublicSubnet1CIDR" {
+output "public_subnet_1_cidr" {
   description = " Public subnet 1 CIDR in Availability Zone 1"
-  value       = module.aws-vpc.PublicSubnet1CIDR
+  value       = module.aws-vpc.public_subnet_1_cidr
 }
 
-output "PublicSubnet1ID" {
+output "public_subnet_1_id" {
   description = " Public subnet 1 ID in Availability Zone 1"
-  value       = module.aws-vpc.PublicSubnet1ID
+  value       = module.aws-vpc.public_subnet_1_id
 }
 
-output "PublicSubnet2CIDR" {
+output "public_subnet_2_cidr" {
   description = " Public subnet 2 CIDR in Availability Zone 2"
-  value       = module.aws-vpc.PublicSubnet2CIDR
+  value       = module.aws-vpc.public_subnet_2_cidr
 }
 
-output "PublicSubnet2ID" {
+output "public_subnet_2_id" {
   description = " Public subnet 2 ID in Availability Zone 2"
-  value       = module.aws-vpc.PublicSubnet2ID
+  value       = module.aws-vpc.public_subnet_2_id
 }
 
-output "PublicSubnet3CIDR" {
+output "public_subnet_3_cidr" {
   description = " Public subnet 3 CIDR in Availability Zone 3"
-  value       = module.aws-vpc.PublicSubnet3CIDR
+  value       = module.aws-vpc.public_subnet_3_cidr
 }
 
-output "PublicSubnet3ID" {
+output "public_subnet_3_id" {
   description = " Public subnet 3 ID in Availability Zone 3"
-  value       = module.aws-vpc.PublicSubnet3ID
+  value       = module.aws-vpc.public_subnet_3_id
 }
 
-output "PublicSubnet4CIDR" {
+output "public_subnet_4_cidr" {
   description = " Public subnet 4 CIDR in Availability Zone 4"
-  value       = module.aws-vpc.PublicSubnet4CIDR
+  value       = module.aws-vpc.public_subnet_4_cidr
 }
 
-output "PublicSubnet4ID" {
+output "public_subnet_4_id" {
   description = " Public subnet 4 ID in Availability Zone 4"
-  value       = module.aws-vpc.PublicSubnet4ID
+  value       = module.aws-vpc.public_subnet_4_id
 }
 
-output "S3VPCEndpoint" {
+output "s3_vpc_endpoint" {
   description = " S3 VPC Endpoint"
-  value       = module.aws-vpc.S3VPCEndpoint
+  value       = module.aws-vpc.s3_vpc_endpoint
 }
 
-output "PrivateSubnet1ARouteTable" {
+output "private_subnet_1a_route_table" {
   description = " Private subnet 1A route table"
-  value       = module.aws-vpc.PrivateSubnet1ARouteTable
+  value       = module.aws-vpc.private_subnet_1a_route_table
 }
 
-output "PrivateSubnet1BRouteTable" {
+output "private_subnet_1b_route_table" {
   description = " Private subnet 1B route table"
-  value       = module.aws-vpc.PrivateSubnet1BRouteTable
+  value       = module.aws-vpc.private_subnet_1b_route_table
 }
 
-output "PrivateSubnet2ARouteTable" {
+output "private_subnet_2a_route_table" {
   description = " Private subnet 2A route table"
-  value       = module.aws-vpc.PrivateSubnet2ARouteTable
+  value       = module.aws-vpc.private_subnet_2a_route_table
 }
 
-output "PrivateSubnet2BRouteTable" {
+output "private_subnet_2b_route_table" {
   description = " Private subnet 2B route table"
-  value       = module.aws-vpc.PrivateSubnet2BRouteTable
+  value       = module.aws-vpc.private_subnet_2b_route_table
 }
 
-output "PrivateSubnet3ARouteTable" {
+output "private_subnet_3a_route_table" {
   description = " Private subnet 3A route table"
-  value       = module.aws-vpc.PrivateSubnet3ARouteTable
+  value       = module.aws-vpc.private_subnet_3a_route_table
 }
 
-output "PrivateSubnet3BRouteTable" {
+output "private_subnet_3b_route_table" {
   description = " Private subnet 3B route table"
-  value       = module.aws-vpc.PrivateSubnet3BRouteTable
+  value       = module.aws-vpc.private_subnet_3b_route_table
 }
 
-output "PrivateSubnet4ARouteTable" {
+output "private_subnet_4a_route_table" {
   description = " Private subnet 4A route table"
-  value       = module.aws-vpc.PrivateSubnet4ARouteTable
+  value       = module.aws-vpc.private_subnet_4a_route_table
 }
 
-output "PrivateSubnet4BRouteTable" {
+output "private_subnet_4b_route_table" {
   description = " Private subnet 4B route table"
-  value       = module.aws-vpc.PrivateSubnet4BRouteTable
+  value       = module.aws-vpc.private_subnet_4b_route_table
 }
 
-output "PublicSubnetRouteTable" {
+output "public_subnet_route_table" {
   description = " Public subnet route table"
-  value       = module.aws-vpc.PublicSubnetRouteTable
+  value       = module.aws-vpc.public_subnet_route_table
 }
