@@ -1,7 +1,7 @@
 locals {
   max_subnet_length = max(
-    length(var.private_subnets_A),
-    length(var.private_subnets_B),
+    length(var.private_subnets_a),
+    length(var.private_subnets_b),
   )
   nat_gateway_count = local.max_subnet_length
 

@@ -52,12 +52,12 @@ variable "public_subnets" {
   type        = list(string)
   default     = ["10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20"]
 }
-variable "private_subnets_A" {
+variable "private_subnets_a" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
   default     = ["10.0.96.0/19", "10.0.232.0/22", "10.0.236.0/22"]
 }
-variable "private_subnets_B" {
+variable "private_subnets_b" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
   default     = []

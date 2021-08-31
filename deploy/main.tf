@@ -42,8 +42,8 @@ module "aws-ia_vpc" {
   region                    = var.region
   cidr                      = var.cidr
   public_subnets            = var.public_subnets
-  private_subnets_A         = var.private_subnets_A
-  private_subnets_B         = var.private_subnets_B
+  private_subnets_a         = var.private_subnets_a
+  private_subnets_b         = var.private_subnets_b
   tags                      = module.vpc_label.tags
   enable_dns_hostnames      = var.enable_dns_hostnames
   enable_dns_support        = var.enable_dns_support

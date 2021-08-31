@@ -56,12 +56,12 @@ variable "public_subnets" {
   type        = list(string)
 }
 
-variable "private_subnets_A" {
+variable "private_subnets_a" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
 }
 
-variable "private_subnets_B" {
+variable "private_subnets_b" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
 }
