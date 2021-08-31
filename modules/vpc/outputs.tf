@@ -17,6 +17,22 @@ output "private_subnets_b" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.private_B.*.id
 }
+output "private_subnets" {
+  description = "List of IDs of private subnets"
+  value       = flatten([compact(aws_subnet.private_A.*.id), compact(aws_subnet.private_B.*.id)])
+}
+output "private_subnet_route_tables" {
+  description = "List of IDs of private subnets"
+  value       = flatten([aws_route_table.private_A.*.id, aws_route_table.private_B.*.id])
+}
+output "availability_zones" {
+  description = "List of availability zones names for subnets in this vpc"
+  value       = compact(distinct(flatten([
+    aws_subnet.private_A.*.availability_zone,
+    aws_subnet.private_B.*.availability_zone,
+    aws_subnet.public.*.availability_zone
+  ])))
+}
 output "public_subnets" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.public.*.id

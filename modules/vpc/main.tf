@@ -10,7 +10,6 @@ terraform {
       version = ">= 3.49.0"
     }
   }
-  backend "remote" {}
 }
 
 provider "aws" {

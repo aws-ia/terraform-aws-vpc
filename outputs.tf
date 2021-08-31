@@ -27,6 +27,21 @@ output "nat_eip_4" {
   value       = module.aws-vpc.nat_eip_4
 }
 
+output "private_subnet_route_tables" {
+  description = "Route tables for all private subnets"
+  value       = module.aws-vpc.private_subnet_route_tables
+}
+
+output "private_subnets" {
+  description = "ID's for all private subnets"
+  value       = module.aws-vpc.private_subnets
+}
+
+output "availability_zones" {
+  description = "List of availability zones names for subnets in this vpc"
+  value       = module.aws-vpc.availability_zones
+}
+
 output "private_subnet_1a_cidr" {
   description = " Private subnet 1A CIDR in Availability Zone 1"
   value       = module.aws-vpc.private_subnet_1a_cidr
