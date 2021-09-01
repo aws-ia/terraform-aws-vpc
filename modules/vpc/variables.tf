@@ -83,3 +83,9 @@ variable "custom_outbound_acl_rules" {
   description = "Custom subnets outbound network ACLs"
   type        = list(map(string))
 }
+
+variable "availability_zones" {
+  description = "A list of availability zones to use for subnets"
+  type        = list(string)
+  default     = []
+}

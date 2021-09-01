@@ -135,6 +135,11 @@ variable "private_subnet_tags" {
   description = "Private Subnet Tags"
 }
 
+variable "availability_zones" {
+  description = "A list of availability zones to use for subnets"
+  type        = list(string)
+  default     = []
+}
 
 variable "create_vpc" {
   type        = bool
