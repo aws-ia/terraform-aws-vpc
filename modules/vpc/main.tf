@@ -127,7 +127,7 @@ resource "aws_subnet" "public" {
   count                   = var.create_vpc == true && length(var.public_subnets) > 0 ? length(var.public_subnets) : 0
   vpc_id                  = aws_vpc.main[0].id
   cidr_block              = var.public_subnets[count.index]
-  availability_zone       = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
+  availability_zone       = length(var.availability_zones) > 0 ? var.availability_zones[count.index] : length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
   map_public_ip_on_launch = true
 
   tags = merge(var.public_subnet_tags)
