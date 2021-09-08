@@ -9,11 +9,6 @@ terraform {
   required_version = ">= 1.0.0"
 }
 
-provider "aws" {
-  region  = var.region
-  profile = "default"
-}
-
 resource "random_string" "rand4" {
   length  = 4
   special = false
@@ -26,7 +21,6 @@ resource "random_string" "rand4" {
 
 module "aws-vpc" {
   source                       = "./modules/vpc"
-  region                       = var.region
   name                         = "${var.name}-${random_string.rand4.result}"
   cidr                         = var.cidr
   public_subnet_cidrs          = var.public_subnet_cidrs

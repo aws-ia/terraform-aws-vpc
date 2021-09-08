@@ -37,24 +37,10 @@ output "public_subnet_cidrs" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.public.*.id
 }
-output "nat_eip_1" {
-  description = "NAT 1 IP address"
-  value       = try(aws_eip.nat[0].public_ip, "")
-}
 
-output "nat_eip_2" {
-  description = " NAT 2 IP address"
-  value       = try(aws_eip.nat[1].public_ip, "")
-}
-
-output "nat_eip_3" {
-  description = " NAT 3 IP address"
-  value       = length(aws_eip.nat.*.public_ip) > 2 ? aws_eip.nat[2].public_ip : null
-}
-
-output "nat_eip_4" {
-  description = " NAT 4 IP address"
-  value       = length(aws_eip.nat.*.public_ip) > 3 ? aws_eip.nat[3].public_ip : null
+output "nat_eips" {
+  description = "NAT IP addresses"
+  value       = try(aws_eip.nat[*].public_ip, "")
 }
 
 output "private_subnet_1a_cidr" {
