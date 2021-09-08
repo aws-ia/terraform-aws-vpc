@@ -1,3 +1,7 @@
+build/
+plan.out
+plan.out.json
+
 # Local .terraform directories
 **/.terraform/*
 

@@ -27,7 +27,7 @@ output "private_subnet_route_tables" {
 }
 output "availability_zones" {
   description = "List of availability zones names for subnets in this vpc"
-  value       = compact(distinct(flatten([
+  value = compact(distinct(flatten([
     aws_subnet.private_A.*.availability_zone,
     aws_subnet.private_B.*.availability_zone,
     aws_subnet.public.*.availability_zone
