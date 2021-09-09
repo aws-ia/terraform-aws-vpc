@@ -25,11 +25,10 @@ static-tests: setup-env
 	# TODO: looks like we need to provide custom features(read tests) to make terraform-compliance useful
 	terraform-compliance -S -f git:https://github.com/terraform-compliance/user-friendly-features.git -p plan.out
 
-unit-tests:
+unit-tests: setup-env
 	# Should test code paths in an individual module. terratest, or `terraform test`, this is where you want to test different regions, use retries to smooth transient errors
 	# Should not run automatically on PR's from un-trusted contributors
-	echo "todo"
-	exit 1
+	cd test && go test -timeout 30m -json | go-test-report
 
 integration-tests:
     # Should test code paths in a module of modules and run when on eof the sub-modules is updated. terratest, or `terraform test` use retries to smooth transient errors
