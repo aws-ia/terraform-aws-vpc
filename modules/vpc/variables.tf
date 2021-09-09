@@ -187,5 +187,5 @@ variable "private_b_outbound_acl_rules" {
 variable "availability_zones" {
   description = "A list of availability zones to use for subnets. If this is not provided availability zones for subnets will be automatically selected"
   type        = list(string)
-  default     = []
+  default     = null
 }

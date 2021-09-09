@@ -96,11 +96,10 @@ resource "aws_route" "public_internet_gateway" {
 # There are as many routing tables as the number of NAT gateways
 #################
 resource "aws_route_table" "private_a" {
-  count  = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? 1 : 0
+  count  = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? length(local.private_subnet_a_cidrs) : 0
   vpc_id = aws_vpc.main[0].id
-
   tags = {
-    Name = "${local.name}_private_routes_A"
+    Name = "${local.name}_private_route_a${count.index}"
   }
 }
 
@@ -109,11 +108,10 @@ resource "aws_route_table" "private_a" {
 # There are as many routing tables as the number of NAT gateways
 #################
 resource "aws_route_table" "private_b" {
-  count  = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? 1 : 0
+  count  = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? length(local.private_subnet_b_cidrs) : 0
   vpc_id = aws_vpc.main[0].id
-
   tags = {
-    Name = "${local.name}_private_routes_B"
+    Name = "${local.name}_private_routes_b${count.index}"
   }
 }
 
@@ -124,7 +122,7 @@ resource "aws_subnet" "public" {
   count                   = var.create_vpc == true && length(local.public_subnet_cidrs) > 0 ? length(local.public_subnet_cidrs) : 0
   vpc_id                  = aws_vpc.main[0].id
   cidr_block              = local.public_subnet_cidrs[count.index]
-  availability_zone       = length(var.availability_zones) > 0 ? var.availability_zones[count.index] : length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
+  availability_zone       = local.availability_zones[count.index]
   map_public_ip_on_launch = true
 
   tags = merge(var.public_subnet_tags, {Name = "${local.name}_public_${count.index}"})
@@ -138,8 +136,7 @@ resource "aws_subnet" "private_a" {
   count             = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? length(local.private_subnet_a_cidrs) : 0
   vpc_id            = aws_vpc.main[0].id
   cidr_block        = local.private_subnet_a_cidrs[count.index]
-  availability_zone = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
-
+  availability_zone = local.availability_zones[count.index]
   tags = merge(var.private_subnet_tags, {Name = "${local.name}_private_a_${count.index}"})
 }
 
@@ -150,9 +147,7 @@ resource "aws_subnet" "private_b" {
   count      = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? length(local.private_subnet_b_cidrs) : 0
   vpc_id     = aws_vpc.main[0].id
   cidr_block = local.private_subnet_b_cidrs[count.index]
-  #availability_zone = data.aws_availability_zones.available.names[length(data.aws_availability_zones.available.names)]
-  availability_zone = length(regexall("^[a-z]{2}-", element(data.aws_availability_zones.available.names, count.index))) > 0 ? element(data.aws_availability_zones.available.names, count.index) : null
-
+  availability_zone = local.availability_zones[count.index]
   tags = merge(var.private_subnet_tags, {Name = "${local.name}_private_b_${count.index}"})
 }
 
@@ -285,28 +280,26 @@ resource "aws_network_acl_rule" "private_b_outbound" {
 ##############
 
 resource "aws_eip" "nat" {
-  count = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? 1 : 0
+  count = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? length(local.private_subnet_a_cidrs) : 0
   vpc   = true
 
   tags = {
-    Name = "${local.name}_EIP_nat"
+    Name = "${local.name}_EIP_nat_${count.index}"
   }
 }
 
 resource "aws_nat_gateway" "nat_gw" {
-  #count         = length(data.aws_availability_zones.available.names)
-  count         = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? 1 : 0
+  count         = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? length(local.private_subnet_a_cidrs) : 0
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
-
   tags = {
-    Name = "${local.name}_EIP_nat_gateway"
+    Name = "${local.name}_EIP_nat_gateway_${count.index}"
   }
   depends_on = [aws_internet_gateway.gw]
 }
 
 resource "aws_route" "private_a_nat_gateway" {
-  count                  = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? 1 : 0
+  count                  = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? length(local.private_subnet_a_cidrs) : 0
   route_table_id         = aws_route_table.private_a[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
@@ -317,7 +310,7 @@ resource "aws_route" "private_a_nat_gateway" {
 }
 
 resource "aws_route" "private_b_nat_gateway" {
-  count                  = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? 1 : 0
+  count                  = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? length(local.private_subnet_b_cidrs) : 0
   route_table_id         = aws_route_table.private_b[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
@@ -333,13 +326,13 @@ resource "aws_route" "private_b_nat_gateway" {
 resource "aws_route_table_association" "private_a" {
   count          = var.create_vpc == true && length(local.private_subnet_a_cidrs) > 0 ? length(local.private_subnet_a_cidrs) : 0
   subnet_id      = aws_subnet.private_a[count.index].id
-  route_table_id = aws_route_table.private_a[0].id
+  route_table_id = aws_route_table.private_a[count.index].id
 }
 
 resource "aws_route_table_association" "private_b" {
   count          = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? length(local.private_subnet_b_cidrs) : 0
   subnet_id      = aws_subnet.private_b[count.index].id
-  route_table_id = aws_route_table.private_b[0].id
+  route_table_id = aws_route_table.private_b[count.index].id
 }
 
 resource "aws_route_table_association" "public" {
