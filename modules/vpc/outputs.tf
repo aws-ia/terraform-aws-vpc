@@ -9,11 +9,11 @@ output "vpc_id" {
   #value       = aws_vpc.main[count.index].id
   value = concat(aws_vpc.main.*.id, [""])[0]
 }
-output "private_subnet_a_cidrs" {
+output "private_subnet_a_ids" {
   description = "List of IDs of privateA subnets"
   value       = aws_subnet.private_a.*.id
 }
-output "private_subnet_b_cidrs" {
+output "private_subnet_b_ids" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.private_b.*.id
 }
@@ -33,7 +33,7 @@ output "availability_zones" {
     aws_subnet.public.*.availability_zone
   ])))
 }
-output "public_subnet_cidrs" {
+output "public_subnet_ids" {
   description = "List of IDs of privateB subnets"
   value       = aws_subnet.public.*.id
 }
