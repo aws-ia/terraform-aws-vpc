@@ -28,7 +28,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
 
-  tags = merge(var.tags, {Name = local.name})
+  tags = merge(var.tags, { Name = local.name })
 }
 
 resource "aws_vpc_endpoint" "s3" {
@@ -125,7 +125,7 @@ resource "aws_subnet" "public" {
   availability_zone       = local.availability_zones[count.index]
   map_public_ip_on_launch = true
 
-  tags = merge(var.public_subnet_tags, {Name = "${local.name}_public_${count.index}"})
+  tags = merge(var.public_subnet_tags, { Name = "${local.name}_public_${count.index}" })
 
 }
 
@@ -137,18 +137,18 @@ resource "aws_subnet" "private_a" {
   vpc_id            = aws_vpc.main[0].id
   cidr_block        = local.private_subnet_a_cidrs[count.index]
   availability_zone = local.availability_zones[count.index]
-  tags = merge(var.private_subnet_tags, {Name = "${local.name}_private_a_${count.index}"})
+  tags              = merge(var.private_subnet_tags, { Name = "${local.name}_private_a_${count.index}" })
 }
 
 #################
 # Private subnet B
 #################
 resource "aws_subnet" "private_b" {
-  count      = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? length(local.private_subnet_b_cidrs) : 0
-  vpc_id     = aws_vpc.main[0].id
-  cidr_block = local.private_subnet_b_cidrs[count.index]
+  count             = var.create_vpc == true && length(local.private_subnet_b_cidrs) > 0 ? length(local.private_subnet_b_cidrs) : 0
+  vpc_id            = aws_vpc.main[0].id
+  cidr_block        = local.private_subnet_b_cidrs[count.index]
   availability_zone = local.availability_zones[count.index]
-  tags = merge(var.private_subnet_tags, {Name = "${local.name}_private_b_${count.index}"})
+  tags              = merge(var.private_subnet_tags, { Name = "${local.name}_private_b_${count.index}" })
 }
 
 

@@ -14,9 +14,9 @@ locals {
     ),
     0,
   )
-  name = var.name == null ? "tf-vpc-${random_string.vpc_name_suffix.id}" : var.name
-  public_subnet_cidrs = var.public_subnet_cidrs == null ? cidrsubnets(cidrsubnets(var.cidr, 2)[0], 2, 2, 2) : var.public_subnet_cidrs
+  name                   = var.name == null ? "tf-vpc-${random_string.vpc_name_suffix.id}" : var.name
+  public_subnet_cidrs    = var.public_subnet_cidrs == null ? cidrsubnets(cidrsubnets(var.cidr, 2)[0], 2, 2, 2) : var.public_subnet_cidrs
   private_subnet_a_cidrs = var.private_subnet_a_cidrs == null ? cidrsubnets(cidrsubnets(var.cidr, 2, 2)[1], 2, 2, 2) : var.private_subnet_a_cidrs
   private_subnet_b_cidrs = var.private_subnet_b_cidrs == null ? [] : var.private_subnet_b_cidrs
-  availability_zones = var.availability_zones == null ? data.aws_availability_zones.available.names : var.availability_zones
+  availability_zones     = var.availability_zones == null ? data.aws_availability_zones.available.names : var.availability_zones
 }

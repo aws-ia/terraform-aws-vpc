@@ -7,12 +7,12 @@ variable "profile" {
 }
 
 provider "aws" {
-  region = var.region
+  region  = var.region
   profile = var.profile
 }
 
 module "aws-ia_vpc" {
-  source                    = "../../"
+  source = "../../"
 }
 
 output "public_subnet_ids" {
