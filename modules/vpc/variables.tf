@@ -189,3 +189,9 @@ variable "availability_zones" {
   type        = list(string)
   default     = null
 }
+
+variable "availability_zones" {
+  description = "A list of availability zones to use for subnets"
+  type        = list(string)
+  default     = []
+}
