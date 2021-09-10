@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/gruntwork-io/terratest/modules/logger"
 	"log"
 	"os"
 	"testing"
@@ -14,6 +15,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Required module author inputs are testPath and testRegions, testCases and their associated functions are optional
@@ -53,16 +55,10 @@ func validateNatGatewayAzAffinity(t *testing.T, tfOpts *terraform.Options) {
 	client := getEc2Client(profile, region)
 	subnetIds := terraform.OutputList(t, tfOpts, "private_subnet_a_ids")
 	subnets, err := client.DescribeSubnets(context.TODO(), &ec2.DescribeSubnetsInput{SubnetIds: subnetIds})
-	if err != nil {
-		t.Errorf("failed to query ec2 api. Error: %s", err.Error())
-		return
-	}
+	require.Nil(t, err)
 	for _, subnet := range subnets.Subnets {
 		gwAz, err := getNatGatewayAz(client, subnet.SubnetId)
-		if err != nil {
-			t.Errorf("cannot find az for the nat gateway associated with subnet %s. Error: %s", *subnet.SubnetId, err.Error())
-			continue
-		}
+		require.Nil(t, err)
 		assert.Equal(
 			t,
 			*subnet.AvailabilityZone,
@@ -88,6 +84,9 @@ func getNatGatewayAz(client *ec2.Client, subnet *string) (*string, error) {
 		return nil, err
 	}
 	var natGatewayId *string = nil
+	if len(routeTableResponse.RouteTables) < 1 {
+		return nil, fmt.Errorf("subnet %s does not have a nat gateway in it's routes", *subnet)
+	}
 	for _, route := range routeTableResponse.RouteTables[0].Routes {
 		if route.NatGatewayId != nil {
 			natGatewayId = route.NatGatewayId
@@ -112,21 +111,9 @@ func getNatGatewayAz(client *ec2.Client, subnet *string) (*string, error) {
 
 // Generic test code to stand up deployments and feed them to any unit tests that have been provided.
 // Test authors probably won't need to change anything below this line
-func TestMinimal(t *testing.T) {
-	suite := newTestSuite(t, testPath, "../", testCases, testRegions)
-	if os.Getenv("SKIP_DESTROY") != "1" {
-		defer suite.Destroy()
-	}
-	suite.RunTests()
-}
 
-type testSuite struct {
-	path        string
-	root        string
-	opts        []*terraform.Options
-	testCases   []testCase
-	testRegions []testRegion
-	t           *testing.T
+func TestMinimal(t *testing.T) {
+	RunTests(t, testRegions, testCases)
 }
 
 type testCase struct {
@@ -139,13 +126,26 @@ type testRegion struct {
 	profile string
 }
 
-func (ts testSuite) RunTests() {
-	for _, terraformOptions := range ts.opts {
-		terraform.Init(ts.t, terraformOptions)
-		ts.t.Run(terraformOptions.Vars["region"].(string), func(t *testing.T) {
+func RunTests(t *testing.T, testRegions []testRegion, testCases []testCase) {
+	for _, testRegion := range testRegions {
+		testRegion := testRegion
+		t.Run(testRegion.region, func(t *testing.T) {
 			t.Parallel()
+			tmpPath := test_structure.CopyTerraformFolderToTemp(t, "../", testPath)
+			terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+				TerraformDir: tmpPath,
+				Vars: map[string]interface{}{
+					"region":  testRegion.region,
+					"profile": testRegion.profile,
+				},
+			})
+			if os.Getenv("TERRATEST_QUIET") == "1" {
+				terraformOptions.Logger = logger.Discard
+			}
+			defer Destroy(t, terraformOptions)
+			terraform.Init(t, terraformOptions)
 			terraform.Apply(t, terraformOptions)
-			for _, testCase := range ts.testCases {
+			for _, testCase := range testCases {
 				t.Run(testCase.name, func(t *testing.T) {
 					testCase.function(t, terraformOptions)
 				})
@@ -154,34 +154,12 @@ func (ts testSuite) RunTests() {
 	}
 }
 
-func (ts testSuite) Destroy() {
-	for _, terraformOptions := range ts.opts {
-		terraform.Destroy(ts.t, terraformOptions)
+func Destroy(t *testing.T, terraformOptions *terraform.Options) {
+	if os.Getenv("SKIP_DESTROY") != "1" {
+		fmt.Printf("Running cleanup for %s %s\n", terraformOptions.Vars["region"].(string), terraformOptions.Vars["profile"].(string))
+		terraform.Destroy(t, terraformOptions)
+		fmt.Printf("Completed cleanup for %s %s\n", terraformOptions.Vars["region"].(string), terraformOptions.Vars["profile"].(string))
 	}
-}
-
-func newTestSuite(t *testing.T, path string, root string, testCases []testCase, testRegions []testRegion) testSuite {
-	suite := testSuite{
-		path:        path,
-		root:        root,
-		testCases:   testCases,
-		testRegions: testRegions,
-		t:           t,
-		opts:        []*terraform.Options{},
-	}
-
-	for _, testRegion := range testRegions {
-		tmpPath := test_structure.CopyTerraformFolderToTemp(t, "../", path)
-		terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-			TerraformDir: tmpPath,
-			Vars: map[string]interface{}{
-				"region":  testRegion.region,
-				"profile": testRegion.profile,
-			},
-		})
-		suite.opts = append(suite.opts, terraformOptions)
-	}
-	return suite
 }
 
 func getEc2Client(profile string, region string) *ec2.Client {
