@@ -41,7 +41,7 @@ func RunTests(t *testing.T, testRegions []testRegion, testCases []testCase, test
 			}
 			defer Destroy(t, terraformOptions)
 			terraform.Init(t, terraformOptions)
-			terraform.Apply(t, terraformOptions)
+			terraform.ApplyAndIdempotent(t, terraformOptions)
 			for _, testCase := range testCases {
 				t.Run(testCase.name, func(t *testing.T) {
 					testCase.function(t, terraformOptions)

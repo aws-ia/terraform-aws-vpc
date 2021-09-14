@@ -105,5 +105,6 @@ func getNatGatewayAz(client *ec2.Client, subnet *string) (*string, error) {
 }
 
 func TestMinimal(t *testing.T) {
+	t.Parallel()
 	RunTests(t, testRegions, testCases, testPath)
 }
