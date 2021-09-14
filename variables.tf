@@ -41,19 +41,19 @@ variable "cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "public_subnets" {
+variable "public_subnet_cidrs" {
   description = "A list of public subnets inside the VPC"
   type        = list(string)
   default     = ["10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20", "10.0.176.0/20", "10.0.240.0/22", "10.0.244.0/22"]
 }
 
-variable "private_subnets_a" {
+variable "private_subnet_a_cidrs" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
   default     = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19", "10.0.96.0/19", "10.0.232.0/22", "10.0.236.0/22"]
 }
 
-variable "private_subnets_b" {
+variable "private_subnet_b_cidrs" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
   default     = []
@@ -91,7 +91,7 @@ variable "public_outbound_acl_rules" {
   ]
 }
 
-variable "custom_inbound_acl_rules" {
+variable "private_b_inbound_acl_rules" {
   description = "Custom subnets inbound network ACLs"
   type        = list(map(string))
 
@@ -107,7 +107,7 @@ variable "custom_inbound_acl_rules" {
   ]
 }
 
-variable "custom_outbound_acl_rules" {
+variable "private_b_outbound_acl_rules" {
   description = "Custom subnets outbound network ACLs"
   type        = list(map(string))
 

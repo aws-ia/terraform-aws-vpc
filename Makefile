@@ -10,6 +10,7 @@ REGULA_VERSION := 1.3.0
 TFLINT_VERSION := 0.31.0
 CONFTEST_VERSION := 0.27.0
 TF_COMPLIANCE_VERSION := 1.3.26
+GO_TEST_REPORT_VERSION  := 0.9.3
 
 SHELL := /usr/bin/env bash
 
@@ -25,11 +26,10 @@ static-tests: setup-env
 	# TODO: looks like we need to provide custom features(read tests) to make terraform-compliance useful
 	terraform-compliance -S -f git:https://github.com/terraform-compliance/user-friendly-features.git -p plan.out
 
-unit-tests:
+unit-tests: setup-env
 	# Should test code paths in an individual module. terratest, or `terraform test`, this is where you want to test different regions, use retries to smooth transient errors
 	# Should not run automatically on PR's from un-trusted contributors
-	echo "todo"
-	exit 1
+	cd test && go test -timeout 30m -json | go-test-report
 
 integration-tests:
     # Should test code paths in a module of modules and run when on eof the sub-modules is updated. terratest, or `terraform test` use retries to smooth transient errors
@@ -45,6 +45,7 @@ e2e-tests:
 	exit 1
 
 setup-env:
+    # using a bin path specific to this project so that different projects can use different versions of the tooling
 	mkdir -p build/bin/ &&\
 		export PATH=$(shell pwd)/build/bin:$${PATH} &&\
 		export TF_ARCH=$(shell echo $(ARCH) | sed 's/x86_64/amd64/') &&\
@@ -74,6 +75,12 @@ setup-env:
 			rm conftest.tgz &&\
 			mv -fv conftest build/bin/ ;\
 		fi &&\
+		if [ "$$(go-test-report version | awk -Fv '{print $$2}')" != "$(GO_TEST_REPORT_VERSION)" ]; then \
+        			wget -O go-test-report.tgz https://github.com/vakenbolt/go-test-report/releases/download/v$(GO_TEST_REPORT_VERSION)/go-test-report-$${TF_OS}-v$(GO_TEST_REPORT_VERSION).tgz &&\
+        			tar -xvf go-test-report.tgz &&\
+        			rm go-test-report.tgz &&\
+        			mv -fv go-test-report build/bin/ ;\
+        		fi &&\
 		if [ "$$(terraform-compliance -v  | tail -n 1)" != "$(TF_COMPLIANCE_VERSION)" ]; then \
 		    pip install --upgrade "terraform-compliance==$(TF_COMPLIANCE_VERSION)" ;\
 		fi
