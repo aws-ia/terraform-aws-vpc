@@ -10,6 +10,7 @@ REGULA_VERSION := 1.3.0
 TFLINT_VERSION := 0.31.0
 CONFTEST_VERSION := 0.27.0
 TF_COMPLIANCE_VERSION := 1.3.26
+GO_TEST_REPORT_VERSION  := 0.9.3
 
 SHELL := /usr/bin/env bash
 
@@ -44,6 +45,7 @@ e2e-tests:
 	exit 1
 
 setup-env:
+    # using a bin path specific to this project so that different projects can use different versions of the tooling
 	mkdir -p build/bin/ &&\
 		export PATH=$(shell pwd)/build/bin:$${PATH} &&\
 		export TF_ARCH=$(shell echo $(ARCH) | sed 's/x86_64/amd64/') &&\
@@ -73,6 +75,12 @@ setup-env:
 			rm conftest.tgz &&\
 			mv -fv conftest build/bin/ ;\
 		fi &&\
+		if [ "$$(go-test-report version | awk -Fv '{print $$2}')" != "$(GO_TEST_REPORT_VERSION)" ]; then \
+        			wget -O go-test-report.tgz https://github.com/vakenbolt/go-test-report/releases/download/v$(GO_TEST_REPORT_VERSION)/go-test-report-$${TF_OS}-v$(GO_TEST_REPORT_VERSION).tgz &&\
+        			tar -xvf go-test-report.tgz &&\
+        			rm go-test-report.tgz &&\
+        			mv -fv go-test-report build/bin/ ;\
+        		fi &&\
 		if [ "$$(terraform-compliance -v  | tail -n 1)" != "$(TF_COMPLIANCE_VERSION)" ]; then \
 		    pip install --upgrade "terraform-compliance==$(TF_COMPLIANCE_VERSION)" ;\
 		fi
