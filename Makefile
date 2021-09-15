@@ -64,31 +64,31 @@ setup-env:
 		export CT_OS=$(shell echo $(OS) | sed 's/macOS/Darwin/') &&\
 		if [ "$$(terraform -v  | head -n 1 | sed 's/Terraform v//')" != "$(TERRAFORM_VERSION)" ]; then \
 			wget -O tf.zip https://releases.hashicorp.com/terraform/$(TERRAFORM_VERSION)/terraform_$(TERRAFORM_VERSION)_$${TF_OS}_$${TF_ARCH}.zip &&\
-			unzip -o tf.zip &&\
+			unzip -o tf.zip terraform &&\
 			rm tf.zip &&\
 			mv -fv terraform build/bin/ ;\
 		fi ;\
 		if [ "$$(tflint --version  | head -n 1 | sed 's/TFLint version //')" != "$(TFLINT_VERSION)" ]; then \
 			wget -O tflint.zip https://github.com/terraform-linters/tflint/releases/download/v$(TFLINT_VERSION)/tflint_$${TF_OS}_$${TF_ARCH}.zip &&\
-			unzip -o tflint.zip &&\
+			unzip -o tflint.zip tflint &&\
 			rm tflint.zip &&\
 			mv -fv tflint build/bin/ ;\
 		fi &&\
 		if [ "$$(regula version | awk -F',' '{print $$1}' | sed 's/v//')" != "$(REGULA_VERSION)" ]; then \
 			wget -O regula.tgz https://github.com/fugue/regula/releases/download/v$(REGULA_VERSION)/regula_$(REGULA_VERSION)_$(OS)_$(ARCH).tar.gz &&\
-			tar -xvf regula.tgz &&\
+			tar -xvf regula.tgz regula &&\
 			rm regula.tgz &&\
 			mv -fv regula build/bin/ ;\
 		fi &&\
 		if [ "$$(conftest --version  | sed 's/Version: //')" != "$(CONFTEST_VERSION)" ]; then \
 			wget -O conftest.tgz https://github.com/open-policy-agent/conftest/releases/download/v$(CONFTEST_VERSION)/conftest_$(CONFTEST_VERSION)_$${CT_OS}_$(ARCH).tar.gz &&\
-			tar -xvf conftest.tgz &&\
+			tar -xvf conftest.tgz conftest &&\
 			rm conftest.tgz &&\
 			mv -fv conftest build/bin/ ;\
 		fi &&\
 		if [ "$$(go-test-report version | awk -Fv '{print $$2}')" != "$(GO_TEST_REPORT_VERSION)" ]; then \
 			wget -O go-test-report.tgz https://github.com/vakenbolt/go-test-report/releases/download/v$(GO_TEST_REPORT_VERSION)/go-test-report-$${TF_OS}-v$(GO_TEST_REPORT_VERSION).tgz &&\
-			tar -xvf go-test-report.tgz &&\
+			tar -xvf go-test-report.tgz go-test-report &&\
 			rm go-test-report.tgz &&\
 			mv -fv go-test-report build/bin/ ;\
 		fi &&\
@@ -99,7 +99,7 @@ setup-env:
 		fi &&\
 		if [ "$$(terrascan version | awk -Fv '{print $$3}')" != "$(TERRASCAN_VERSION)" ]; then \
 			wget -O terrascan.tgz https://github.com/accurics/terrascan/releases/download/v$(TERRASCAN_VERSION)/terrascan_$(TERRASCAN_VERSION)_$${CT_OS}_$(ARCH).tar.gz &&\
-			tar -xvf terrascan.tgz &&\
+			tar -xvf terrascan.tgz terrascan &&\
 			rm terrascan.tgz &&\
 			mv -fv terrascan build/bin/ ;\
 		fi &&\
