@@ -26,7 +26,7 @@ static-tests: setup-env
 	regula run || ( echo 'FAILED: regula found issues'; exit 1 )
 	tfsec || ( echo 'FAILED: tfsec found issues'; exit 1 )
 	terrascan init # need to work out how to lock to a version of the terrascan policies
-	terrsascan scan || ( echo 'FAILED: terrascan found issues'; exit 1 )
+	terrascan scan || ( echo 'FAILED: terrascan found issues'; exit 1 )
 	# terraform-compliance and conftest need a plan file to work off
 	terraform plan -out=plan.out -var region=us-east-1 -var profile=default || ( echo 'FAILED: terraform plan failed'; exit 1 )
 	# conftest ## custom rules must be written https://github.com/open-policy-agent/conftest/tree/master/examples/hcl2
