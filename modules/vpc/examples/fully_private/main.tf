@@ -31,6 +31,7 @@ module "aws-ia_vpc" {
   create_igw                    = var.create_igw
   create_nat_gateways_private_a = var.create_nat_gateways_private_a
   create_nat_gateways_private_b = var.create_nat_gateways_private_b
+  private_subnet_b_cidrs        = ["10.0.112.0/20", "10.0.128.0/20", "10.0.144.0/20"]
 }
 
 output "igw_id" {
