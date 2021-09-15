@@ -1,7 +1,7 @@
 build/
 plan.out
 plan.out.json
-
+test/test_report.html
 # Local .terraform directories
 **/.terraform/*
 
