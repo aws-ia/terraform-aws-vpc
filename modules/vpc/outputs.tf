@@ -212,3 +212,23 @@ output "public_subnet_route_table" {
   description = " Public subnet route table"
   value       = aws_route_table.public.*.id
 }
+
+output "igw_id" {
+  description = "ID for IGW attached to public subnets"
+  value       = length(aws_internet_gateway.gw) == 1 ? aws_internet_gateway.gw[0].id : ""
+}
+
+output "nat_gw_ids" {
+  description = "ID's for NAT gateways attached to private subnets"
+  value       = length(aws_nat_gateway.nat_gw) > 0 ? aws_nat_gateway.nat_gw[*].id : []
+}
+
+output "private_a_nat_routes" {
+  description = "Routes for NAT gateways attached to private_a subnets"
+  value       = length(aws_route.private_a_nat_gateway[*]) > 0 ? aws_route.private_a_nat_gateway[*].id : []
+}
+
+output "private_b_nat_routes" {
+  description = "Routes for NAT gateways attached to private_b subnets"
+  value       = length(aws_route.private_b_nat_gateway[*]) > 0 ? aws_route.private_b_nat_gateway[*].id : []
+}

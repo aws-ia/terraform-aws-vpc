@@ -11,9 +11,9 @@ import (
 // Required module author inputs are testPath and testRegions, testCases and their associated functions are optional
 var testPathNoCreate = "modules/vpc/examples/no_create"
 
-var testRegionsNoCreate = []testRegion{
-	{region: "eu-west-2", profile: "default"},
-	{region: "eu-central-1", profile: "default"},
+var testVarsNoCreate = []map[string]interface{}{
+	{"region": "eu-west-2", "profile": "default"},
+	{"region": "eu-central-1", "profile": "default"},
 }
 
 var testCasesNoCreate = []testCase{
@@ -45,5 +45,5 @@ func validateNoResources(t *testing.T, tfOpts *terraform.Options) {
 
 func TestNoCreate(t *testing.T) {
 	t.Parallel()
-	RunTests(t, testRegionsNoCreate, testCasesNoCreate, testPathNoCreate)
+	RunTests(t, testVarsNoCreate, testCasesNoCreate, testPathNoCreate)
 }

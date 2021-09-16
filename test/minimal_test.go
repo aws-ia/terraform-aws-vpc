@@ -16,12 +16,12 @@ import (
 // Required module author inputs are testPath and testRegions, testCases and their associated functions are optional
 var testPath = "modules/vpc/examples/minimal"
 
-var testRegions = []testRegion{
-	{region: "us-west-2", profile: "default"},
-	{region: "us-east-2", profile: "default"},
+var testVarsMinimal = []map[string]interface{}{
+	{"region": "us-west-2", "profile": "default"},
+	{"region": "us-east-2", "profile": "default"},
 }
 
-var testCases = []testCase{
+var testCasesMinimal = []testCase{
 	{name: "validate subnets created are as expected", function: validateSubnets},
 	{name: "validates route tables are using the correct NAT Gateways", function: validateNatGatewayAzAffinity},
 }
@@ -106,5 +106,5 @@ func getNatGatewayAz(client *ec2.Client, subnet *string) (*string, error) {
 
 func TestMinimal(t *testing.T) {
 	t.Parallel()
-	RunTests(t, testRegions, testCases, testPath)
+	RunTests(t, testVarsMinimal, testCasesMinimal, testPath)
 }

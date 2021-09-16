@@ -191,19 +191,19 @@ variable "availability_zones" {
 }
 
 variable "create_igw" {
-  description = "If set to false no IGW will be created for the public subnets"
+  description = "If set to false no IGW will be created for the public subnets. Setting this to false will also disable NAT gateways on private subnets, as NAT gateways require IGW in public subnets"
   type        = bool
   default     = true
 }
 
 variable "create_nat_gateways_private_a" {
-  description = "If set to false no NATE gateways will be created for the private_a subnets"
+  description = "If set to false no NAT gateways will be created for the private_a subnets"
   type        = bool
   default     = true
 }
 
 variable "create_nat_gateways_private_b" {
-  description = "If set to false no NATE gateways will be created for the private_b subnets"
+  description = "If set to false no NAT gateways will be created for the private_b subnets"
   type        = bool
   default     = false
 }

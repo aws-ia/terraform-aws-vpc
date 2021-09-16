@@ -30,6 +30,6 @@ locals {
   public_route_table_count    = length(local.public_subnet_cidrs) > 0 ? local.vpc_count : 0
   private_a_nacl_count        = length(local.private_subnet_a_cidrs) > 0 ? local.vpc_count : 0
   private_b_nacl_count        = length(local.private_subnet_b_cidrs) > 0 ? local.vpc_count : 0
-  nat_gateway_private_a_count = var.create_vpc && var.create_nat_gateways_private_a ? length(local.private_subnet_a_cidrs) : 0
-  nat_gateway_private_b_count = var.create_vpc && var.create_nat_gateways_private_b ? length(local.private_subnet_b_cidrs) : 0
+  nat_gateway_private_a_count = var.create_vpc && var.create_igw && var.create_nat_gateways_private_a ? length(local.private_subnet_a_cidrs) : 0
+  nat_gateway_private_b_count = var.create_vpc && var.create_igw && var.create_nat_gateways_private_b ? length(local.private_subnet_b_cidrs) : 0
 }

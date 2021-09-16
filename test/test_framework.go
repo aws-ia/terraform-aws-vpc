@@ -18,23 +18,15 @@ type testCase struct {
 	function func(*testing.T, *terraform.Options)
 }
 
-type testRegion struct {
-	region  string
-	profile string
-}
-
-func RunTests(t *testing.T, testRegions []testRegion, testCases []testCase, testPath string) {
-	for _, testRegion := range testRegions {
-		testRegion := testRegion
-		t.Run(testRegion.region, func(t *testing.T) {
+func RunTests(t *testing.T, testVars []map[string]interface{}, testCases []testCase, testPath string) {
+	for _, testVar := range testVars {
+		testVar := testVar
+		t.Run(testVar["region"].(string), func(t *testing.T) {
 			t.Parallel()
 			tmpPath := test_structure.CopyTerraformFolderToTemp(t, "../", testPath)
 			terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 				TerraformDir: tmpPath,
-				Vars: map[string]interface{}{
-					"region":  testRegion.region,
-					"profile": testRegion.profile,
-				},
+				Vars:         testVar,
 			})
 			if os.Getenv("TERRATEST_QUIET") == "1" {
 				terraformOptions.Logger = logger.Discard
