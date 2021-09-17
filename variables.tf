@@ -5,18 +5,18 @@ variable "create_vpc" {
 }
 
 variable "region" {
-  type        = string
   description = "AWS region to create VPC in"
+  type        = string
 }
 
 variable "profile" {
-  type        = string
   description = "AWS CLI profile to use when calling AWS API's"
+  type        = string
 }
 
 variable "tags" {
-  type        = map(string)
   description = "tags, which could be used for additional tags"
+  type        = map(string)
   default     = {}
 }
 
