@@ -1,9 +1,11 @@
 variable "region" {
-  type = string
+  description = "AWS region to create VPC in"
+  type        = string
 }
 
 variable "profile" {
-  type = string
+  description = "AWS CLI profile to use when calling AWS API's"
+  type        = string
 }
 
 provider "aws" {
