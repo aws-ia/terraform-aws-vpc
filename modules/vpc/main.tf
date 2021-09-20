@@ -271,7 +271,7 @@ resource "aws_network_acl_rule" "private_b_outbound" {
 ##############
 
 resource "aws_eip" "nat" {
-  count = local.nat_gateway_private_a_count
+  count = local.nat_gateway_count
   vpc   = true
 
   tags = {
@@ -280,7 +280,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "nat_gw" {
-  count         = local.nat_gateway_private_a_count
+  count         = local.nat_gateway_count
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
   tags = {
