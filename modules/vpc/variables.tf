@@ -5,8 +5,8 @@ variable "create_vpc" {
 }
 
 variable "name" {
-  type        = string
   description = "Will be used as a prefix for all resources that require a name field. Should be unique in the region."
+  type        = string
   default     = null
   validation {
     condition     = can(length(var.name) < 223) || var.name == null
@@ -15,8 +15,8 @@ variable "name" {
 }
 
 variable "tags" {
-  type        = map(string)
   description = "tags, which could be used for additional tags"
+  type        = map(string)
   default     = {}
 }
 

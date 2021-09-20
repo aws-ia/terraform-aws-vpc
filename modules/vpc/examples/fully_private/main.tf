@@ -1,24 +1,29 @@
 variable "region" {
-  type = string
+  description = "AWS region to create VPC in"
+  type        = string
 }
 
 variable "profile" {
-  type = string
+  description = "AWS CLI profile to use when calling AWS API's"
+  type        = string
 }
 
 variable "create_igw" {
-  type    = bool
-  default = false
+  description = "If set to false no IGW will be created for the public subnets. Setting this to false will also disable NAT gateways on private subnets, as NAT gateways require IGW in public subnets"
+  type        = bool
+  default     = false
 }
 
 variable "create_nat_gateways_private_b" {
-  type    = bool
-  default = false
+  description = "If set to false no NAT gateways will be created for the private_b subnets"
+  type        = bool
+  default     = false
 }
 
 variable "create_nat_gateways_private_a" {
-  type    = bool
-  default = false
+  description = "If set to false no NAT gateways will be created for the private_a subnets"
+  type        = bool
+  default     = false
 }
 
 provider "aws" {
