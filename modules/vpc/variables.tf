@@ -215,7 +215,7 @@ variable "create_vpc_flow_logs" {
 }
 
 variable "log_destination" {
-  description = "The ARN of the flow log logging destination. If log_destination_type set to s3, provide the ARN of your bucket. Otherwise, a bucket will be created for you. If log_destination_type is set to cloud-wtch-logs, provide ARN of log group otherwise log group will be created for you."
+  description = "The ARN of the flow log logging destination. If log_destination_type set to s3, provide the ARN of your bucket. Otherwise, a bucket will be created for you. If log_destination_type is set to cloud-watch-logs, provide ARN of log group otherwise log group will be created for you."
   type        = string
   default     = null
 }

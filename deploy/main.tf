@@ -48,4 +48,11 @@ module "aws-ia_vpc" {
   instance_tenancy       = var.instance_tenancy
   public_subnet_tags     = tomap(var.public_subnet_tags)
   private_subnet_tags    = tomap(var.private_subnet_tags)
+  create_vpc_flow_logs   = var.create_vpc_flow_logs
+  flog_log_iam_role_arn  = var.flog_log_iam_role_arn
+  log_destination        = var.log_destination
+  log_destination_type   = var.log_destination_type
+  log_format             = var.log_format
+  traffic_type           = var.traffic_type
+  enriched_meta_data     = var.enriched_meta_data
 }

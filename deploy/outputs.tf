@@ -211,3 +211,18 @@ output "public_subnet_route_table" {
   description = " Public subnet route table"
   value       = module.aws-ia_vpc.public_subnet_route_table
 }
+
+output "flow_log_id" {
+  description = "The Flow Log ID"
+  value       = module.aws-ia_vpc.flow_log_id
+}
+
+output "flow_log_arn" {
+  description = "The ARN of the Flow log."
+  value       = module.aws-ia_vpc.flow_log_arn
+}
+
+output "flow_log_destination" {
+  description = "The ARN of the logging destination."
+  value       = module.aws-ia_vpc.flow_log_destination
+}
