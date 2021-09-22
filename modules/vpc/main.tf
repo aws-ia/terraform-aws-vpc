@@ -331,3 +331,87 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public[0].id
 }
+
+##########################
+# VPC flow logs
+##########################
+resource "aws_flow_log" "flow_logs" {
+  count = var.create_vpc_flow_logs ? 1 : 0
+
+  vpc_id               = aws_vpc.main[count.index].id
+  iam_role_arn         = local.flog_log_iam_role_arn
+  log_destination      = local.log_destination
+  log_destination_type = var.log_destination_type
+  log_format           = local.log_format
+  traffic_type         = var.traffic_type
+  tags                 = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "flow_logs_log_group" {
+  count = local.create_log_group ? 1 : 0
+
+  name = format("vpc-flow-logs-%s", random_string.vpc_name_suffix[0].result)
+}
+
+resource "aws_iam_role" "flow_logs_role" {
+  count = local.create_flow_log_iam_role ? 1 : 0
+
+  name = format("vpc-flow-logs-role-%s", random_string.vpc_name_suffix[0].result)
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "flow_logs_policy" {
+  count = local.create_flow_log_iam_role ? 1 : 0
+
+  name = format("vpc-flow-logs-policy-%s", random_string.vpc_name_suffix[0].result)
+  role = aws_iam_role.flow_logs_role[0].id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_s3_bucket" "flow_logs_bucket" {
+  count = local.create_log_bucket ? 1 : 0
+
+  bucket_prefix = format("vpc-flow-logs-bucket-%s", lower(random_string.vpc_name_suffix[0].result))
+  acl           = "private"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}

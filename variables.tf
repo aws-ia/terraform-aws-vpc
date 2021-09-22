@@ -207,3 +207,45 @@ variable "create_nat_gateways_private_b" {
   type        = bool
   default     = false
 }
+
+variable "create_vpc_flow_logs" {
+  description = "Controls if VPC logs should be created for the VPC"
+  type        = bool
+  default     = true
+}
+
+variable "log_destination" {
+  description = "The ARN of the flow log logging destination. If log_destination_type set to s3, provide the ARN of your bucket. Otherwise, a bucket will be created for you. If log_destination_type is set to cloud-watch-logs, provide ARN of log group otherwise log group will be created for you."
+  type        = string
+  default     = null
+}
+
+variable "flog_log_iam_role_arn" {
+  description = "The ARN for the IAM role that's used to post flow logs to a CloudWatch Logs log group."
+  type        = string
+  default     = null
+}
+
+variable "log_destination_type" {
+  description = "The type of the logging destination for flow log. Valid values: cloud-watch-logs, s3"
+  type        = string
+  default     = "cloud-watch-logs"
+}
+
+variable "traffic_type" {
+  description = "The type of traffic to capture in the flow log."
+  type        = string
+  default     = "ALL"
+}
+
+variable "log_format" {
+  description = "The fields to include in the flow log record, in the order in which they should appear."
+  type        = string
+  default     = null
+}
+
+variable "enriched_meta_data" {
+  description = "Controls if VPC logs should have enriched meta data fields."
+  type        = bool
+  default     = true
+}

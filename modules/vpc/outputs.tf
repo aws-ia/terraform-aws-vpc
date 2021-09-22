@@ -232,3 +232,18 @@ output "private_b_nat_routes" {
   description = "Routes for NAT gateways attached to private_b subnets"
   value       = length(aws_route.private_b_nat_gateway[*]) > 0 ? aws_route.private_b_nat_gateway[*].id : []
 }
+
+output "flow_log_id" {
+  value       = try(aws_flow_log.flow_logs[0].id, "")
+  description = "The Flow Log ID"
+}
+
+output "flow_log_arn" {
+  value       = try(aws_flow_log.flow_logs[0].arn, "")
+  description = "The ARN of the Flow log"
+}
+
+output "flow_log_destination" {
+  value       = try(aws_flow_log.flow_logs[0].log_destination, "")
+  description = "The ARN of the logging destination."
+}
