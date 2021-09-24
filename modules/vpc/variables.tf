@@ -211,7 +211,7 @@ variable "create_nat_gateways_private_b" {
 variable "create_vpc_flow_logs" {
   description = "Controls if VPC logs should be created for the VPC"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "log_destination" {
