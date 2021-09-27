@@ -82,6 +82,10 @@ variable "create_vpc" {
   default     = true
 }
 
+variable "region" {
+  description = "AWS region to create VPC in"
+  type        = string
+}
 variable "create_vpc_flow_logs" {
   description = "Controls if VPC logs should be created for the VPC"
   type        = bool
