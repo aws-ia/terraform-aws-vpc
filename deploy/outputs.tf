@@ -7,24 +7,9 @@ output "vpc_id" {
   description = "The ID of the VPC"
   value       = module.aws-ia_vpc.vpc_id
 }
-output "nat_eip_1" {
-  description = "NAT 1 IP address"
-  value       = module.aws-ia_vpc.nat_eip_1
-}
-
-output "nat_eip_2" {
-  description = " NAT 2 IP address"
-  value       = module.aws-ia_vpc.nat_eip_2
-}
-
-output "nat_eip_3" {
-  description = " NAT 3 IP address"
-  value       = module.aws-ia_vpc.nat_eip_3
-}
-
-output "nat_eip_4" {
-  description = " NAT 4 IP address"
-  value       = module.aws-ia_vpc.nat_eip_4
+output "nat_eips" {
+  description = "NAT IP address"
+  value       = module.aws-ia_vpc.nat_eips
 }
 
 output "private_subnet_route_tables" {
