@@ -27,7 +27,7 @@ provider "aws" {
 }
 
 module "aws-ia_vpc" {
-  source                        = "../../"
+  source                        = "..\/..\/modules\/vpc"
   create_igw                    = var.create_igw
   create_nat_gateways_private_a = var.create_nat_gateways_private_a
   create_nat_gateways_private_b = var.create_nat_gateways_private_b
