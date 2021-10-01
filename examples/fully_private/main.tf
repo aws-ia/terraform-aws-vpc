@@ -62,7 +62,7 @@ output "endpoints" {
       private_dns_enabled = module.aws-ia_vpc.interface_endpoints["s3"]["private_dns_enabled"]
     },
     sts = {
-      arn                 = keys(module.aws-ia_vpc.interface_endpoints)["sqs"]["arn"]
+      arn                 = module.aws-ia_vpc.interface_endpoints["sqs"]["arn"]
       private_dns_enabled = module.aws-ia_vpc.interface_endpoints["sqs"]["private_dns_enabled"]
     }
   }
