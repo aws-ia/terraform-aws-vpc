@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 module "aws-ia_vpc" {
-  source = "..\/..\/modules\/vpc"
+  source = "../../"
 }
 
 output "public_subnet_ids" {

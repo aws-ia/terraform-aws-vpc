@@ -12,6 +12,6 @@ provider "aws" {
 }
 
 module "aws-ia_vpc" {
-  source     = "..\/..\/modules\/vpc"
+  source     = "../../"
   create_vpc = false
 }

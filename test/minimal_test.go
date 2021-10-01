@@ -14,7 +14,7 @@ import (
 )
 
 // Required module author inputs are testPath and testRegions, testCases and their associated functions are optional
-var testPath = "modules/vpc/examples/minimal"
+var testPath = "examples/minimal"
 
 var testVarsMinimal = []map[string]interface{}{
 	{"region": "us-west-2", "profile": "default"},

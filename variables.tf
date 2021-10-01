@@ -4,14 +4,14 @@ variable "create_vpc" {
   default     = true
 }
 
-variable "region" {
+variable "name" {
   type        = string
-  description = "AWS region to create VPC in"
-}
-
-variable "profile" {
-  type        = string
-  description = "AWS CLI profile to use when calling AWS API's"
+  description = "Will be used as a prefix for all resources that require a name field. Should be unique in the region."
+  default     = null
+  validation {
+    condition     = can(length(var.name) < 223) || var.name == null
+    error_message = "Name can not be longer than 222 characters."
+  }
 }
 
 variable "tags" {
@@ -65,7 +65,7 @@ variable "cidr" {
 }
 
 variable "public_subnet_cidrs" {
-  description = "A list of CIDR blocks to use for public subnets. Default is 3 /20 cidrs from the CIDR range specified in the cidr variable. The number of public subnets is inferred from the number of CIDR's provided. The number of public subnets is inferred from the number of CIDR's provided. If availability_zones are specified, must have the same number of elements, if not specified number of elements must not be greater than the number of availability zones in the region."
+  description = "A list of CIDR blocks to use for public subnets. Default is 3 /20 cidrs from the CIDR range specified in the cidr variable. The number of public subnets is inferred from the number of CIDR's provided. If availability_zones are specified, it must have the same number of elements. If not specified, the number of elements must not be greater than the number of availability zones in the region."
   type        = list(string)
   default     = null
   validation {
@@ -75,7 +75,7 @@ variable "public_subnet_cidrs" {
 }
 
 variable "private_subnet_a_cidrs" {
-  description = "A list of CIDR blocks to use for private subnets. Default is 3 /19 cidrs from the CIDR range specified in the cidr variable. The number of private subnets is inferred from the number of CIDR's provided. If availability_zones are specified, must have the same number of elements, if not specified number of elements must not be greater than the number of availability zones in the region."
+  description = "A list of CIDR blocks to use for private subnets. Default is 3 /19 cidrs from the CIDR range specified in the cidr variable. The number of private subnets is inferred from the number of CIDR's provided. If availability_zones are specified, must have the same number of elements. If not specified, the number of elements must not be greater than the number of availability zones in the region."
   type        = list(string)
   default     = null
   validation {
@@ -206,4 +206,16 @@ variable "create_nat_gateways_private_b" {
   description = "If set to false no NAT gateways will be created for the private_b subnets"
   type        = bool
   default     = false
+}
+
+variable "enabled_gateway_endpoints" {
+  description = "List of shortened gateway endpoint names that are to be enabled. Endpoints will be attached to the private_a and private_b route tables. Shortened names are the endpoint name excluding the dns style prefix, so \"com.amazonaws.us-east-1.s3\" would be entered as \"s3\". For a full list of available endpoint names, see the aws-ia/vpc_endpoints module on the terraform registry."
+  type        = list(string)
+  default     = []
+}
+
+variable "enabled_interface_endpoints" {
+  description = "List of shortened interface endpoint names that are to be enabled. Endpoints will be attached to the private_b subnets. A dedicated security group will be created (allowing tcp443 ingress from vpc cidr) and outputted as \"vpc_endpoint_security_group_id\". Shortened names are the endpoint name excluding the dns style prefix, so \"com.amazonaws.us-east-1.s3\" would be entered as \"s3\". For a full list of available endpoint names, see the aws-ia/vpc_endpoints module on the terraform registry. For advanced configuration options, use the aws-ia/vpc_endpoints module directly."
+  type        = list(string)
+  default     = []
 }

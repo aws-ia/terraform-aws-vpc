@@ -9,7 +9,7 @@ import (
 )
 
 // Required module author inputs are testPath and testRegions, testCases and their associated functions are optional
-var testPathNoCreate = "modules/vpc/examples/no_create"
+var testPathNoCreate = "examples/no_create"
 
 var testVarsNoCreate = []map[string]interface{}{
 	{"region": "eu-west-2", "profile": "default"},

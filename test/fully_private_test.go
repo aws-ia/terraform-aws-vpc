@@ -7,7 +7,7 @@ import (
 )
 
 // Required module author inputs are testPath and testRegions, testCases and their associated functions are optional
-var testPathFullyPrivate = "modules/vpc/examples/fully_private"
+var testPathFullyPrivate = "examples/fully_private"
 
 var testRegionsFullyPrivate = []map[string]interface{}{
 	{"region": "eu-west-3", "profile": "default"},
