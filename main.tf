@@ -205,19 +205,28 @@ resource "aws_subnet" "private_b" {
 ########################
 # Network ACLs
 ########################
-resource "aws_network_acl" "public" {
+resource "awscc_ec2_network_acl" "public" {
   count      = local.public_route_table_count
   vpc_id     = awscc_ec2_vpc.main[0].id
-  subnet_ids = aws_subnet.public.*.id
+  # subnet_ids = aws_subnet.public.*.id
 
-  tags = {
-    Name = "${local.name}_public_nework_acl"
-  }
+  # tags = {
+  #   Name = "${local.name}_public_nework_acl"
+  # }
+    tags = concat(
+    [
+      {
+        key   = "Name"
+        value = "${local.name}_public_nework_acl"
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 resource "aws_network_acl_rule" "public_inbound" {
   count          = local.public_route_table_count
-  network_acl_id = aws_network_acl.public[0].id
+  network_acl_id = awscc_ec2_network_acl.public[0].id
 
   egress      = false
   rule_number = var.public_inbound_acl_rules[0]["rule_number"]
@@ -232,7 +241,7 @@ resource "aws_network_acl_rule" "public_inbound" {
 
 resource "aws_network_acl_rule" "public_outbound" {
   count          = local.public_route_table_count
-  network_acl_id = aws_network_acl.public[0].id
+  network_acl_id = awscc_ec2_network_acl.public[0].id
 
   egress      = true
   rule_number = var.public_outbound_acl_rules[0]["rule_number"]
@@ -245,19 +254,28 @@ resource "aws_network_acl_rule" "public_outbound" {
   cidr_block  = lookup(var.public_outbound_acl_rules[0], "cidr_block", null)
 }
 
-resource "aws_network_acl" "private_a" {
+resource "awscc_ec2_network_acl" "private_a" {
   count      = local.private_a_nacl_count
   vpc_id     = awscc_ec2_vpc.main[0].id
-  subnet_ids = aws_subnet.private_a.*.id
+  # subnet_ids = aws_subnet.private_a.*.id
 
-  tags = {
-    Name = "${local.name}_private_a_nework_acl"
-  }
+  # tags = {
+  #   Name = "${local.name}_private_a_nework_acl"
+  # }
+    tags = concat(
+    [
+      {
+        key   = "Name"
+        value = "${local.name}_private_a_nework_acl"
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 resource "aws_network_acl_rule" "private_a_inbound" {
   count          = local.private_a_nacl_count
-  network_acl_id = aws_network_acl.private_a[count.index].id
+  network_acl_id = awscc_ec2_network_acl.private_a[count.index].id
 
   egress      = false
   rule_number = var.private_a_inbound_acl_rules[0]["rule_number"]
@@ -272,7 +290,7 @@ resource "aws_network_acl_rule" "private_a_inbound" {
 
 resource "aws_network_acl_rule" "private_a_outbound" {
   count          = local.private_a_nacl_count
-  network_acl_id = aws_network_acl.private_a[count.index].id
+  network_acl_id = awscc_ec2_network_acl.private_a[count.index].id
 
   egress      = true
   rule_number = var.private_a_outbound_acl_rules[0]["rule_number"]
@@ -285,19 +303,28 @@ resource "aws_network_acl_rule" "private_a_outbound" {
   cidr_block  = lookup(var.private_a_outbound_acl_rules[0], "cidr_block", null)
 }
 
-resource "aws_network_acl" "private_b" {
+resource "awscc_ec2_network_acl" "private_b" {
   count      = local.private_b_nacl_count
   vpc_id     = awscc_ec2_vpc.main[0].id
-  subnet_ids = aws_subnet.private_b.*.id
+  # subnet_ids = aws_subnet.private_b.*.id
 
-  tags = {
-    Name = "${local.name}_private_b_nework_acl"
-  }
+  # tags = {
+  #   Name = "${local.name}_private_b_nework_acl"
+  # }
+  tags = concat(
+    [
+      {
+        key   = "Name"
+        value = "${local.name}_private_b_nework_acl"
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 resource "aws_network_acl_rule" "private_b_inbound" {
   count          = local.private_b_nacl_count
-  network_acl_id = aws_network_acl.private_b[count.index].id
+  network_acl_id = awscc_ec2_network_acl.private_b[count.index].id
 
   egress      = false
   rule_number = var.private_b_inbound_acl_rules[0]["rule_number"]
@@ -312,7 +339,7 @@ resource "aws_network_acl_rule" "private_b_inbound" {
 
 resource "aws_network_acl_rule" "private_b_outbound" {
   count          = local.private_b_nacl_count
-  network_acl_id = aws_network_acl.private_b[count.index].id
+  network_acl_id = awscc_ec2_network_acl.private_b[count.index].id
 
   egress      = true
   rule_number = var.private_b_outbound_acl_rules[0]["rule_number"]
