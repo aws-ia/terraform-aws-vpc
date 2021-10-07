@@ -11,6 +11,11 @@ provider "aws" {
   profile = var.profile
 }
 
+provider "awscc" {
+  region  = var.region
+  profile = var.profile
+}
+
 module "aws-ia_vpc" {
   source = "../../"
 }

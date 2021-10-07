@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 3.49.0"
     }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = ">= 0.1.1"
+    }
   }
 }
 
@@ -19,6 +23,7 @@ locals {
     length(local.private_subnet_b_cidrs),
   )
 
+  tags_as_list           = [for k, v in var.tags : { name = k, value = v }]
   name                   = var.name == null ? length(random_string.vpc_name_suffix) > 0 ? "tf-vpc-${random_string.vpc_name_suffix[0].id}" : "" : var.name
   public_subnet_cidrs    = var.public_subnet_cidrs == null ? cidrsubnets(cidrsubnets(var.cidr, 2)[0], 2, 2, 2) : var.public_subnet_cidrs
   private_subnet_a_cidrs = var.private_subnet_a_cidrs == null ? cidrsubnets(cidrsubnets(var.cidr, 2, 2)[1], 2, 2, 2) : var.private_subnet_a_cidrs
@@ -40,11 +45,11 @@ locals {
 
 module "vpc_endpoints" {
   source                      = "aws-ia/vpc_endpoints/aws"
-  version                     = "0.1.1"
+  version                     = ">= 0.1.1"
   count                       = var.create_vpc ? length(var.enabled_interface_endpoints) > 0 || length(var.enabled_gateway_endpoints) > 0 ? 1 : 0 : 0
-  vpc_id                      = aws_vpc.main[0].id
+  vpc_id                      = awscc_ec2_vpc.main[0].id
   subnet_ids                  = aws_subnet.private_b[*].id
-  route_table_ids             = concat(aws_route_table.private_a[*].id, aws_route_table.private_b[*].id)
+  route_table_ids             = concat(awscc_ec2_route_table.private_a[*].id, awscc_ec2_route_table.private_b[*].id)
   enabled_interface_endpoints = var.enabled_interface_endpoints
   enabled_gateway_endpoints   = var.enabled_gateway_endpoints
   private_dns_enabled         = true
@@ -63,7 +68,7 @@ resource "random_string" "vpc_name_suffix" {
 ######
 # VPC
 ######
-resource "aws_vpc" "main" {
+resource "awscc_ec2_vpc" "main" {
   count = local.vpc_count
 
   cidr_block           = var.cidr
@@ -71,7 +76,15 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
 
-  tags = merge(var.tags, { Name = local.name })
+  tags = concat(
+    [
+      {
+        key   = "Name"
+        value = local.name
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 ###################
@@ -79,7 +92,7 @@ resource "aws_vpc" "main" {
 ###################
 resource "aws_internet_gateway" "gw" {
   count  = local.igw_count
-  vpc_id = aws_vpc.main[count.index].id
+  vpc_id = awscc_ec2_vpc.main[count.index].id
 
   tags = {
     Name = "${local.name}_iGW"
@@ -90,19 +103,24 @@ resource "aws_internet_gateway" "gw" {
 ################
 # Publiс routes
 ################
-resource "aws_route_table" "public" {
+resource "awscc_ec2_route_table" "public" {
   count  = local.public_route_table_count
-  vpc_id = aws_vpc.main[count.index].id
+  vpc_id = awscc_ec2_vpc.main[0].id
 
-  tags = {
-    Name = "${local.name}-public_routes"
-  }
-
+  tags = concat(
+    [
+      {
+        key   = "Name"
+        value = "${local.name}-public_routes"
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 resource "aws_route" "public_internet_gateway" {
   count                  = local.igw_count
-  route_table_id         = aws_route_table.public[count.index].id
+  route_table_id         = awscc_ec2_route_table.public[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw[count.index].id
 
@@ -115,24 +133,36 @@ resource "aws_route" "public_internet_gateway" {
 # Private routes A
 # We always create one route table per subnet, regardless of how many nat gateways are deployed
 #################
-resource "aws_route_table" "private_a" {
+resource "awscc_ec2_route_table" "private_a" {
   count  = local.private_subnet_a_count
-  vpc_id = aws_vpc.main[0].id
-  tags = {
-    Name = "${local.name}_private_route_a${count.index}"
-  }
+  vpc_id = awscc_ec2_vpc.main[0].id
+  tags = concat(
+    [
+      {
+        key   = "Name"
+        value = "${local.name}_private_route_a${count.index}"
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 #################
 # Private routes B
 # We always create one route table per subnet, regardless of how many nat gateways are deployed
 #################
-resource "aws_route_table" "private_b" {
+resource "awscc_ec2_route_table" "private_b" {
   count  = local.private_subnet_b_count
-  vpc_id = aws_vpc.main[0].id
-  tags = {
-    Name = "${local.name}_private_routes_b${count.index}"
-  }
+  vpc_id = awscc_ec2_vpc.main[0].id
+  tags = concat(
+    [
+      {
+        key   = "Name"
+        value = "${local.name}_private_route_b${count.index}"
+      }
+    ],
+    local.tags_as_list
+  )
 }
 
 ################
@@ -140,7 +170,7 @@ resource "aws_route_table" "private_b" {
 ################
 resource "aws_subnet" "public" {
   count                   = local.public_subnet_count
-  vpc_id                  = aws_vpc.main[0].id
+  vpc_id                  = awscc_ec2_vpc.main[0].id
   cidr_block              = local.public_subnet_cidrs[count.index]
   availability_zone       = local.availability_zones[count.index]
   map_public_ip_on_launch = true
@@ -154,7 +184,7 @@ resource "aws_subnet" "public" {
 #################
 resource "aws_subnet" "private_a" {
   count             = local.private_subnet_a_count
-  vpc_id            = aws_vpc.main[0].id
+  vpc_id            = awscc_ec2_vpc.main[0].id
   cidr_block        = local.private_subnet_a_cidrs[count.index]
   availability_zone = local.availability_zones[count.index]
   tags              = merge(var.private_subnet_tags, { Name = "${local.name}_private_a_${count.index}" })
@@ -165,7 +195,7 @@ resource "aws_subnet" "private_a" {
 #################
 resource "aws_subnet" "private_b" {
   count             = local.private_subnet_b_count
-  vpc_id            = aws_vpc.main[0].id
+  vpc_id            = awscc_ec2_vpc.main[0].id
   cidr_block        = local.private_subnet_b_cidrs[count.index]
   availability_zone = local.availability_zones[count.index]
   tags              = merge(var.private_subnet_tags, { Name = "${local.name}_private_b_${count.index}" })
@@ -177,7 +207,7 @@ resource "aws_subnet" "private_b" {
 ########################
 resource "aws_network_acl" "public" {
   count      = local.public_route_table_count
-  vpc_id     = aws_vpc.main[0].id
+  vpc_id     = awscc_ec2_vpc.main[0].id
   subnet_ids = aws_subnet.public.*.id
 
   tags = {
@@ -217,7 +247,7 @@ resource "aws_network_acl_rule" "public_outbound" {
 
 resource "aws_network_acl" "private_a" {
   count      = local.private_a_nacl_count
-  vpc_id     = aws_vpc.main[0].id
+  vpc_id     = awscc_ec2_vpc.main[0].id
   subnet_ids = aws_subnet.private_a.*.id
 
   tags = {
@@ -257,7 +287,7 @@ resource "aws_network_acl_rule" "private_a_outbound" {
 
 resource "aws_network_acl" "private_b" {
   count      = local.private_b_nacl_count
-  vpc_id     = aws_vpc.main[0].id
+  vpc_id     = awscc_ec2_vpc.main[0].id
   subnet_ids = aws_subnet.private_b.*.id
 
   tags = {
@@ -320,7 +350,7 @@ resource "aws_nat_gateway" "nat_gw" {
 
 resource "aws_route" "private_a_nat_gateway" {
   count                  = local.nat_gateway_private_a_count
-  route_table_id         = aws_route_table.private_a[count.index].id
+  route_table_id         = awscc_ec2_route_table.private_a[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
 
@@ -331,7 +361,7 @@ resource "aws_route" "private_a_nat_gateway" {
 
 resource "aws_route" "private_b_nat_gateway" {
   count                  = local.nat_gateway_private_b_count
-  route_table_id         = aws_route_table.private_b[count.index].id
+  route_table_id         = awscc_ec2_route_table.private_b[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
 
@@ -343,20 +373,20 @@ resource "aws_route" "private_b_nat_gateway" {
 ##########################
 # Route table association
 ##########################
-resource "aws_route_table_association" "private_a" {
+resource "awscc_ec2_subnet_route_table_association" "private_a" {
   count          = local.private_subnet_a_count
   subnet_id      = aws_subnet.private_a[count.index].id
-  route_table_id = aws_route_table.private_a[count.index].id
+  route_table_id = awscc_ec2_route_table.private_a[count.index].id
 }
 
-resource "aws_route_table_association" "private_b" {
+resource "awscc_ec2_subnet_route_table_association" "private_b" {
   count          = local.private_subnet_b_count
   subnet_id      = aws_subnet.private_b[count.index].id
-  route_table_id = aws_route_table.private_b[count.index].id
+  route_table_id = awscc_ec2_route_table.private_b[count.index].id
 }
 
-resource "aws_route_table_association" "public" {
+resource "awscc_ec2_subnet_route_table_association" "public" {
   count          = local.public_subnet_count
   subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public[0].id
+  route_table_id = awscc_ec2_route_table.public[0].id
 }

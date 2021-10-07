@@ -1,13 +1,16 @@
+locals {
+  local_2 = "blah"
+}
 # VPC
 output "vpc_cidr" {
   description = "VPC_CIDR "
-  #value       = aws_vpc.main[count.index].cidr_block
-  value = concat(aws_vpc.main.*.cidr_block, [""])[0]
+  #value       = awscc_ec2_vpc.main[count.index].cidr_block
+  value = concat(awscc_ec2_vpc.main.*.cidr_block, [""])[0]
 }
 output "vpc_id" {
   description = "The ID of the VPC"
-  #value       = aws_vpc.main[count.index].id
-  value = concat(aws_vpc.main.*.id, [""])[0]
+  #value       = awscc_ec2_vpc.main[count.index].id
+  value = concat(awscc_ec2_vpc.main.*.id, [""])[0]
 }
 output "private_subnet_a_ids" {
   description = "List of IDs of privateA subnets"
@@ -23,7 +26,7 @@ output "private_subnets" {
 }
 output "private_subnet_route_tables" {
   description = "List of IDs of private subnets"
-  value       = flatten([aws_route_table.private_a.*.id, aws_route_table.private_b.*.id])
+  value       = flatten([awscc_ec2_route_table.private_a.*.id, awscc_ec2_route_table.private_b.*.id])
 }
 output "availability_zones" {
   description = "List of availability zones names for subnets in this vpc"
@@ -165,47 +168,47 @@ output "public_subnet_4_id" {
 
 output "private_subnet_1a_route_table" {
   description = " Private subnet 1A route table"
-  value       = try(aws_route_table.private_a[0].id, "")
+  value       = try(awscc_ec2_route_table.private_a[0].id, "")
 }
 
 output "private_subnet_1b_route_table" {
   description = " Private subnet 1B route table"
-  value       = try(aws_route_table.private_b[0].id, "")
+  value       = try(awscc_ec2_route_table.private_b[0].id, "")
 }
 
 output "private_subnet_2a_route_table" {
   description = " Private subnet 2A route table"
-  value       = try(aws_route_table.private_a[1].id, "")
+  value       = try(awscc_ec2_route_table.private_a[1].id, "")
 }
 
 output "private_subnet_2b_route_table" {
   description = " Private subnet 2B route table"
-  value       = try(aws_route_table.private_b[1].id, "")
+  value       = try(awscc_ec2_route_table.private_b[1].id, "")
 }
 
 output "private_subnet_3a_route_table" {
   description = " Private subnet 3A route table"
-  value       = length(aws_route_table.private_a.*.id) > 2 ? aws_route_table.private_a[2].id : null
+  value       = length(awscc_ec2_route_table.private_a.*.id) > 2 ? awscc_ec2_route_table.private_a[2].id : null
 }
 
 output "private_subnet_3b_route_table" {
   description = " Private subnet 3B route table"
-  value       = length(aws_route_table.private_b.*.id) > 2 ? aws_route_table.private_b[2].id : null
+  value       = length(awscc_ec2_route_table.private_b.*.id) > 2 ? awscc_ec2_route_table.private_b[2].id : null
 }
 
 output "private_subnet_4a_route_table" {
   description = " Private subnet 4A route table"
-  value       = length(aws_route_table.private_a.*.id) > 3 ? aws_route_table.private_a[3].id : null
+  value       = length(awscc_ec2_route_table.private_a.*.id) > 3 ? awscc_ec2_route_table.private_a[3].id : null
 }
 
 output "private_subnet_4b_route_table" {
   description = " Private subnet 4B route table"
-  value       = length(aws_route_table.private_b.*.id) > 3 ? aws_route_table.private_b[3].id : null
+  value       = length(awscc_ec2_route_table.private_b.*.id) > 3 ? awscc_ec2_route_table.private_b[3].id : null
 }
 
 output "public_subnet_route_table" {
   description = " Public subnet route table"
-  value       = aws_route_table.public.*.id
+  value       = awscc_ec2_route_table.public.*.id
 }
 
 output "igw_id" {
