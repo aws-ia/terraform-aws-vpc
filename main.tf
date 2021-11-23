@@ -7,7 +7,7 @@ terraform {
     }
     awscc = {
       source  = "hashicorp/awscc"
-      version = ">= 0.2.0"
+      version = ">= 0.6.0"
     }
   }
 }
@@ -70,7 +70,7 @@ resource "random_string" "vpc_name_suffix" {
 ######
 resource "awscc_ec2_vpc" "main" {
   count = local.vpc_count
-
+  
   cidr_block           = var.cidr
   instance_tenancy     = var.instance_tenancy
   enable_dns_hostnames = var.enable_dns_hostnames
