@@ -22,11 +22,10 @@ resource "random_string" "rand4" {
 
 module "vpc_label" {
   source    = "aws-ia/label/aws"
-  version   = "0.0.1"
+  version   = "0.0.3"
   region    = var.region
   namespace = var.namespace
   env       = var.env
-  #account = var.account_name
   name      = "${var.name}-${random_string.rand4.result}"
   delimiter = var.delimiter
   tags      = tomap({ propogate_at_launch = "true", "terraform" = "true" })
@@ -36,13 +35,13 @@ module "vpc_label" {
 # Create VPC
 ######################################
 module "aws-ia_vpc" {
-  source                 = "../modules/vpc"
+  source                 = "../"
   create_vpc             = var.create_vpc
   name                   = module.vpc_label.id
   cidr                   = var.cidr
   public_subnet_cidrs    = var.public_subnet_cidrs
   private_subnet_a_cidrs = var.private_subnet_a_cidrs
-  tags                   = module.vpc_label.tags
+  tags                   = {}
   enable_dns_hostnames   = var.enable_dns_hostnames
   enable_dns_support     = var.enable_dns_support
   instance_tenancy       = var.instance_tenancy
