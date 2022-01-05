@@ -1,9 +1,11 @@
 variable "region" {
-  type = string
+  type    = string
+  default = "us-east-1"
 }
 
 variable "profile" {
-  type = string
+  type    = string
+  default = null
 }
 
 provider "aws" {

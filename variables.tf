@@ -15,21 +15,30 @@ variable "name" {
 }
 
 variable "tags" {
-  type        = map(string)
   description = "tags, which could be used for additional tags"
-  default     = {}
+  type = list(object({
+    key   = string,
+    value = string
+  }))
+  default = []
 }
 
 variable "private_subnet_tags" {
   description = "Additional tags for the private subnets"
-  type        = map(string)
-  default     = {}
+  type = list(object({
+    key   = string,
+    value = string
+  }))
+  default = []
 }
 
 variable "public_subnet_tags" {
   description = "Additional tags for the public subnets"
-  type        = map(string)
-  default     = {}
+  type = list(object({
+    key   = string,
+    value = string
+  }))
+  default = []
 }
 
 variable "enable_dns_hostnames" {
