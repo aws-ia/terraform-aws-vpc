@@ -228,3 +228,8 @@ variable "enabled_interface_endpoints" {
   type        = list(string)
   default     = []
 }
+
+variable "region" {
+  type = string
+  default = "us-east-1"
+}
