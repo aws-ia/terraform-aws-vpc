@@ -1,3 +1,8 @@
+> Note: This module is in alpha state and is likely to contain bugs and updates may introduce breaking changes. It is not recommended for production use at this time.
+
+# Terraform AWS VPC
+This module is designed to deploy into Terraform Cloud
+
 ## Requirements
 
 | Name | Version |
@@ -25,6 +30,7 @@
 | Name | Type |
 |------|------|
 | [aws_eip.nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_internet_gateway.gw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_nat_gateway.nat_gw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
 | [aws_network_acl_rule.private_a_inbound](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl_rule) | resource |
 | [aws_network_acl_rule.private_a_outbound](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl_rule) | resource |
@@ -35,7 +41,6 @@
 | [aws_route.private_a_nat_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.private_b_nat_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.public_internet_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
-| [awscc_ec2_internet_gateway.gw](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_internet_gateway) | resource |
 | [awscc_ec2_network_acl.private_a](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_network_acl) | resource |
 | [awscc_ec2_network_acl.private_b](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_network_acl) | resource |
 | [awscc_ec2_network_acl.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_network_acl) | resource |
@@ -79,6 +84,7 @@
 | <a name="input_public_outbound_acl_rules"></a> [public\_outbound\_acl\_rules](#input\_public\_outbound\_acl\_rules) | Public subnets outbound network ACLs. Default allows all traffic | `list(map(string))` | <pre>[<br>  {<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_action": "allow",<br>    "rule_number": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | <a name="input_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#input\_public\_subnet\_cidrs) | A list of CIDR blocks to use for public subnets. Default is 3 /20 cidrs from the CIDR range specified in the cidr variable. The number of public subnets is inferred from the number of CIDR's provided. If availability\_zones are specified, it must have the same number of elements. If not specified, the number of elements must not be greater than the number of availability zones in the region. | `list(string)` | `null` | no |
 | <a name="input_public_subnet_tags"></a> [public\_subnet\_tags](#input\_public\_subnet\_tags) | Additional tags for the public subnets | <pre>list(object({<br>    key   = string,<br>    value = string<br>  }))</pre> | `[]` | no |
+| <a name="input_region"></a> [region](#input\_region) | n/a | `string` | `"us-east-1"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | tags, which could be used for additional tags | <pre>list(object({<br>    key   = string,<br>    value = string<br>  }))</pre> | `[]` | no |
 
 ## Outputs
