@@ -1,4 +1,0 @@
-include:
-- ./.regula-waivers.rego
-# comment out below when activating regula
-severity: critical
