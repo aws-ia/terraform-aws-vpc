@@ -21,7 +21,7 @@ module "subnet_calculator" {
   count = local.types_to_calculate == [] ? 0 : 1
   #TODO: switch to registry link once published
   source  = "drewmullen/subnets/cidr"
-  version = "1.0.0"
+  version = "1.0.2"
 
   base_cidr_block = var.cidr
   networks        = local.calculated_subnet_objects
