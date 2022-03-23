@@ -23,6 +23,6 @@ module "vpc" {
   vpc_flow_logs = {
     log_destination_type = "cloud-watch-logs"
     retention_in_days    = 180
-    kms_key_id           = null
+    kms_key_id           = var.kms_key_id
   }
 }
