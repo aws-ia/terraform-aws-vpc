@@ -49,11 +49,15 @@ Before:
 ```hcl
 vpc_cidr_block = "10.0.0.0/16"
 az_count = 2
-private = {
-    netmask = 24
-}
-public = {
-    netmask = 24
+
+subnets = {
+  public = {
+   netmask = 24
+  }
+
+  private = {
+   netmask = 24
+  }
 }
 ```
 
@@ -61,11 +65,15 @@ After:
 ```hcl
 vpc_cidr_block = "10.0.0.0/16"
 az_count = 3
-private = {
-    cidrs = ["10.0.0.0/24", "10.0.1.0/24", "10.0.4.0/24"]
-}
-public = {
-    cidrs = ["10.0.2.0/24", "10.0.3.0/24", "10.0.5.0/24"]
+
+subnets = {
+  public = {
+   cidrs = ["10.0.0.0/24", "10.0.1.0/24", "10.0.4.0/24"]
+  }
+
+  private = {
+   cidrs = ["10.0.2.0/24", "10.0.3.0/24", "10.0.5.0/24"]
+  }
 }
 ```
 
