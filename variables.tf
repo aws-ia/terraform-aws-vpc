@@ -145,6 +145,7 @@ variable "tags" {
 variable "vpc_flow_logs" {
   description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
   nullable    = false
+
   type = object({
     log_destination = optional(string)
     iam_role_arn    = optional(string)
@@ -166,7 +167,7 @@ variable "vpc_flow_logs" {
   }
 
   validation {
-    condition     = can(regex("^(cloud-watch-logs|s3|none)$", var.vpc_flow_logs.log_destination_type))
+    condition     = contains(["cloud-watch-logs", "s3", "none"], var.vpc_flow_logs.log_destination_type)
     error_message = "Invalid input, options: \"cloud-watch-logs\", \"s3\", or \"none\"."
   }
 }

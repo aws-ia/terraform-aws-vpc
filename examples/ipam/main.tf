@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "aws-ia/vpc/awscc"
+  source = "../.."
 
   name     = "ipam-vpc"
   az_count = 3

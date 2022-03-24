@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-# VPC Module Pre-release docs
+# AWS VPC Module
 
 This module can be used to deploy a pragmatic VPC with various subnets types in # AZs. Common deployment examples can be found in [examples/](./examples/). Subnet CIDRs can be explicitly set via list of string argument `cidrs` or set via a number `netmask` argument.
 
@@ -9,7 +9,8 @@ The example below builds a VPC with public and private subnets in 3 AZs. Each su
 
 ```hcl
 module "vpc" {
-  source = "aws-ia/vpc/aws"
+  source   = "aws-ia/vpc/aws"
+  versions = ">= 1.0.0"
 
   name           = "multi-az-vpc"
   vpc_cidr_block = "10.0.0.0/20"
@@ -85,7 +86,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.15.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.72.0 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.13.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.15.0 |
 
 ## Providers
 
