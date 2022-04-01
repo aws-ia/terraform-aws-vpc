@@ -1,5 +1,6 @@
 module "vpc" {
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 1.0.0"
 
   name           = "multi-az-vpc"
   vpc_cidr_block = "10.0.0.0/20"
