@@ -1,221 +1,173 @@
-variable "create_vpc" {
-  description = "Controls if VPC should be created (it affects almost all resources)"
+variable "name" {
+  type        = string
+  description = "Name to give VPC. Note: does not effect subnet names, which get assigned name based on name_prefix."
+}
+
+variable "vpc_cidr_block" {
+  description = "CIDR range to assign to VPC if creating VPC. Overridden by var.vpc_id output from data.aws_vpc."
+  default     = null
+  type        = string
+
+}
+
+variable "vpc_id" {
+  description = "VPC ID to use if not creating VPC."
+  default     = null
+  type        = string
+}
+
+variable "az_count" {
+  type        = number
+  description = "Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z."
+}
+
+variable "vpc_enable_dns_hostnames" {
   type        = bool
+  description = "Indicates whether the instances launched in the VPC get DNS hostnames. If enabled, instances in the VPC get DNS hostnames; otherwise, they do not. Disabled by default for nondefault VPCs."
   default     = true
 }
 
-variable "name" {
+variable "vpc_enable_dns_support" {
+  type        = bool
+  description = "Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range \"plus two\" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default."
+  default     = true
+}
+
+variable "vpc_instance_tenancy" {
   type        = string
-  description = "Will be used as a prefix for all resources that require a name field. Should be unique in the region."
-  default     = null
+  description = "The allowed tenancy of instances launched into the VPC."
+  default     = "default"
+
+  /*
+  Note:
+  Updating InstanceTenancy requires no replacement only if you are updating its value from "dedicated" to "default". Updating InstanceTenancy from "default" to "dedicated" requires replacement.
+  */
+
   validation {
-    condition     = can(length(var.name) < 223) || var.name == null
-    error_message = "Name can not be longer than 222 characters."
+    condition     = var.vpc_instance_tenancy == "default" || var.vpc_instance_tenancy == "dedicated"
+    error_message = "Invalid input, options: \"default\", or \"dedicated\"."
+  }
+}
+
+variable "vpc_ipv4_ipam_pool_id" {
+  description = "Set to use IPAM to get CIDR block."
+  type        = string
+  default     = null
+}
+
+variable "vpc_ipv4_netmask_length" {
+  description = "Set to use IPAM to get CIDR block using a specified netmask. Must be set with var.vpc_ipv4_ipam_pool_id."
+  type        = string
+  default     = null
+}
+
+variable "subnets" {
+  description = "Configuration of subnets to build in VPC. Valid key restriction information found in variables.tf."
+  type        = any
+
+  ######### EXAMPLE #########
+  #  subnets = {
+  #   public = {
+  #     name_prefix               = "my-public" # omit to prefix with "public"
+  #     netmask                   = 24
+  #     nat_gateway_configuration = "all_azs" # options: "single_az", "none"
+  #     tags = { env = "dev" }
+  #   }
+
+  #   private = {
+  #     name_prefix  = "private"
+  #     netmask      = 24
+  #     route_to_nat = true
+  #   }
+  # }
+  ###########################
+
+  # Only valid keys for var.subnets
+  validation {
+    error_message = "Only valid key values \"public\", \"private\"."
+    condition = length(setsubtract(keys(var.subnets), [
+      "public",
+      "private"
+    ])) == 0
+  }
+
+  # All var.subnets.public valid keys
+  validation {
+    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
+    condition = length(setsubtract(keys(try(var.subnets.public, {})), [
+      "cidrs",
+      "netmask",
+      "name_prefix",
+      "nat_gateway_configuration",
+      "tags"
+    ])) == 0
+  }
+
+  # All var.subnets.private valid keys
+  validation {
+    error_message = "Invalid key in private subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"route_to_nat\", \"tags\"."
+    condition = length(setsubtract(keys(try(var.subnets.private, {})), [
+      "cidrs",
+      "netmask",
+      "name_prefix",
+      "route_to_nat",
+      "tags"
+    ])) == 0
+  }
+
+  validation {
+    error_message = "Each subnet type must contain only 1 key: `cidrs` or `netmask`."
+    condition     = alltrue([for subnet_type, v in var.subnets : length(setintersection(keys(v), ["cidrs", "netmask"])) == 1])
+  }
+
+  validation {
+    error_message = "Public subnet `nat_gateway_configuration` can only be `all_azs`, `single_az`, `none`, or `null`."
+    condition     = can(regex("^(all_azs|single_az|none)$", var.subnets.public.nat_gateway_configuration)) || try(var.subnets.public.nat_gateway_configuration, null) == null
+  }
+
+  validation {
+    error_message = "If private.route_to_nat == true, then public.nat_gateway_configuration must be either `all_azs` or `single_az`."
+    condition     = try(var.subnets.private.route_to_nat, false) ? can(regex("^(all_azs|single_az)$", var.subnets.public.nat_gateway_configuration)) : true
+  }
+
+  validation {
+    error_message = "Any subnet type `name_prefix` must not contain \"/\"."
+    condition     = alltrue([for _, v in var.subnets : !can(regex("/", try(v.name_prefix, "")))])
   }
 }
 
 variable "tags" {
-  type        = map(string)
-  description = "tags, which could be used for additional tags"
-  default     = {}
-}
-
-variable "private_subnet_tags" {
-  description = "Additional tags for the private subnets"
+  description = "Tags to apply to all resources."
   type        = map(string)
   default     = {}
 }
 
-variable "public_subnet_tags" {
-  description = "Additional tags for the public subnets"
-  type        = map(string)
-  default     = {}
-}
+variable "vpc_flow_logs" {
+  description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
+  nullable    = false
 
-variable "enable_dns_hostnames" {
-  description = "Should be true to enable DNS hostnames in the VPC"
-  type        = bool
-  default     = true
-}
+  type = object({
+    log_destination = optional(string)
+    iam_role_arn    = optional(string)
+    kms_key_id      = optional(string)
 
-variable "enable_dns_support" {
-  description = "Should be true to enable DNS support in the VPC"
-  type        = bool
-  default     = true
-}
+    log_destination_type = string
+    retention_in_days    = optional(number)
+    tags                 = optional(map(string))
+    traffic_type         = optional(string)
+    destination_options = optional(object({
+      file_format                = optional(string)
+      hive_compatible_partitions = optional(bool)
+      per_hour_partition         = optional(bool)
+    }))
+  })
 
-variable "instance_tenancy" {
-  description = "A tenancy option for instances launched into the VPC"
-  type        = string
-  default     = "default"
-  validation {
-    condition     = var.instance_tenancy == "default" || var.instance_tenancy == "dedicated"
-    error_message = "Value must be either \"default\" or \"dedicated\"."
+  default = {
+    log_destination_type = "none"
   }
-}
 
-variable "cidr" {
-  description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
-  type        = string
-  default     = "10.0.0.0/16"
   validation {
-    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$", var.cidr)) && can(split("/", var.cidr)[1] >= 16) && can(split("/", var.cidr)[1] <= 28)
-    error_message = "Value must be a valid cidr block and must have a subnet mask from 28 to 16. eg.: \"10.0.0.0/16\"."
+    condition     = contains(["cloud-watch-logs", "s3", "none"], var.vpc_flow_logs.log_destination_type)
+    error_message = "Invalid input, options: \"cloud-watch-logs\", \"s3\", or \"none\"."
   }
-}
-
-variable "public_subnet_cidrs" {
-  description = "A list of CIDR blocks to use for public subnets. Default is 3 /20 cidrs from the CIDR range specified in the cidr variable. The number of public subnets is inferred from the number of CIDR's provided. If availability_zones are specified, it must have the same number of elements. If not specified, the number of elements must not be greater than the number of availability zones in the region."
-  type        = list(string)
-  default     = null
-  validation {
-    condition     = can([for s in var.public_subnet_cidrs : regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$", s)]) || var.public_subnet_cidrs == null
-    error_message = "Each element of the list must be a valid CIDR block."
-  }
-}
-
-variable "private_subnet_a_cidrs" {
-  description = "A list of CIDR blocks to use for private subnets. Default is 3 /19 cidrs from the CIDR range specified in the cidr variable. The number of private subnets is inferred from the number of CIDR's provided. If availability_zones are specified, must have the same number of elements. If not specified, the number of elements must not be greater than the number of availability zones in the region."
-  type        = list(string)
-  default     = null
-  validation {
-    condition     = can([for s in var.private_subnet_a_cidrs : regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$", s)]) || var.private_subnet_a_cidrs == null
-    error_message = "Each element of the list must be a valid CIDR block."
-  }
-}
-
-variable "private_subnet_b_cidrs" {
-  description = "A list of CIDR blocks to use for private subnets. Default is 3 /19 cidrs from the CIDR range specified in the cidr variable. The number of private subnets is inferred from the number of CIDR's provided."
-  type        = list(string)
-  default     = null
-  validation {
-    condition     = can([for s in var.private_subnet_b_cidrs : regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$", s)]) || var.private_subnet_b_cidrs == null
-    error_message = "Each element of the list must be a valid CIDR block."
-  }
-}
-
-variable "public_inbound_acl_rules" {
-  description = "Public subnets inbound network ACLs. Default allows all traffic"
-  type        = list(map(string))
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
-}
-
-variable "public_outbound_acl_rules" {
-  description = "Public subnets outbound network ACLs. Default allows all traffic"
-  type        = list(map(string))
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
-}
-
-variable "private_a_inbound_acl_rules" {
-  description = "Private subnet A's inbound network ACLs. Default allows all traffic"
-  type        = list(map(string))
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
-}
-
-variable "private_a_outbound_acl_rules" {
-  description = "Private subnet A's outbound network ACLs. Default allows all traffic"
-  type        = list(map(string))
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
-}
-
-variable "private_b_inbound_acl_rules" {
-  description = "Private subnet B's inbound network ACLs. Default allows all traffic"
-  type        = list(map(string))
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
-}
-
-variable "private_b_outbound_acl_rules" {
-  description = "Private subnet B's outbound network ACLs. Default allows all traffic"
-  type        = list(map(string))
-  default = [
-    {
-      rule_number = 100
-      rule_action = "allow"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_block  = "0.0.0.0/0"
-    },
-  ]
-}
-
-variable "availability_zones" {
-  description = "A list of availability zones to use for subnets. If this is not provided availability zones for subnets will be automatically selected"
-  type        = list(string)
-  default     = null
-}
-
-variable "create_igw" {
-  description = "If set to false no IGW will be created for the public subnets. Setting this to false will also disable NAT gateways on private subnets, as NAT gateways require IGW in public subnets"
-  type        = bool
-  default     = true
-}
-
-variable "create_nat_gateways_private_a" {
-  description = "If set to false no NAT gateways will be created for the private_a subnets"
-  type        = bool
-  default     = true
-}
-
-variable "create_nat_gateways_private_b" {
-  description = "If set to false no NAT gateways will be created for the private_b subnets"
-  type        = bool
-  default     = false
-}
-
-variable "enabled_gateway_endpoints" {
-  description = "List of shortened gateway endpoint names that are to be enabled. Endpoints will be attached to the private_a and private_b route tables. Shortened names are the endpoint name excluding the dns style prefix, so \"com.amazonaws.us-east-1.s3\" would be entered as \"s3\". For a full list of available endpoint names, see the aws-ia/vpc_endpoints module on the terraform registry."
-  type        = list(string)
-  default     = []
-}
-
-variable "enabled_interface_endpoints" {
-  description = "List of shortened interface endpoint names that are to be enabled. Endpoints will be attached to the private_b subnets. A dedicated security group will be created (allowing tcp443 ingress from vpc cidr) and outputted as \"vpc_endpoint_security_group_id\". Shortened names are the endpoint name excluding the dns style prefix, so \"com.amazonaws.us-east-1.s3\" would be entered as \"s3\". For a full list of available endpoint names, see the aws-ia/vpc_endpoints module on the terraform registry. For advanced configuration options, use the aws-ia/vpc_endpoints module directly."
-  type        = list(string)
-  default     = []
 }
