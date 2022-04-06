@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
 # AWS VPC Module
 
-This module can be used to deploy a pragmatic VPC with various subnets types in # AZs. Common deployment examples can be found in [examples/](./examples/). Subnet CIDRs can be explicitly set via list of string argument `cidrs` or set via a number `netmask` argument.
+This module can be used to deploy a pragmatic VPC with various subnets types in # AZs. Common deployment examples can be found in [examples/](https://github.com/aws-ia/terraform-aws-vpc/tree/main/examples). Subnet CIDRs can be explicitly set via list of string argument `cidrs` or set via a number `netmask` argument.
 
 ## Usage
 
@@ -93,7 +93,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.8.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.0.1 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.16.0 |
 
 ## Modules
 
