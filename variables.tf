@@ -27,6 +27,12 @@ variable "vpc_enable_dns_hostnames" {
   default     = true
 }
 
+variable "vpc_secondary_cidr" {
+  type        = bool
+  description = "If `true` the module will create a `aws_vpc_ipv4_cidr_block_association` and subnets for that secondary cidr. If using IPAM for both primary and secondary CIDRs, you may only call this module serially (aka using `-target`, etc)."
+  default     = false
+}
+
 variable "vpc_enable_dns_support" {
   type        = bool
   description = "Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range \"plus two\" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default."

@@ -1,7 +1,8 @@
 module "calculate_subnets" {
   source = "./modules/calculate_subnets"
 
-  cidr = local.vpc.cidr_block
+  # cidr = local.vpc.cidr_block
+  cidr = local.vpc_cidr_block
   azs  = local.azs
 
   subnets = var.subnets
@@ -22,6 +23,14 @@ resource "aws_vpc" "main" {
   module.tags.tags_aws)
 }
 
+resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
+  count = (var.vpc_secondary_cidr && !local.create_vpc) ? 1 : 0
+
+  vpc_id            = var.vpc_id
+  cidr_block        = local.vpc_cidr_block
+  ipv4_ipam_pool_id = var.vpc_ipv4_ipam_pool_id
+}
+
 resource "aws_subnet" "private" {
   for_each = try(local.subnets.private, {})
 
@@ -33,6 +42,10 @@ resource "aws_subnet" "private" {
   tags = merge({
     Name = "${local.subnet_names["private"]}-${each.key}" },
   module.tags.tags_aws)
+
+  depends_on = [
+    aws_vpc_ipv4_cidr_block_association.secondary
+  ]
 }
 
 resource "aws_subnet" "public" {
