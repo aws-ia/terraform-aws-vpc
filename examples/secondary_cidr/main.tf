@@ -1,9 +1,8 @@
 # To test this example, uncomment the module blocks for "vpc" and "ipam_base_for_example_only"
 
 module "secondary" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 1.0.0"
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 1.0.0"
 
   name = "secondary-cidr"
 
@@ -18,22 +17,19 @@ module "secondary" {
   }
 }
 
+# module "ipam_base_for_example_only" {
+#   source = "../../test/hcl_fixtures/ipam_base"
+# }
 
-module "ipam_base_for_example_only" {
-  source = "../../test/hcl_fixtures/ipam_base"
-}
+# module "vpc" {
+#   source  = "aws-ia/vpc/aws"
+#   version = ">= 1.0.0"
 
-module "vpc" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 1.0.0"
-  source = "../.."
+#   name       = "multi-az-vpc"
+#   cidr_block = "10.0.0.0/16"
+#   az_count   = 3
 
-
-  name       = "multi-az-vpc"
-  cidr_block = "10.0.0.0/16"
-  az_count   = 3
-
-  subnets = {
-    private = { netmask = 24 }
-  }
-}
+#   subnets = {
+#     private = { netmask = 24 }
+#   }
+# }
