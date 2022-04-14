@@ -10,7 +10,7 @@ The example below builds a VPC with public and private subnets in 3 AZs. Each su
 ```hcl
 module "vpc" {
   source   = "aws-ia/vpc/aws"
-  versions = ">= 1.0.0"
+  version = ">= 1.0.0"
 
   name           = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
