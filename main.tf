@@ -1,7 +1,6 @@
 module "calculate_subnets" {
   source = "./modules/calculate_subnets"
 
-  # cidr = local.vpc.cidr_block
   cidr = local.cidr_block
   azs  = local.azs
 
