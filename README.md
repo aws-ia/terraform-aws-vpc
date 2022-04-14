@@ -13,7 +13,7 @@ module "vpc" {
   versions = ">= 1.0.0"
 
   name           = "multi-az-vpc"
-  vpc_cidr_block = "10.0.0.0/20"
+  cidr_block = "10.0.0.0/20"
   az_count       = 3
 
   subnets = {
@@ -48,7 +48,7 @@ Example: Changing from 2 azs to 3
 
 Before:
 ```hcl
-vpc_cidr_block = "10.0.0.0/16"
+cidr_block = "10.0.0.0/16"
 az_count = 2
 
 subnets = {
@@ -64,7 +64,7 @@ subnets = {
 
 After:
 ```hcl
-vpc_cidr_block = "10.0.0.0/16"
+cidr_block = "10.0.0.0/16"
 az_count = 3
 
 subnets = {
@@ -131,8 +131,8 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 | <a name="input_az_count"></a> [az\_count](#input\_az\_count) | Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z. | `number` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name to give VPC. Note: does not effect subnet names, which get assigned name based on name\_prefix. | `string` | n/a | yes |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Configuration of subnets to build in VPC. Valid key restriction information found in variables.tf. | `any` | n/a | yes |
+| <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc\_id output from data.aws\_vpc. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
-| <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | CIDR range to assign to VPC if creating VPC. Overridden by var.vpc\_id output from data.aws\_vpc. | `string` | `null` | no |
 | <a name="input_vpc_enable_dns_hostnames"></a> [vpc\_enable\_dns\_hostnames](#input\_vpc\_enable\_dns\_hostnames) | Indicates whether the instances launched in the VPC get DNS hostnames. If enabled, instances in the VPC get DNS hostnames; otherwise, they do not. Disabled by default for nondefault VPCs. | `bool` | `true` | no |
 | <a name="input_vpc_enable_dns_support"></a> [vpc\_enable\_dns\_support](#input\_vpc\_enable\_dns\_support) | Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range "plus two" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default. | `bool` | `true` | no |
 | <a name="input_vpc_flow_logs"></a> [vpc\_flow\_logs](#input\_vpc\_flow\_logs) | Whether or not to create VPC flow logs and which type. Options: "cloudwatch", "s3", "none". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf. | <pre>object({<br>    log_destination = optional(string)<br>    iam_role_arn    = optional(string)<br>    kms_key_id      = optional(string)<br><br>    log_destination_type = string<br>    retention_in_days    = optional(number)<br>    tags                 = optional(map(string))<br>    traffic_type         = optional(string)<br>    destination_options = optional(object({<br>      file_format                = optional(string)<br>      hive_compatible_partitions = optional(bool)<br>      per_hour_partition         = optional(bool)<br>    }))<br>  })</pre> | <pre>{<br>  "log_destination_type": "none"<br>}</pre> | no |

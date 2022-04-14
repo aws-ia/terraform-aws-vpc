@@ -1,4 +1,4 @@
-output "subnets" {
+output "secondary_subnets" {
   description = "Map of subnet types with key/value az = cidr."
-  value       = module.vpc.subnets
+  value       = module.secondary.subnets
 }

@@ -1,5 +1,4 @@
 module "vpc" {
-  # source = "../.."
   source  = "aws-ia/vpc/aws"
   version = ">= 1.0.0"
 

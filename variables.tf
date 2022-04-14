@@ -3,8 +3,8 @@ variable "name" {
   description = "Name to give VPC. Note: does not effect subnet names, which get assigned name based on name_prefix."
 }
 
-variable "vpc_cidr_block" {
-  description = "CIDR range to assign to VPC if creating VPC. Overridden by var.vpc_id output from data.aws_vpc."
+variable "cidr_block" {
+  description = "CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc_id output from data.aws_vpc."
   default     = null
   type        = string
 
