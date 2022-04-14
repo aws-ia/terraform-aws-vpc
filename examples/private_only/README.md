@@ -1,4 +1,8 @@
 <!-- BEGIN_TF_DOCS -->
+# Create VPC with private subnets
+
+This example builds a VPC with private subnets in 3 availability zones
+
 ## Requirements
 
 No requirements.

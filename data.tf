@@ -21,19 +21,19 @@ locals {
   nat_configuration = contains(keys(local.subnets), "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
 
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
-  create_vpc     = var.vpc_id == null ? true : false
-  vpc            = local.create_vpc ? aws_vpc.main[0] : data.awscc_ec2_vpc.main[0]
-  vpc_cidr_block = var.vpc_ipv4_ipam_pool_id == null ? var.vpc_cidr_block : data.aws_vpc_ipam_preview_next_cidr.main[0].cidr
+  create_vpc = var.vpc_id == null ? true : false
+  vpc        = local.create_vpc ? aws_vpc.main[0] : data.awscc_ec2_vpc.main[0]
+  /*
+    vpc            = local.create_vpc ? aws_vpc.main[0] : (
+    var.vpc_secondary_cidr ? aws_vpc_ipv4_cidr_block_association.secondary[0] : data.awscc_ec2_vpc.main[0]
+  )
+  */
+  cidr_block = var.vpc_ipv4_ipam_pool_id == null ? var.cidr_block : data.aws_vpc_ipam_preview_next_cidr.main[0].cidr
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
 }
 
-data "aws_availability_zones" "current" {
-  filter {
-    name   = "opt-in-status"
-    values = ["opt-in-not-required"]
-  }
-}
+data "aws_availability_zones" "current" {}
 
 # search for existing vpc with var.vpc_id if not creating
 data "awscc_ec2_vpc" "main" {

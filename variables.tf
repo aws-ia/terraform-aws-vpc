@@ -3,8 +3,8 @@ variable "name" {
   description = "Name to give VPC. Note: does not effect subnet names, which get assigned name based on name_prefix."
 }
 
-variable "vpc_cidr_block" {
-  description = "CIDR range to assign to VPC if creating VPC. Overridden by var.vpc_id output from data.aws_vpc."
+variable "cidr_block" {
+  description = "CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc_id output from data.aws_vpc."
   default     = null
   type        = string
 
@@ -25,6 +25,12 @@ variable "vpc_enable_dns_hostnames" {
   type        = bool
   description = "Indicates whether the instances launched in the VPC get DNS hostnames. If enabled, instances in the VPC get DNS hostnames; otherwise, they do not. Disabled by default for nondefault VPCs."
   default     = true
+}
+
+variable "vpc_secondary_cidr" {
+  type        = bool
+  description = "If `true` the module will create a `aws_vpc_ipv4_cidr_block_association` and subnets for that secondary cidr. If using IPAM for both primary and secondary CIDRs, you may only call this module serially (aka using `-target`, etc)."
+  default     = false
 }
 
 variable "vpc_enable_dns_support" {

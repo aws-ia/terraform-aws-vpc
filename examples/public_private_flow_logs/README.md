@@ -1,4 +1,10 @@
 <!-- BEGIN_TF_DOCS -->
+# Create VPC flow logs
+
+This example builds a VPC with public and private subnets in 3 availability zones, creates a nat gateway in each AZ and appropriately routes from each private to the nat gateway. It creates an internet gateway and appropriately routes subnet traffic from "0.0.0.0/0" to the IGW. It creates encrypted VPC Flow Logs that are sent to cloud-watch and retained for 180 days.
+
+At this point, only cloud-watch logs are support, pending: https://github.com/aws-ia/terraform-aws-vpc/issues/35
+
 ## Requirements
 
 No requirements.
@@ -11,7 +17,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 1.0.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources
 

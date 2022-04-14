@@ -1,5 +1,5 @@
-output "vpc_id" {
-  description = "VPC Information"
+output "vpc" {
+  description = "VPC Resource Information. Full output of aws_vpc."
   value       = local.vpc
 }
 

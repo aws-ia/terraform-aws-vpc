@@ -1,7 +1,7 @@
 module "calculate_subnets" {
   source = "./modules/calculate_subnets"
 
-  cidr = local.vpc.cidr_block
+  cidr = local.cidr_block
   azs  = local.azs
 
   subnets = var.subnets
@@ -10,7 +10,7 @@ module "calculate_subnets" {
 resource "aws_vpc" "main" {
   count = local.create_vpc ? 1 : 0
 
-  cidr_block           = local.vpc_cidr_block
+  cidr_block           = local.cidr_block
   enable_dns_hostnames = var.vpc_enable_dns_hostnames
   enable_dns_support   = var.vpc_enable_dns_support
   instance_tenancy     = var.vpc_instance_tenancy
@@ -20,6 +20,14 @@ resource "aws_vpc" "main" {
     "Name" = var.name
     },
   module.tags.tags_aws)
+}
+
+resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
+  count = (var.vpc_secondary_cidr && !local.create_vpc) ? 1 : 0
+
+  vpc_id            = var.vpc_id
+  cidr_block        = local.cidr_block
+  ipv4_ipam_pool_id = var.vpc_ipv4_ipam_pool_id
 }
 
 resource "aws_subnet" "private" {
@@ -33,6 +41,10 @@ resource "aws_subnet" "private" {
   tags = merge({
     Name = "${local.subnet_names["private"]}-${each.key}" },
   module.tags.tags_aws)
+
+  depends_on = [
+    aws_vpc_ipv4_cidr_block_association.secondary
+  ]
 }
 
 resource "aws_subnet" "public" {
@@ -64,7 +76,7 @@ resource "awscc_ec2_route_table" "public" {
   vpc_id = local.vpc.id
 
   tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["public"]}}-${each.key}" }],
+    [{ "key" = "Name", "value" = "${local.subnet_names["public"]}-${each.key}" }],
     module.tags.tags
   )
 }

@@ -4,12 +4,12 @@ module "ipam" {
   source  = "aws-ia/ipam/aws"
   version = ">= 1.0.0"
 
-  top_cidr = ["10.0.0.0/8"]
+  top_cidr = ["172.0.0.0/8"]
 
   pool_configurations = {
     "${data.aws_region.current.name}" = {
       description = "${data.aws_region.current.name} top level pool"
-      cidr        = ["10.0.0.0/16"]
+      cidr        = ["172.2.0.0/16"]
       locale      = data.aws_region.current.name
     }
   }
