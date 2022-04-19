@@ -93,7 +93,8 @@ variable "subnets" {
     error_message = "Only valid key values \"public\", \"private\"."
     condition = length(setsubtract(keys(var.subnets), [
       "public",
-      "private"
+      "private",
+      "transit_gateway"
     ])) == 0
   }
 
@@ -117,6 +118,20 @@ variable "subnets" {
       "netmask",
       "name_prefix",
       "route_to_nat",
+      "tags"
+    ])) == 0
+  }
+
+  # All var.subnets.transit_gateway valid keys
+  validation {
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"tags\"."
+    condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
+      "cidrs",
+      "netmask",
+      "name_prefix",
+      "transit_gateway_id",
+      "transit_gateway_default_route_table_association",
+      "transit_gateway_default_route_table_propagation",
       "tags"
     ])) == 0
   }
