@@ -90,7 +90,7 @@ variable "subnets" {
 
   # Only valid keys for var.subnets
   validation {
-    error_message = "Only valid key values \"public\", \"private\"."
+    error_message = "Only valid key values \"public\", \"private\", or \"transit_gateway\"."
     condition = length(setsubtract(keys(var.subnets), [
       "public",
       "private",
