@@ -1,11 +1,25 @@
-output "vpc" {
-  description = "VPC Resource Information. Full output of aws_vpc."
+output "vpc_attributes" {
+  description = "VPC resource attributes. Full output of aws_vpc."
   value       = local.vpc
 }
 
 output "subnets" {
-  description = "Map of subnets grouped by type with child map { az = cidr }"
+  description = "Map of subnets grouped by type with child map { az = cidr }."
   value       = module.calculate_subnets.subnets_by_type
+  /* Example:
+    subnets = {
+       private = {
+          us-east-1a = "10.0.0.0/24"
+          us-east-1b = "10.0.1.0/24"
+          us-east-1c = "10.0.2.0/24"
+        }
+      public  = {
+          us-east-1a = "10.0.3.0/24"
+          us-east-1b = "10.0.4.0/24"
+          us-east-1c = "10.0.5.0/24"
+        }
+    }
+  */
 }
 
 output "transit_gateway_attachment_id" {

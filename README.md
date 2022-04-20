@@ -151,8 +151,8 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 |------|-------------|
 | <a name="output_private_subnet_attributes_by_az"></a> [private\_subnet\_attributes\_by\_az](#output\_private\_subnet\_attributes\_by\_az) | Map of all private subnets containing their attributes. |
 | <a name="output_public_subnet_attributes_by_az"></a> [public\_subnet\_attributes\_by\_az](#output\_public\_subnet\_attributes\_by\_az) | Map of all public subnets containing their attributes. |
-| <a name="output_subnets"></a> [subnets](#output\_subnets) | Map of subnets grouped by type with child map { az = cidr } |
+| <a name="output_subnets"></a> [subnets](#output\_subnets) | Map of subnets grouped by type with child map { az = cidr }. |
 | <a name="output_tgw_subnet_attributes_by_az"></a> [tgw\_subnet\_attributes\_by\_az](#output\_tgw\_subnet\_attributes\_by\_az) | Map of all transit gateway subnets containing their attributes. |
 | <a name="output_transit_gateway_attachment_id"></a> [transit\_gateway\_attachment\_id](#output\_transit\_gateway\_attachment\_id) | Transit gateway attachment id. |
-| <a name="output_vpc"></a> [vpc](#output\_vpc) | VPC Resource Information. Full output of aws\_vpc. |
+| <a name="output_vpc_attributes"></a> [vpc\_attributes](#output\_vpc\_attributes) | VPC resource attributes. Full output of aws\_vpc. |
 <!-- END_TF_DOCS -->
