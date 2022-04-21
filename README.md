@@ -13,7 +13,7 @@ module "vpc" {
   version = ">= 1.0.0"
 
   name           = "multi-az-vpc"
-  cidr_block = "10.0.0.0/20"
+  cidr_block     = "10.0.0.0/20"
   az_count       = 3
 
   subnets = {
