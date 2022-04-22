@@ -13,7 +13,7 @@ module "vpc" {
   version = ">= 1.0.0"
 
   name           = "multi-az-vpc"
-  cidr_block     = "10.0.0.0/20"
+  cidr_block = "10.0.0.0/20"
   az_count       = 3
 
   subnets = {
@@ -85,14 +85,14 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.15.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.72.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.73.0 |
 | <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.15.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.72.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
 | <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.15.0 |
 
 ## Modules
