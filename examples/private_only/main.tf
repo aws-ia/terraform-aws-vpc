@@ -4,7 +4,7 @@ module "vpc" {
 
   name       = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
-  az_count   = 3
+  az_count   = 1
 
   subnets = {
     private = { netmask = 24 }

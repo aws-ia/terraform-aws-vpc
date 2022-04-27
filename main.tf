@@ -55,7 +55,19 @@ resource "aws_subnet" "public" {
   cidr_block        = each.value
 
   tags = merge({
-    Name = "${local.subnet_names["public"]}}-${each.key}" },
+    Name = "${local.subnet_names["public"]}-${each.key}" },
+  module.tags.tags_aws)
+}
+
+resource "aws_subnet" "tgw" {
+  for_each = try(local.subnets.transit_gateway, {})
+
+  availability_zone = each.key
+  vpc_id            = local.vpc.id
+  cidr_block        = each.value
+
+  tags = merge({
+    Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
   module.tags.tags_aws)
 }
 
@@ -144,6 +156,24 @@ resource "aws_route" "public_to_igw" {
   route_table_id         = awscc_ec2_route_table.public[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.main[0].id
+}
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
+  count = contains(keys(local.subnets), "transit_gateway") ? 1 : 0
+
+  subnet_ids         = values(aws_subnet.tgw)[*].id
+  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
+  vpc_id             = local.vpc.id
+
+  transit_gateway_default_route_table_association = try(var.subnets.transit_gateway.transit_gateway_default_route_table_association, null)
+  transit_gateway_default_route_table_propagation = try(var.subnets.transit_gateway.transit_gateway_default_route_table_propagation, null)
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "tgw" {
+  count = can(var.subnets.transit_gateway.transit_gateway_route_table_id) ? 1 : 0
+
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tgw[0].id
+  transit_gateway_route_table_id = var.subnets.transit_gateway.transit_gateway_route_table_id
 }
 
 module "flow_logs" {
