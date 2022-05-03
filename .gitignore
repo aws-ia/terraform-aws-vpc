@@ -38,3 +38,5 @@ override.tf.json
 terraform.rc
 .terraform.lock.hcl
 
+go.mod
+go.sum
