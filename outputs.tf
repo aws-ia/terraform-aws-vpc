@@ -41,3 +41,12 @@ output "tgw_subnet_attributes_by_az" {
   description = "Map of all transit gateway subnets containing their attributes."
   value       = try(aws_subnet.tgw, null)
 }
+
+output "route_table_by_subnet_type" {
+  description = "Map of route tables by type => az => route table attributes. Ex usage: module.vpc.route_table_by_subnet_type.private.id"
+  value = {
+    # TODO: omit keys if value is null
+    "private" = awscc_ec2_route_table.private,
+    "public"  = awscc_ec2_route_table.public
+  }
+}
