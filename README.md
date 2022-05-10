@@ -101,7 +101,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 |------|--------|---------|
 | <a name="module_calculate_subnets"></a> [calculate\_subnets](#module\_calculate\_subnets) | ./modules/calculate_subnets | n/a |
 | <a name="module_flow_logs"></a> [flow\_logs](#module\_flow\_logs) | ./modules/flow_logs | n/a |
-| <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.4 |
+| <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.5 |
 
 ## Resources
 
