@@ -49,7 +49,7 @@ data "aws_vpc_ipam_preview_next_cidr" "main" {
 # awscc tags = module.tags.tags
 module "tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.4"
+  version = "0.0.5"
 
   tags = var.tags
 }
