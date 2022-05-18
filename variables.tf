@@ -131,6 +131,7 @@ variable "subnets" {
       "cidrs",
       "netmask",
       "name_prefix",
+      "route_to_nat",
       "transit_gateway_id",
       "transit_gateway_default_route_table_association",
       "transit_gateway_default_route_table_propagation",
@@ -178,7 +179,6 @@ variable "tags" {
 
 variable "vpc_flow_logs" {
   description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
-  nullable    = false
 
   type = object({
     log_destination = optional(string)

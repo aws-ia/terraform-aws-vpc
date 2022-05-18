@@ -82,6 +82,18 @@ resource "awscc_ec2_route_table" "private" {
   )
 }
 
+resource "awscc_ec2_route_table" "tgw" {
+  for_each = try(local.subnets.transit_gateway, {})
+
+  vpc_id = local.vpc.id
+
+  tags = concat(
+    [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
+    module.tags.tags
+  )
+}
+
+
 resource "awscc_ec2_route_table" "public" {
   for_each = try(local.subnets.public, {})
 
@@ -149,6 +161,17 @@ resource "aws_route" "private_to_nat" {
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
+
+resource "aws_route" "tgw_to_nat" {
+  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
+  for_each = try(var.subnets.transit_gateway.route_to_nat, false) ? try(local.subnets.public, {}) : {}
+
+  route_table_id         = awscc_ec2_route_table.tgw[each.key].id
+  destination_cidr_block = "0.0.0.0/0"
+  # try to get nat for AZ, else use singular nat
+  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
+}
+
 
 resource "aws_route" "private_to_tgw" {
   # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item

@@ -116,6 +116,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 | [aws_route.private_to_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.public_to_igw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.public_to_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.tgw_to_nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_subnet.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
@@ -123,6 +124,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 | [aws_vpc_ipv4_cidr_block_association.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipv4_cidr_block_association) | resource |
 | [awscc_ec2_route_table.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
 | [awscc_ec2_route_table.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
+| [awscc_ec2_route_table.tgw](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
 | [awscc_ec2_subnet_route_table_association.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
 | [awscc_ec2_subnet_route_table_association.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
 | [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
