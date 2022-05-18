@@ -106,6 +106,7 @@ variable "subnets" {
       "netmask",
       "name_prefix",
       "nat_gateway_configuration",
+      "route_to_transit_gateway",
       "tags"
     ])) == 0
   }
@@ -118,6 +119,7 @@ variable "subnets" {
       "netmask",
       "name_prefix",
       "route_to_nat",
+      "route_to_transit_gateway",
       "tags"
     ])) == 0
   }
@@ -154,6 +156,17 @@ variable "subnets" {
   validation {
     error_message = "Any subnet type `name_prefix` must not contain \"/\"."
     condition     = alltrue([for _, v in var.subnets : !can(regex("/", try(v.name_prefix, "")))])
+  }
+
+  validation {
+    error_message = "Private subnet cannot set `route_to_transit_gateway` = \"0.0.0.0/.\" if `route_to_nat` = true."
+    condition     = try(var.subnets.private.route_to_nat, false) ? try(var.subnets.private.route_to_transit_gateway[0] != "0.0.0.0/0", true) : null
+  }
+
+  # TODO: remove once `route_to_transit_gateway` can accept more than 1 argument
+  validation {
+    error_message = "Argument `route_to_transit_gateway` cannot accept more than 1 string."
+    condition     = try(length(var.subnets.private.route_to_transit_gateway), 0) <= 1 || try(length(var.subnets.public.route_to_transit_gateway), 0) <= 1
   }
 }
 
