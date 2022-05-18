@@ -151,6 +151,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 
 | Name | Description |
 |------|-------------|
+| <a name="output_nat_gateways_by_az"></a> [nat\_gateways\_by\_az](#output\_nat\_gateways\_by\_az) | Map of nat gateway resource attributes by AZ. |
 | <a name="output_private_subnet_attributes_by_az"></a> [private\_subnet\_attributes\_by\_az](#output\_private\_subnet\_attributes\_by\_az) | Map of all private subnets containing their attributes. |
 | <a name="output_public_subnet_attributes_by_az"></a> [public\_subnet\_attributes\_by\_az](#output\_public\_subnet\_attributes\_by\_az) | Map of all public subnets containing their attributes. |
 | <a name="output_route_table_by_subnet_type"></a> [route\_table\_by\_subnet\_type](#output\_route\_table\_by\_subnet\_type) | Map of route tables by type => az => route table attributes. Example usage: module.vpc.route\_table\_by\_subnet\_type.private.id |

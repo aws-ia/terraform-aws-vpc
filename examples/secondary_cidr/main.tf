@@ -1,8 +1,9 @@
 # To test this example, uncomment the module blocks for "vpc" and "ipam_base_for_example_only"
 
 module "secondary" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 1.0.0"
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 1.0.0"
+  source = "../.."
 
   name = "secondary-cidr"
 

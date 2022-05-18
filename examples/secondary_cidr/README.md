@@ -21,7 +21,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_secondary"></a> [secondary](#module\_secondary) | aws-ia/vpc/aws | >= 1.0.0 |
+| <a name="module_secondary"></a> [secondary](#module\_secondary) | ../.. | n/a |
 
 ## Resources
 

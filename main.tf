@@ -152,7 +152,6 @@ resource "aws_route" "private_to_nat" {
 
 resource "aws_route" "private_to_tgw" {
   # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item
-  # local.subnets.private :
   for_each = try(var.subnets.private.route_to_transit_gateway, []) != [] ? toset([
     for _, key in keys(local.subnets.private) : "${key}:${var.subnets.private.route_to_transit_gateway[0]}"
   ]) : toset([])

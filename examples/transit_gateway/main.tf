@@ -25,9 +25,8 @@ module "vpc" {
     }
 
     transit_gateway = {
-      netmask            = 24
-      transit_gateway_id = aws_ec2_transit_gateway.example.id
-      # route_to_nat                                    = true # default false
+      netmask                                         = 24
+      transit_gateway_id                              = aws_ec2_transit_gateway.example.id
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
     }

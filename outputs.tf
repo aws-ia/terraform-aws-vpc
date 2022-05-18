@@ -50,3 +50,8 @@ output "route_table_by_subnet_type" {
     "public"  = awscc_ec2_route_table.public
   }
 }
+
+output "nat_gateways_by_az" {
+  description = "Map of nat gateway resource attributes by AZ."
+  value       = try(aws_nat_gateway.main, null)
+}

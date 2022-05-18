@@ -64,3 +64,12 @@ rule "terraform_standard_module_structure" {
 rule "terraform_workspace_remote" {
   enabled = true
 }
+
+# seems to be a bug when a resource is not created
+rule "aws_route_not_specified_target" {
+  enabled = false
+}
+
+rule "aws_route_specified_multiple_targets" {
+  enabled = false
+}
