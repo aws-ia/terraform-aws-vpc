@@ -82,6 +82,18 @@ resource "awscc_ec2_route_table" "private" {
   )
 }
 
+resource "awscc_ec2_route_table" "tgw" {
+  for_each = try(local.subnets.transit_gateway, {})
+
+  vpc_id = local.vpc.id
+
+  tags = concat(
+    [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
+    module.tags.tags
+  )
+}
+
+
 resource "awscc_ec2_route_table" "public" {
   for_each = try(local.subnets.public, {})
 
@@ -150,12 +162,44 @@ resource "aws_route" "private_to_nat" {
   nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
+resource "aws_route" "tgw_to_nat" {
+  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
+  for_each = try(var.subnets.transit_gateway.route_to_nat, false) ? try(local.subnets.public, {}) : {}
+
+  route_table_id         = awscc_ec2_route_table.tgw[each.key].id
+  destination_cidr_block = "0.0.0.0/0"
+  # try to get nat for AZ, else use singular nat
+  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
+}
+
+
+resource "aws_route" "private_to_tgw" {
+  # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item
+  for_each = try(var.subnets.private.route_to_transit_gateway, []) != [] ? toset([
+    for _, key in keys(local.subnets.private) : "${key}:${var.subnets.private.route_to_transit_gateway[0]}"
+  ]) : toset([])
+
+  route_table_id         = awscc_ec2_route_table.private[split(":", each.key)[0]].id
+  destination_cidr_block = var.subnets.private.route_to_transit_gateway[0]
+  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
+}
+
 resource "aws_route" "public_to_igw" {
   for_each = try(local.subnets.public, {})
 
   route_table_id         = awscc_ec2_route_table.public[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.main[0].id
+}
+
+resource "aws_route" "public_to_tgw" {
+  for_each = try(var.subnets.public.route_to_transit_gateway, []) != [] ? toset([
+    for _, key in keys(local.subnets.public) : "${key}:${var.subnets.public.route_to_transit_gateway[0]}"
+  ]) : toset([])
+
+  route_table_id         = awscc_ec2_route_table.public[split(":", each.key)[0]].id
+  destination_cidr_block = var.subnets.public.route_to_transit_gateway[0]
+  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
