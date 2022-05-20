@@ -68,25 +68,58 @@ variable "vpc_ipv4_netmask_length" {
 }
 
 variable "subnets" {
-  description = "Configuration of subnets to build in VPC. Valid key restriction information found in variables.tf."
+  description = <<-EOF
+  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway". Each Subnet type offers its own set of available arguments detailed below.
+
+  Attributes shared across subnet types:
+  - `cidrs`       = (Optional|list(string)) **Cannot set if `netmask` is set.** List of CIDRs to set to subnets. Count of CIDRs defined must match quatity of azs in `az_count`.
+  - `netmask`     = (Optional|Int) Netmask of the `var.cidr_block` to calculate for each subnet. **Cannot set if `cidrs` is set.**
+  - `name_prefix` = (Optional|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.
+  - `tags`        = (Optional|map(string)) Tags to set on the subnet and associated resources.
+
+  `private` subnet type options:
+  - All shared keys above
+  - `route_to_nat`             = (Optional|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `route_to_transit_gateway` = (Optional|list(string)) Optionally create routes from private subnets to transit gateway subnets.
+
+  `public` subnet type options:
+  - All shared keys above
+  - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.route_to_nat = true`.
+  - `route_to_transit_gateway`  = (Optional|list(string)) Optionally create routes from private subnets to transit gateway subnets.
+
+  `transit_gateway` subnet type options:
+  - All shared keys above
+  - `route_to_nat`                                    = (Optional|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `transit_gateway_id`                              = (Required|string) Transit gateway to attach VPC to.
+  - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
+  - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
+
+  Example:
+  ```
+  subnets = {
+    public = {
+      netmask                   = 24
+      nat_gateway_configuration = "single_az"
+      route_to_transit_gateway  = ["10.1.0.0/16"]
+    }
+
+    private = {
+      netmask                  = 24
+      route_to_nat             = true
+      route_to_transit_gateway = ["10.1.0.0/16"]
+    }
+
+    transit_gateway = {
+      netmask                                         = 24
+      transit_gateway_id                              = aws_ec2_transit_gateway.example.id
+      route_to_nat                                    = false
+      transit_gateway_default_route_table_association = true
+      transit_gateway_default_route_table_propagation = true
+    }
+  }
+  ```
+EOF
   type        = any
-
-  ######### EXAMPLE #########
-  #  subnets = {
-  #   public = {
-  #     name_prefix               = "my-public" # omit to prefix with "public"
-  #     netmask                   = 24
-  #     nat_gateway_configuration = "all_azs" # options: "single_az", "none"
-  #     tags = { env = "dev" }
-  #   }
-
-  #   private = {
-  #     name_prefix  = "private"
-  #     netmask      = 24
-  #     route_to_nat = true
-  #   }
-  # }
-  ###########################
 
   # Only valid keys for var.subnets
   validation {
