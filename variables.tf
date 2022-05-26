@@ -194,7 +194,7 @@ EOF
 
   validation {
     error_message = "Private subnet cannot set `route_to_transit_gateway` = \"0.0.0.0/.\" if `route_to_nat` = true."
-    condition     = try(var.subnets.private.route_to_nat, false) ? try(var.subnets.private.route_to_transit_gateway[0] != "0.0.0.0/0", true) : null
+    condition     = try(var.subnets.private.route_to_nat, false) ? try(var.subnets.private.route_to_transit_gateway[0] != "0.0.0.0/0", true) : true
   }
 
   # TODO: remove once `route_to_transit_gateway` can accept more than 1 argument
