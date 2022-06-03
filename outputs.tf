@@ -46,8 +46,9 @@ output "route_table_by_subnet_type" {
   description = "Map of route tables by type => az => route table attributes. Example usage: module.vpc.route_table_by_subnet_type.private.id"
   value = {
     # TODO: omit keys if value is null
-    "private" = awscc_ec2_route_table.private,
-    "public"  = awscc_ec2_route_table.public
+    "private"         = awscc_ec2_route_table.private,
+    "public"          = awscc_ec2_route_table.public
+    "transit_gateway" = awscc_ec2_route_table.tgw
   }
 }
 

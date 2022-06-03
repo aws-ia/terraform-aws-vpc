@@ -12,9 +12,9 @@ module "vpc" {
   source   = "aws-ia/vpc/aws"
   version = ">= 1.0.0"
 
-  name           = "multi-az-vpc"
+  name       = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
-  az_count       = 3
+  az_count   = 3
 
   subnets = {
     public = {
@@ -92,8 +92,8 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.15.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.14.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.21.0 |
 
 ## Modules
 
