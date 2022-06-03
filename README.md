@@ -92,8 +92,8 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.15.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.14.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.21.0 |
 
 ## Modules
 
