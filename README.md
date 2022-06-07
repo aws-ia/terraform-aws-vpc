@@ -80,6 +80,66 @@ subnets = {
 
 The above example will cause only creating 2 new subnets in az `c` of the region being used.
 
+## Output manipulation
+
+The outputs in this module attempt to align to a methodology of outputting resource attributes in a reasonable collection. The benefit of this is that, most likely, attributes you want access to are already present without having to create new `output {}` for each possible attribute. The [potential] downside is that you will have to extract it yourself using HCL logic. Below are some common examples:
+
+### Extracting subnet IDs for private subnets
+
+Example Configuration:
+```terraform
+module "vpc" {
+  source  = "aws-ia/vpc/aws"
+  version = ">= 1.0.0"
+
+  name       = "multi-az-vpc"
+  cidr_block = "10.0.0.0/20"
+  az_count   = 3
+
+  subnets = {
+    private = { netmask = 24 }
+  }
+}
+```
+
+Extracting subnet\_ids to a list (using `terraform console` for example output):
+```terraform
+> [ for _, value in module.vpc.private_subnet_attributes_by_az: value.id]
+[
+  "subnet-04a86315c4839b519",
+  "subnet-02a7249c8652a7136",
+  "subnet-09af79b5329b3681f",
+]
+```
+
+Alternatively, since these are maps, you can use key in another resource `for_each` loop. The benefit here is that your dependent resource will have keys that match the AZ the subnet is in:
+
+```terraform
+resource "aws_route53recoveryreadiness_cell" "cell_per_az" {
+  for_each = module.vpc.private_subnet_attributes_by_az
+
+  cell_name = "${each.key}-failover-cell-for-subnet-${each.value.id}"
+}
+...
+```
+
+Terraform Plan:
+
+```shell
+# aws_route53recoveryreadiness_cell.cell_per_az["us-east-1a"] will be created
++ resource "aws_route53recoveryreadiness_cell" "cell_per_az" {
+    + cell_name               = "us-east-1a-failover-cell-for-subnet-subnet-070696086c5864da1"
+    ...
+  }
+
+# aws_route53recoveryreadiness_cell.cell_per_az["us-east-1b"] will be created
+...
+```
+
+## Contributing
+
+Please see our [developer documentation](https://github.com/aws-ia/terraform-aws-vpc/contributing.md) for guidance on contributing to this module
+
 ## Requirements
 
 | Name | Version |
@@ -92,8 +152,8 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.14.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.21.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.15.0 |
 
 ## Modules
 
@@ -137,7 +197,7 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 |------|-------------|------|---------|:--------:|
 | <a name="input_az_count"></a> [az\_count](#input\_az\_count) | Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z. | `number` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name to give VPC. Note: does not effect subnet names, which get assigned name based on name\_prefix. | `string` | n/a | yes |
-| <a name="input_subnets"></a> [subnets](#input\_subnets) | Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit\_gateway". Each Subnet type offers its own set of available arguments detailed below.<br><br>Attributes shared across subnet types:<br>- `cidrs`       = (Optional\|list(string)) **Cannot set if `netmask` is set.** List of CIDRs to set to subnets. Count of CIDRs defined must match quatity of azs in `az_count`.<br>- `netmask`     = (Optional\|Int) Netmask of the `var.cidr_block` to calculate for each subnet. **Cannot set if `cidrs` is set.**<br>- `name_prefix` = (Optional\|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit\_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.<br>- `tags`        = (Optional\|map(string)) Tags to set on the subnet and associated resources.<br><br>`private` subnet type options:<br>- All shared keys above<br>- `route_to_nat`             = (Optional\|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.<br>- `route_to_transit_gateway` = (Optional\|list(string)) Optionally create routes from private subnets to transit gateway subnets.<br><br>`public` subnet type options:<br>- All shared keys above<br>- `nat_gateway_configuration` = (Optional\|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.route_to_nat = true`.<br>- `route_to_transit_gateway`  = (Optional\|list(string)) Optionally create routes from private subnets to transit gateway subnets.<br><br>`transit_gateway` subnet type options:<br>- All shared keys above<br>- `route_to_nat`                                    = (Optional\|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.<br>- `transit_gateway_id`                              = (Required\|string) Transit gateway to attach VPC to.<br>- `transit_gateway_default_route_table_association` = (Optional\|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.<br>- `transit_gateway_default_route_table_propagation` = (Optional\|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.<br><br>Example:<pre>subnets = {<br>  public = {<br>    netmask                   = 24<br>    nat_gateway_configuration = "single_az"<br>    route_to_transit_gateway  = ["10.1.0.0/16"]<br>  }<br><br>  private = {<br>    netmask                  = 24<br>    route_to_nat             = true<br>    route_to_transit_gateway = ["10.1.0.0/16"]<br>  }<br><br>  transit_gateway = {<br>    netmask                                         = 24<br>    transit_gateway_id                              = aws_ec2_transit_gateway.example.id<br>    route_to_nat                                    = false<br>    transit_gateway_default_route_table_association = true<br>    transit_gateway_default_route_table_propagation = true<br>  }<br>}</pre> | `any` | n/a | yes |
+| <a name="input_subnets"></a> [subnets](#input\_subnets) | Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit\_gateway". Each Subnet type offers its own set of available arguments detailed below.<br><br>**Attributes shared across subnet types:**<br>- `cidrs`       = (Optional\|list(string)) **Cannot set if `netmask` is set.** List of CIDRs to set to subnets. Count of CIDRs defined must match quatity of azs in `az_count`.<br>- `netmask`     = (Optional\|Int) Netmask of the `var.cidr_block` to calculate for each subnet. **Cannot set if `cidrs` is set.**<br>- `name_prefix` = (Optional\|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit\_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.<br>- `tags`        = (Optional\|map(string)) Tags to set on the subnet and associated resources.<br><br>**private subnet type options:**<br>- All shared keys above<br>- `route_to_nat`             = (Optional\|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.<br>- `route_to_transit_gateway` = (Optional\|list(string)) Optionally create routes from private subnets to transit gateway subnets.<br><br>**public subnet type options:**<br>- All shared keys above<br>- `nat_gateway_configuration` = (Optional\|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.route_to_nat = true`.<br>- `route_to_transit_gateway`  = (Optional\|list(string)) Optionally create routes from private subnets to transit gateway subnets.<br><br>**transit\_gateway subnet type options:**<br>- All shared keys above<br>- `route_to_nat`                                    = (Optional\|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.<br>- `transit_gateway_id`                              = (Required\|string) Transit gateway to attach VPC to.<br>- `transit_gateway_default_route_table_association` = (Optional\|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.<br>- `transit_gateway_default_route_table_propagation` = (Optional\|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.<br><br>Example:<pre>subnets = {<br>  public = {<br>    netmask                   = 24<br>    nat_gateway_configuration = "single_az"<br>    route_to_transit_gateway  = ["10.1.0.0/16"]<br>  }<br><br>  private = {<br>    netmask                  = 24<br>    route_to_nat             = true<br>    route_to_transit_gateway = ["10.1.0.0/16"]<br>  }<br><br>  transit_gateway = {<br>    netmask                                         = 24<br>    transit_gateway_id                              = aws_ec2_transit_gateway.example.id<br>    route_to_nat                                    = false<br>    transit_gateway_default_route_table_association = true<br>    transit_gateway_default_route_table_propagation = true<br>  }<br>}</pre> | `any` | n/a | yes |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc\_id output from data.aws\_vpc. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 | <a name="input_vpc_enable_dns_hostnames"></a> [vpc\_enable\_dns\_hostnames](#input\_vpc\_enable\_dns\_hostnames) | Indicates whether the instances launched in the VPC get DNS hostnames. If enabled, instances in the VPC get DNS hostnames; otherwise, they do not. Disabled by default for nondefault VPCs. | `bool` | `true` | no |
@@ -153,12 +213,15 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 
 | Name | Description |
 |------|-------------|
-| <a name="output_nat_gateways_by_az"></a> [nat\_gateways\_by\_az](#output\_nat\_gateways\_by\_az) | Map of nat gateway resource attributes by AZ. |
-| <a name="output_private_subnet_attributes_by_az"></a> [private\_subnet\_attributes\_by\_az](#output\_private\_subnet\_attributes\_by\_az) | Map of all private subnets containing their attributes. |
-| <a name="output_public_subnet_attributes_by_az"></a> [public\_subnet\_attributes\_by\_az](#output\_public\_subnet\_attributes\_by\_az) | Map of all public subnets containing their attributes. |
-| <a name="output_route_table_by_subnet_type"></a> [route\_table\_by\_subnet\_type](#output\_route\_table\_by\_subnet\_type) | Map of route tables by type => az => route table attributes. Example usage: module.vpc.route\_table\_by\_subnet\_type.private.id |
-| <a name="output_subnets"></a> [subnets](#output\_subnets) | Map of subnets grouped by type with child map { az = cidr }. |
-| <a name="output_tgw_subnet_attributes_by_az"></a> [tgw\_subnet\_attributes\_by\_az](#output\_tgw\_subnet\_attributes\_by\_az) | Map of all transit gateway subnets containing their attributes. |
+| <a name="output_nat_gateway_attributes_by_az"></a> [nat\_gateway\_attributes\_by\_az](#output\_nat\_gateway\_attributes\_by\_az) | Map of nat gateway resource attributes by AZ.<br><br>Example:<pre>nat_gateway_attributes_by_az = {<br>  "us-east-1a" = {<br>    "allocation_id" = "eipalloc-0e8b20303eea88b13"<br>    "connectivity_type" = "public"<br>    "id" = "nat-0fde39f9550f4abb5"<br>    "network_interface_id" = "eni-0d422727088bf9a86"<br>    "private_ip" = "10.0.3.40"<br>    "public_ip" = <><br>    "subnet_id" = "subnet-0f11c92e439c8ab4a"<br>    "tags" = tomap({<br>      "Name" = "nat-my-public-us-east-1a"<br>    })<br>    "tags_all" = tomap({<br>      "Name" = "nat-my-public-us-east-1a"<br>    })<br>  }<br>  "us-east-1b" = { ... }<br>}</pre> |
+| <a name="output_nat_gateways_by_az"></a> [nat\_gateways\_by\_az](#output\_nat\_gateways\_by\_az) | DEPRECATED OUTPUT: this output has been renamed to `nat_gateway_attributes_by_az`. Please transition to that output and see it for a proper description. |
+| <a name="output_private_subnet_attributes_by_az"></a> [private\_subnet\_attributes\_by\_az](#output\_private\_subnet\_attributes\_by\_az) | Map of all private subnets containing their attributes.<br><br>Example:<pre>private_subnet_attributes = {<br>  "us-east-1a" = {<br>    "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"<br>    "assign_ipv6_address_on_creation" = false<br>    ...<br>    <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference><br>  }<br>  "us-east-1b" = {...)<br>}</pre> |
+| <a name="output_public_subnet_attributes_by_az"></a> [public\_subnet\_attributes\_by\_az](#output\_public\_subnet\_attributes\_by\_az) | Map of all public subnets containing their attributes.<br><br>Example:<pre>public_subnet_attributes = {<br>  "us-east-1a" = {<br>    "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"<br>    "assign_ipv6_address_on_creation" = false<br>    ...<br>    <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference><br>  }<br>  "us-east-1b" = {...)<br>}</pre> |
+| <a name="output_route_table_attributes_by_type_by_az"></a> [route\_table\_attributes\_by\_type\_by\_az](#output\_route\_table\_attributes\_by\_type\_by\_az) | Map of route tables by type => az => route table attributes. Example usage: module.vpc.route\_table\_by\_subnet\_type.private.id<br><br>Example:<pre>route_table_attributes_by_type_by_az = {<br>  "private" = {<br>    "us-east-1a" = {<br>      "id" = "rtb-0e77040c0598df003"<br>      "route_table_id" = "rtb-0e77040c0598df003"<br>      "tags" = tolist([<br>        {<br>          "key" = "Name"<br>          "value" = "private-us-east-1a"<br>        },<br>      ])<br>      "vpc_id" = "vpc-033e054f49409592a"<br>    }<br>    "us-east-1b" = { ... }<br>  "public" = { ... }</pre> |
+| <a name="output_route_table_by_subnet_type"></a> [route\_table\_by\_subnet\_type](#output\_route\_table\_by\_subnet\_type) | DEPRECATED OUTPUT: this output has been renamed to `route_table_attributes_by_type_by_az`. Please transition to that output and see it for a proper description. |
+| <a name="output_subnet_cidrs_by_type_by_az"></a> [subnet\_cidrs\_by\_type\_by\_az](#output\_subnet\_cidrs\_by\_type\_by\_az) | Map of subnets grouped by type with child map { az = cidr }.<br><br>Example:<pre>subnets = {<br>    private = {<br>      us-east-1a = "10.0.0.0/24"<br>      us-east-1b = "10.0.1.0/24"<br>      us-east-1c = "10.0.2.0/24"<br>    }<br>    public  = {<br>      us-east-1a = "10.0.3.0/24"<br>      us-east-1b = "10.0.4.0/24"<br>      us-east-1c = "10.0.5.0/24"<br>    }<br>  }</pre> |
+| <a name="output_subnets"></a> [subnets](#output\_subnets) | DEPRECATED OUTPUT: this output has been renamed to `subnet_cidrs_by_type_by_az`. Please transition to that output and see it for a proper description. |
+| <a name="output_tgw_subnet_attributes_by_az"></a> [tgw\_subnet\_attributes\_by\_az](#output\_tgw\_subnet\_attributes\_by\_az) | Map of all tgw subnets containing their attributes.<br><br>Example:<pre>tgw_subnet_attributes = {<br>  "us-east-1a" = {<br>    "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"<br>    "assign_ipv6_address_on_creation" = false<br>    ...<br>    <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference><br>  }<br>  "us-east-1b" = {...)<br>}</pre> |
 | <a name="output_transit_gateway_attachment_id"></a> [transit\_gateway\_attachment\_id](#output\_transit\_gateway\_attachment\_id) | Transit gateway attachment id. |
 | <a name="output_vpc_attributes"></a> [vpc\_attributes](#output\_vpc\_attributes) | VPC resource attributes. Full output of aws\_vpc. |
 <!-- END_TF_DOCS -->

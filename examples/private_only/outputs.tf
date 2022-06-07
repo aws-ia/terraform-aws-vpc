@@ -3,6 +3,6 @@ output "subnets" {
   value       = module.vpc.subnets
 }
 
-output "subnet_attributes" {
+output "private_subnet_attributes" {
   value = module.vpc.private_subnet_attributes_by_az
 }
