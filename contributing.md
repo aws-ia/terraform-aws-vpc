@@ -2,7 +2,7 @@
 
 ## Outputs Methodology
 
-This module organizes outputs by creating output collections of grouped entire resources. The benefit of this is that, most likely, attributes users want access to are already present without having to create new `output {}` for each possible attribute. The [potential] downside is that you will have to extract it yourself using HCL logic. See the [outputs.tf](https://github.com/aws-ia/terraform-aws-vpc/blob/b7396f072a95feb367fbc0916f1d2b83a24649df/outputs.tf) for examples.
+This module organizes outputs by creating output collections of grouped entire resources. The benefit of this is that, most likely, attributes users want access to are already present without having to create new `output {}` for each possible attribute. The [potential] downside is that you will have to extract it yourself using HCL logic. See the [outputs.tf](https://github.com/aws-ia/terraform-aws-vpc/outputs.tf) for examples.
 
 Our naming convetion attempts to make the output content clear. `route_table_attributes_by_type_by_az` is a nested map of route table resource attributes grouped by their subnet type then by the az.  Example:
 ```terraform

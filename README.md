@@ -136,6 +136,10 @@ Terraform Plan:
 ...
 ```
 
+## Contributing
+
+Please see our [developer documentation](https://github.com/aws-ia/terraform-aws-vpc/contributing.md) for guidance on contributing to this module
+
 ## Requirements
 
 | Name | Version |
