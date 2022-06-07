@@ -30,22 +30,7 @@ resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
   ipv4_ipam_pool_id = var.vpc_ipv4_ipam_pool_id
 }
 
-resource "aws_subnet" "private" {
-  for_each = try(local.subnets.private, {})
-
-  availability_zone       = each.key
-  vpc_id                  = local.vpc.id
-  cidr_block              = each.value
-  map_public_ip_on_launch = false
-
-  tags = merge({
-    Name = "${local.subnet_names["private"]}-${each.key}" },
-  module.tags.tags_aws)
-
-  depends_on = [
-    aws_vpc_ipv4_cidr_block_association.secondary
-  ]
-}
+# Public Subnets
 
 resource "aws_subnet" "public" {
   for_each = try(local.subnets.public, {})
@@ -59,41 +44,6 @@ resource "aws_subnet" "public" {
   module.tags.tags_aws)
 }
 
-resource "aws_subnet" "tgw" {
-  for_each = try(local.subnets.transit_gateway, {})
-
-  availability_zone = each.key
-  vpc_id            = local.vpc.id
-  cidr_block        = each.value
-
-  tags = merge({
-    Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
-  module.tags.tags_aws)
-}
-
-resource "awscc_ec2_route_table" "private" {
-  for_each = try(local.subnets.private, {})
-
-  vpc_id = local.vpc.id
-
-  tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["private"]}-${each.key}" }],
-    module.tags.tags
-  )
-}
-
-resource "awscc_ec2_route_table" "tgw" {
-  for_each = try(local.subnets.transit_gateway, {})
-
-  vpc_id = local.vpc.id
-
-  tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
-    module.tags.tags
-  )
-}
-
-
 resource "awscc_ec2_route_table" "public" {
   for_each = try(local.subnets.public, {})
 
@@ -103,13 +53,6 @@ resource "awscc_ec2_route_table" "public" {
     [{ "key" = "Name", "value" = "${local.subnet_names["public"]}-${each.key}" }],
     module.tags.tags
   )
-}
-
-resource "awscc_ec2_subnet_route_table_association" "private" {
-  for_each = try(local.subnets.private, {})
-
-  subnet_id      = aws_subnet.private[each.key].id
-  route_table_id = awscc_ec2_route_table.private[each.key].id
 }
 
 resource "awscc_ec2_subnet_route_table_association" "public" {
@@ -152,38 +95,6 @@ resource "aws_internet_gateway" "main" {
   module.tags.tags_aws)
 }
 
-resource "aws_route" "private_to_nat" {
-  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
-  for_each = try(var.subnets.private.route_to_nat, false) ? try(local.subnets.public, {}) : {}
-
-  route_table_id         = awscc_ec2_route_table.private[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
-  # try to get nat for AZ, else use singular nat
-  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
-}
-
-resource "aws_route" "tgw_to_nat" {
-  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
-  for_each = try(var.subnets.transit_gateway.route_to_nat, false) ? try(local.subnets.public, {}) : {}
-
-  route_table_id         = awscc_ec2_route_table.tgw[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
-  # try to get nat for AZ, else use singular nat
-  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
-}
-
-
-resource "aws_route" "private_to_tgw" {
-  # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item
-  for_each = try(var.subnets.private.route_to_transit_gateway, []) != [] ? toset([
-    for _, key in keys(local.subnets.private) : "${key}:${var.subnets.private.route_to_transit_gateway[0]}"
-  ]) : toset([])
-
-  route_table_id         = awscc_ec2_route_table.private[split(":", each.key)[0]].id
-  destination_cidr_block = var.subnets.private.route_to_transit_gateway[0]
-  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
-}
-
 resource "aws_route" "public_to_igw" {
   for_each = try(local.subnets.public, {})
 
@@ -200,6 +111,106 @@ resource "aws_route" "public_to_tgw" {
   route_table_id         = awscc_ec2_route_table.public[split(":", each.key)[0]].id
   destination_cidr_block = var.subnets.public.route_to_transit_gateway[0]
   transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
+}
+
+# Private Subnets
+
+resource "aws_subnet" "private" {
+  for_each = try(local.subnets.private, {})
+
+  availability_zone       = each.key
+  vpc_id                  = local.vpc.id
+  cidr_block              = each.value
+  map_public_ip_on_launch = false
+
+  tags = merge({
+    Name = "${local.subnet_names["private"]}-${each.key}" },
+  module.tags.tags_aws)
+
+  depends_on = [
+    aws_vpc_ipv4_cidr_block_association.secondary
+  ]
+}
+
+resource "awscc_ec2_route_table" "private" {
+  for_each = try(local.subnets.private, {})
+
+  vpc_id = local.vpc.id
+
+  tags = concat(
+    [{ "key" = "Name", "value" = "${local.subnet_names["private"]}-${each.key}" }],
+    module.tags.tags
+  )
+}
+
+resource "awscc_ec2_subnet_route_table_association" "private" {
+  for_each = try(local.subnets.private, {})
+
+  subnet_id      = aws_subnet.private[each.key].id
+  route_table_id = awscc_ec2_route_table.private[each.key].id
+}
+
+resource "aws_route" "private_to_nat" {
+  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
+  for_each = try(var.subnets.private.route_to_nat, false) ? try(local.subnets.public, {}) : {}
+
+  route_table_id         = awscc_ec2_route_table.private[each.key].id
+  destination_cidr_block = "0.0.0.0/0"
+  # try to get nat for AZ, else use singular nat
+  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
+}
+
+resource "aws_route" "private_to_tgw" {
+  # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item
+  for_each = try(var.subnets.private.route_to_transit_gateway, []) != [] ? toset([
+    for _, key in keys(local.subnets.private) : "${key}:${var.subnets.private.route_to_transit_gateway[0]}"
+  ]) : toset([])
+
+  route_table_id         = awscc_ec2_route_table.private[split(":", each.key)[0]].id
+  destination_cidr_block = var.subnets.private.route_to_transit_gateway[0]
+  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
+}
+
+# Transit Gateway Subnets
+
+resource "aws_subnet" "tgw" {
+  for_each = try(local.subnets.transit_gateway, {})
+
+  availability_zone = each.key
+  vpc_id            = local.vpc.id
+  cidr_block        = each.value
+
+  tags = merge({
+    Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
+  module.tags.tags_aws)
+}
+
+resource "awscc_ec2_route_table" "tgw" {
+  for_each = try(local.subnets.transit_gateway, {})
+
+  vpc_id = local.vpc.id
+
+  tags = concat(
+    [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
+    module.tags.tags
+  )
+}
+
+resource "awscc_ec2_subnet_route_table_association" "tgw" {
+  for_each = try(local.subnets.transit_gateway, {})
+
+  subnet_id      = aws_subnet.tgw[each.key].id
+  route_table_id = awscc_ec2_route_table.tgw[each.key].id
+}
+
+resource "aws_route" "tgw_to_nat" {
+  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
+  for_each = try(var.subnets.transit_gateway.route_to_nat, false) ? try(local.subnets.public, {}) : {}
+
+  route_table_id         = awscc_ec2_route_table.tgw[each.key].id
+  destination_cidr_block = "0.0.0.0/0"
+  # try to get nat for AZ, else use singular nat
+  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
@@ -219,6 +230,8 @@ resource "aws_ec2_transit_gateway_route_table_association" "tgw" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tgw[0].id
   transit_gateway_route_table_id = var.subnets.transit_gateway.transit_gateway_route_table_id
 }
+
+# Flow Logs
 
 module "flow_logs" {
   count = local.create_flow_logs ? 1 : 0
