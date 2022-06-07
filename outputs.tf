@@ -151,3 +151,24 @@ output "nat_gateway_attributes_by_az" {
 EOF
 }
 
+## DEPRECATED OUTPUTS
+
+output "subnets" {
+  description = "DEPRECATED OUTPUT: this output has been renamed to `subnet_cidrs_by_type_by_az`. Please transition to that output and see it for a proper description."
+  value       = module.calculate_subnets.subnets_by_type
+}
+
+output "route_table_by_subnet_type" {
+  description = "DEPRECATED OUTPUT: this output has been renamed to `route_table_attributes_by_type_by_az`. Please transition to that output and see it for a proper description."
+  value = {
+    # TODO: omit keys if value is null
+    "private"         = awscc_ec2_route_table.private,
+    "public"          = awscc_ec2_route_table.public
+    "transit_gateway" = awscc_ec2_route_table.tgw
+  }
+}
+
+output "nat_gateways_by_az" {
+  description = "DEPRECATED OUTPUT: this output has been renamed to `nat_gateway_attributes_by_az`. Please transition to that output and see it for a proper description."
+  value       = try(aws_nat_gateway.main, null)
+}
