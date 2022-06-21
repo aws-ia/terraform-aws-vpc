@@ -222,6 +222,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
 
   transit_gateway_default_route_table_association = try(var.subnets.transit_gateway.transit_gateway_default_route_table_association, null)
   transit_gateway_default_route_table_propagation = try(var.subnets.transit_gateway.transit_gateway_default_route_table_propagation, null)
+  appliance_mode_support                          = try(var.subnets.transit_gateway.transit_gateway_appliance_mode_support, "disable")
+  dns_support                                     = try(var.subnets.transit_gateway.transit_gateway_dns_support, "enable")
 }
 
 resource "aws_ec2_transit_gateway_route_table_association" "tgw" {
