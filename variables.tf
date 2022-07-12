@@ -124,14 +124,14 @@ EOF
   type        = any
 
   # Only valid keys for var.subnets
-  validation {
-    error_message = "Only valid key values \"public\", \"private\", or \"transit_gateway\"."
-    condition = length(setsubtract(keys(var.subnets), [
-      "public",
-      "private",
-      "transit_gateway"
-    ])) == 0
-  }
+  # validation {
+  #   error_message = "Only valid key values \"public\", \"private\", or \"transit_gateway\"."
+  #   condition = length(setsubtract(keys(var.subnets), [
+  #     "public",
+  #     "private",
+  #     "transit_gateway"
+  #   ])) == 0
+  # }
 
   # All var.subnets.public valid keys
   validation {

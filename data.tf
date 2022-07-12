@@ -7,6 +7,8 @@ locals {
   # default names if no name_prefix is passed
   subnet_names = { for type, v in var.subnets : type => try(v.name_prefix, type) }
 
+  singleton_subnet_types = ["public", "transit_gateway"]
+
   # NAT configurations options, selected based on nat_gateway_configuration
   # null   = none
   # all    = local.azs
