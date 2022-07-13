@@ -7,6 +7,19 @@ locals {
   # default names if no name_prefix is passed
   subnet_names = { for type, v in var.subnets : type => try(v.name_prefix, type) }
 
+  singleton_subnet_types = ["public", "transit_gateway"]
+  private_subnet_names   = setsubtract(keys(local.subnets), local.singleton_subnet_types)
+
+  # constructed list of <private_subnet_key>/az
+  private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])
+  # list of private subnet keys with route_to_nat = true
+  private_subnets_nat_routed = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_nat, false)]
+  # private subnets with cidrs per az if route_to_nat = true ...  "privatetwo/us-east-1a"
+  private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
+
+  private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if can(var.subnets[type].route_to_transit_gateway)]
+  private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
+
   # NAT configurations options, selected based on nat_gateway_configuration
   # null   = none
   # all    = local.azs

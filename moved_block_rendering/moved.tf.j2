@@ -1,0 +1,31 @@
+{%- for az in azs %}
+
+# moved blocks for private subnet in az {{ az }}
+
+moved {
+    from = aws_subnet.private["{{az}}"]
+    to   = aws_subnet.private["private/{{az}}"]
+}
+
+moved {
+    from = awscc_ec2_subnet_route_table_association.private["{{az}}"]
+    to   = awscc_ec2_subnet_route_table_association.private["private/{{az}}"]
+}
+
+moved {
+    from = awscc_ec2_route_table.private["{{az}}"]
+    to   = awscc_ec2_route_table.private["private/{{az}}"]
+}
+
+moved {
+    from = aws_route.private_to_nat["{{az}}"]
+    to   = aws_route.private_to_nat["private/{{az}}"]
+}
+
+moved {
+    from = aws_route.private_to_tgw["{{az}}"]
+    to   = aws_route.private_to_tgw["private/{{az}}"]
+}
+
+
+{%- endfor %}

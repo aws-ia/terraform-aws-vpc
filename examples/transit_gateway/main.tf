@@ -19,6 +19,12 @@ module "vpc" {
 
     private = {
       netmask                  = 24
+      route_to_nat             = false
+      route_to_transit_gateway = ["10.0.0.0/8"]
+    }
+
+    privatetwo = {
+      netmask                  = 24
       route_to_nat             = true
       route_to_transit_gateway = ["10.0.0.0/8"]
     }
