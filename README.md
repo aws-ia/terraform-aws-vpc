@@ -180,6 +180,8 @@ Resolve with this command per AZ
 terraform state mv 'module.vpc.aws_route.private_to_tgw["us-east-1a:10.0.0.0/8"]' 'module.vpc.aws_route.private_to_tgw["private/us-east-1a"]'
 ```
 
+If for some reason, you want to adusted the moved.tf file to accomplish the state mv commands for you, or move other resources, the python used to generate moved.tf can be found in [moved\_block\_rendering/](https://github.com/aws-ia/terraform-aws-vpc/tree/main/moved_block_rendering)
+
 ## Deprecation Notices and Breaking Changes
 
 Overtime we will update this module to support new features. If a breaking change is introduced we will do a major update via semver. We're currently tracking targeted changes for v2.x [in this issue](https://github.com/aws-ia/terraform-aws-vpc/issues/62). There is currently no date for a 2.x release.
