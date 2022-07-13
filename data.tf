@@ -9,7 +9,6 @@ locals {
 
   singleton_subnet_types = ["public", "transit_gateway"]
   private_subnet_names   = setsubtract(keys(local.subnets), local.singleton_subnet_types)
-  private_subets         = { for name, values in local.subnets : name => values if contains(local.private_subnet_names, name) }
 
   # constructed list of <private_subnet_key>/az
   private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])

@@ -123,16 +123,6 @@ variable "subnets" {
 EOF
   type        = any
 
-  # Only valid keys for var.subnets
-  # validation {
-  #   error_message = "Only valid key values \"public\", \"private\", or \"transit_gateway\"."
-  #   condition = length(setsubtract(keys(var.subnets), [
-  #     "public",
-  #     "private",
-  #     "transit_gateway"
-  #   ])) == 0
-  # }
-
   # All var.subnets.public valid keys
   validation {
     error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."

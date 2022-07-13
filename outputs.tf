@@ -31,7 +31,7 @@ output "transit_gateway_attachment_id" {
   value       = try(aws_ec2_transit_gateway_vpc_attachment.tgw[0].id, null)
 }
 
-output "private_subnet_attributes_by_az" {
+output "multi_private_subnet_attributes_by_az" {
   value       = try(aws_subnet.private, null)
   description = <<-EOF
   Map of all private subnets containing their attributes.
@@ -39,7 +39,7 @@ output "private_subnet_attributes_by_az" {
   Example:
   ```
   private_subnet_attributes = {
-    "us-east-1a" = {
+    "private/us-east-1a" = {
       "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
       "assign_ipv6_address_on_creation" = false
       ...
@@ -91,7 +91,7 @@ output "tgw_subnet_attributes_by_az" {
 EOF
 }
 
-output "route_table_attributes_by_type_by_az" {
+output "rt_attributes_by_type_by_az" {
   value = {
     # TODO: omit keys if value is null
     "private"         = awscc_ec2_route_table.private,
@@ -162,7 +162,7 @@ output "route_table_by_subnet_type" {
   description = "DEPRECATED OUTPUT: this output has been renamed to `route_table_attributes_by_type_by_az`. Please transition to that output and see it for a proper description."
   value = {
     # TODO: omit keys if value is null
-    "private"         = awscc_ec2_route_table.private,
+    "private"         = { for rt, values in awscc_ec2_route_table.private : split("/", rt)[1] => values if split("/", rt)[0] == "private" }
     "public"          = awscc_ec2_route_table.public
     "transit_gateway" = awscc_ec2_route_table.tgw
   }
@@ -171,4 +171,22 @@ output "route_table_by_subnet_type" {
 output "nat_gateways_by_az" {
   description = "DEPRECATED OUTPUT: this output has been renamed to `nat_gateway_attributes_by_az`. Please transition to that output and see it for a proper description."
   value       = try(aws_nat_gateway.main, null)
+}
+
+output "private_subnet_attributes_by_az" {
+  value = try(
+    { for subnet, values in aws_subnet.private : split("/", subnet)[1] => values if split("/", subnet)[0] == "private" }
+  , null)
+  description = "DEPRECATED OUTPUT: this output has been renamed to `multi_private_subnet_attributes_by_az`. Please transition to that output and see it for a proper description."
+}
+
+output "route_table_attributes_by_type_by_az" {
+  value = {
+    # TODO: omit keys if value is null
+    # "private"         = awscc_ec2_route_table.private,
+    "private"         = { for rt, values in awscc_ec2_route_table.private : split("/", rt)[1] => values if split("/", rt)[0] == "private" }
+    "public"          = awscc_ec2_route_table.public
+    "transit_gateway" = awscc_ec2_route_table.tgw
+  }
+  description = "DEPRECATED OUTPUT: this output has been renamed to `rt_attributes_by_type_by_az`. Please transition to that output and see it for a proper description. This was renamed because the data structure of private subnets changed slightly to account for extra private subnets."
 }

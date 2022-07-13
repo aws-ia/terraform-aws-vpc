@@ -104,7 +104,7 @@ resource "aws_route" "public_to_igw" {
 }
 
 resource "aws_route" "public_to_tgw" {
-  for_each = try(var.subnets.public.route_to_transit_gateway, []) != [] ? toset([
+  for_each = length(try(var.subnets.public.route_to_transit_gateway, [])) > 0 ? toset([
     for _, key in keys(local.subnets.public) : "${key}:${var.subnets.public.route_to_transit_gateway[0]}"
   ]) : toset([])
 
