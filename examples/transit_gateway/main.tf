@@ -5,7 +5,6 @@ resource "aws_ec2_transit_gateway" "example" {
 module "vpc" {
   source  = "aws-ia/vpc/aws"
   version = ">= 1.0.0"
-  # source = "../.."
 
   name       = "tgw"
   cidr_block = "10.0.0.0/16"
@@ -19,6 +18,12 @@ module "vpc" {
     }
 
     private = {
+      netmask                  = 24
+      route_to_nat             = false
+      route_to_transit_gateway = ["10.0.0.0/8"]
+    }
+
+    privatetwo = {
       netmask                  = 24
       route_to_nat             = true
       route_to_transit_gateway = ["10.0.0.0/8"]
