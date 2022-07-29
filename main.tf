@@ -40,7 +40,7 @@ resource "aws_subnet" "public" {
   cidr_block        = each.value
 
   tags = merge({
-    Name = "${local.subnet_names["public"]}-${each.key}" },
+    Name = "${local.tags_prefix}${local.subnet_names["public"]}-${each.key}" },
   module.tags.tags_aws)
 }
 
@@ -50,7 +50,7 @@ resource "awscc_ec2_route_table" "public" {
   vpc_id = local.vpc.id
 
   tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["public"]}-${each.key}" }],
+    [{ "key" = "Name", "value" = "${local.tags_prefix}${local.subnet_names["public"]}-${each.key}" }],
     module.tags.tags
   )
 }
@@ -67,7 +67,7 @@ resource "aws_eip" "nat" {
   vpc      = true
 
   tags = merge({
-    Name = "nat-${local.subnet_names["public"]}-${each.key}"
+    Name = "${local.tags_prefix}nat-${local.subnet_names["public"]}-${each.key}"
   }, module.tags.tags_aws)
 }
 
@@ -78,7 +78,7 @@ resource "aws_nat_gateway" "main" {
   subnet_id     = aws_subnet.public[each.key].id
 
   tags = merge({
-    Name = "nat-${local.subnet_names["public"]}-${each.key}" },
+    Name = "${local.tags_prefix}nat-${local.subnet_names["public"]}-${each.key}" },
   module.tags.tags_aws)
 
   depends_on = [
@@ -124,7 +124,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
 
   tags = merge({
-    Name = "${local.subnet_names["private"]}-${each.key}" },
+    Name = "${local.tags_prefix}${local.subnet_names["private"]}-${each.key}" },
   module.tags.tags_aws)
 
   depends_on = [
@@ -138,7 +138,7 @@ resource "awscc_ec2_route_table" "private" {
   vpc_id = local.vpc.id
 
   tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["private"]}-${each.key}" }],
+    [{ "key" = "Name", "value" = "${local.tags_prefix}${local.subnet_names["private"]}-${each.key}" }],
     module.tags.tags
   )
 }
@@ -181,7 +181,7 @@ resource "aws_subnet" "tgw" {
   cidr_block        = each.value
 
   tags = merge({
-    Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
+    Name = "${local.tags_prefix}${local.subnet_names["transit_gateway"]}-${each.key}" },
   module.tags.tags_aws)
 }
 
@@ -191,7 +191,7 @@ resource "awscc_ec2_route_table" "tgw" {
   vpc_id = local.vpc.id
 
   tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
+    [{ "key" = "Name", "value" = "${local.tags_prefix}${local.subnet_names["transit_gateway"]}-${each.key}" }],
     module.tags.tags
   )
 }
