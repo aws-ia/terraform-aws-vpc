@@ -214,6 +214,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "tags_prefix" {
+  description = "Prefix tag value to apply to all resources."
+  type        = string
+  default     = null
+}
+
 variable "vpc_flow_logs" {
   description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
 
