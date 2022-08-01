@@ -20,6 +20,10 @@ resource "aws_vpc" "main" {
     "Name" = var.name
     },
   module.tags.tags_aws)
+
+  lifecycle {
+    ignore_changes = [cidr_block]
+  }
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
@@ -28,6 +32,10 @@ resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
   vpc_id            = var.vpc_id
   cidr_block        = local.cidr_block
   ipv4_ipam_pool_id = var.vpc_ipv4_ipam_pool_id
+
+  lifecycle {
+    ignore_changes = [cidr_block]
+  }
 }
 
 # Public Subnets
@@ -41,7 +49,12 @@ resource "aws_subnet" "public" {
 
   tags = merge({
     Name = "${local.subnet_names["public"]}-${each.key}" },
-  module.tags.tags_aws)
+    module.tags.tags_aws
+  )
+
+  lifecycle {
+    ignore_changes = [cidr_block]
+  }
 }
 
 resource "awscc_ec2_route_table" "public" {
@@ -130,6 +143,9 @@ resource "aws_subnet" "private" {
   depends_on = [
     aws_vpc_ipv4_cidr_block_association.secondary
   ]
+  lifecycle {
+    ignore_changes = [cidr_block]
+  }
 }
 
 resource "awscc_ec2_route_table" "private" {
@@ -184,7 +200,11 @@ resource "aws_subnet" "tgw" {
 
   tags = merge({
     Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
-  module.tags.tags_aws)
+    module.tags.tags_aws
+  )
+  lifecycle {
+    ignore_changes = [cidr_block]
+  }
 }
 
 resource "awscc_ec2_route_table" "tgw" {
