@@ -23,8 +23,8 @@ module "vpc" {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
 
-      route_to_transit_gateway  = true
-      destination_route_to_tgw  = aws_ec2_managed_prefix_list.example.id
+      route_to_transit_gateway = true
+      destination_route_to_tgw = aws_ec2_managed_prefix_list.example.id
     }
 
     private = {
@@ -47,7 +47,7 @@ module "vpc" {
     # }
 
     transit_gateway = {
-      name_prefix = "tgw_test"
+      name_prefix                                     = "tgw_test"
       netmask                                         = 28
       transit_gateway_id                              = module.tgw_base_for_example_only.tgw_id # var.tgw_id
       route_to_nat                                    = false

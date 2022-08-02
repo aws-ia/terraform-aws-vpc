@@ -2,7 +2,7 @@ locals {
   azs = slice(data.aws_availability_zones.current.names, 0, var.az_count)
 
   # references to module.calculate_subnets output
-  subnet_keys   = keys(var.subnets) #module.calculate_subnets.subnets_by_type
+  subnet_keys        = keys(var.subnets) #module.calculate_subnets.subnets_by_type
   calculated_subnets = module.calculate_subnets.subnets_by_type
 
   # default names if no name_prefix is passed
