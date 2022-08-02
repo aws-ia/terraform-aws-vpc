@@ -7,6 +7,7 @@ module "vpc" {
   az_count   = 3
 
   subnets = {
-    private = { netmask = 24 }
+    private                = { netmask = 24 }
+    mysecondprivatesubnets = { netmask = 24 }
   }
 }
