@@ -43,6 +43,6 @@ module "vpc" {
 # terraform apply -target=module.tgw_base_for_example_only
 #####################################
 
-module "tgw_base_for_example_only" {
-  source = "../../test/hcl_fixtures/transit_gateway_base"
-}
+# module "tgw_base_for_example_only" {
+#   source = "../../test/hcl_fixtures/transit_gateway_base"
+# }
