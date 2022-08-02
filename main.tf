@@ -45,7 +45,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "awscc_ec2_route_table" "public" {
-  for_each = try(local.subnet_keys.public, {})
+  for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
 
   vpc_id = local.vpc.id
 
@@ -107,11 +107,9 @@ resource "aws_route" "public_to_igw" {
 }
 
 resource "aws_route" "public_to_tgw" {
-  for_each = length(try(var.subnets.public.route_to_transit_gateway, [])) > 0 ? toset([
-    for _, key in keys(local.subnet_keys.public) : "${key}:${var.subnets.public.route_to_transit_gateway[0]}"
-  ]) : toset([])
+  for_each = (contains(local.subnet_keys, "public") && can(var.subnets.public.route_to_transit_gateway)) ? toset(local.azs) : toset([])
 
-  route_table_id         = awscc_ec2_route_table.public[split(":", each.key)[0]].id
+  route_table_id         = awscc_ec2_route_table.public[each.key].id
   destination_cidr_block = var.subnets.public.route_to_transit_gateway[0]
   transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
 }
@@ -193,7 +191,7 @@ resource "aws_subnet" "tgw" {
 }
 
 resource "awscc_ec2_route_table" "tgw" {
-  for_each = try(local.subnet_keys.transit_gateway, {})
+  for_each = contains(local.subnet_keys, "transit_gateway") ? toset(local.azs) : toset([])
 
   vpc_id = local.vpc.id
 
@@ -204,7 +202,7 @@ resource "awscc_ec2_route_table" "tgw" {
 }
 
 resource "awscc_ec2_subnet_route_table_association" "tgw" {
-  for_each = try(local.subnet_keys.transit_gateway, {})
+  for_each = contains(local.subnet_keys, "transit_gateway") ? toset(local.azs) : toset([])
 
   subnet_id      = aws_subnet.tgw[each.key].id
   route_table_id = awscc_ec2_route_table.tgw[each.key].id
