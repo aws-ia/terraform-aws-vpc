@@ -3,24 +3,64 @@ output "vpc_attributes" {
   value       = local.vpc
 }
 
-output "subnet_cidrs_by_type_by_az" {
-  value       = module.calculate_subnets.subnets_by_type
+output "public_subnet_cidrs_by_az" {
+  value       = try(aws_subnet.public, null)
   description = <<-EOF
-  Map of subnets grouped by type with child map { az = cidr }.
+  Map of public subnet resource attributes grouped by AZ.
 
   Example:
   ```
-    subnets = {
-      private = {
-        us-east-1a = "10.0.0.0/24"
-        us-east-1b = "10.0.1.0/24"
-        us-east-1c = "10.0.2.0/24"
-      }
-      public  = {
-        us-east-1a = "10.0.3.0/24"
-        us-east-1b = "10.0.4.0/24"
-        us-east-1c = "10.0.5.0/24"
-      }
+  public_subnets = {
+    "us-east-1a" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-028d7f65ccc12ff98"
+      "vpc_id" = "vpc-05601d7778af1ba9c"
+      ...
+    }
+    "us-east-1b" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-0091597b2b4c78dda"
+      ...
+    }
+  ```
+EOF
+}
+
+output "tgw_subnet_cidrs_by_az" {
+  value       = try(aws_subnet.tgw, null)
+  description = <<-EOF
+  Map of transit gateway subnet resource attributes grouped by AZ.
+
+  Example:
+  ```
+  tgw_subnets = {
+    "us-east-1a" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-028d7f65ccc12ff98"
+      "vpc_id" = "vpc-05601d7778af1ba9c"
+      ...
+    }
+    "us-east-1b" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-0091597b2b4c78dda"
+      ...
+    }
+  ```
+EOF
+}
+
+output "private_subnet_cidrs_by_az" {
+  value       = try(aws_subnet.private, null)
+  description = <<-EOF
+  Map of private subnet resource attributes grouped by "type/AZ".
+
+  Example:
+  ```
+  private_subnets = {
+    "private/us-east-1a" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-028d7f65ccc12ff98"
+      "vpc_id" = "vpc-05601d7778af1ba9c"
+      ...
+    }
+    "private/us-east-1b" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-0091597b2b4c78dda"
+      ...
     }
   ```
 EOF
@@ -149,44 +189,4 @@ output "nat_gateway_attributes_by_az" {
   }
   ```
 EOF
-}
-
-## DEPRECATED OUTPUTS
-
-output "subnets" {
-  description = "DEPRECATED OUTPUT: this output has been renamed to `subnet_cidrs_by_type_by_az`. Please transition to that output and see it for a proper description."
-  value       = module.calculate_subnets.subnets_by_type
-}
-
-output "route_table_by_subnet_type" {
-  description = "DEPRECATED OUTPUT: this output has been renamed to `route_table_attributes_by_type_by_az`. Please transition to that output and see it for a proper description."
-  value = {
-    # TODO: omit keys if value is null
-    "private"         = { for rt, values in awscc_ec2_route_table.private : split("/", rt)[1] => values if split("/", rt)[0] == "private" }
-    "public"          = awscc_ec2_route_table.public
-    "transit_gateway" = awscc_ec2_route_table.tgw
-  }
-}
-
-output "nat_gateways_by_az" {
-  description = "DEPRECATED OUTPUT: this output has been renamed to `nat_gateway_attributes_by_az`. Please transition to that output and see it for a proper description."
-  value       = try(aws_nat_gateway.main, null)
-}
-
-output "private_subnet_attributes_by_az" {
-  value = try(
-    { for subnet, values in aws_subnet.private : split("/", subnet)[1] => values if split("/", subnet)[0] == "private" }
-  , null)
-  description = "DEPRECATED OUTPUT: this output has been renamed to `multi_private_subnet_attributes_by_az`. Please transition to that output and see it for a proper description."
-}
-
-output "route_table_attributes_by_type_by_az" {
-  value = {
-    # TODO: omit keys if value is null
-    # "private"         = awscc_ec2_route_table.private,
-    "private"         = { for rt, values in awscc_ec2_route_table.private : split("/", rt)[1] => values if split("/", rt)[0] == "private" }
-    "public"          = awscc_ec2_route_table.public
-    "transit_gateway" = awscc_ec2_route_table.tgw
-  }
-  description = "DEPRECATED OUTPUT: this output has been renamed to `rt_attributes_by_type_by_az`. Please transition to that output and see it for a proper description. This was renamed because the data structure of private subnets changed slightly to account for extra private subnets."
 }

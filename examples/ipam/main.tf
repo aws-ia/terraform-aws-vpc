@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 1.0.0"
+  version = ">= 2.0.0"
 
   name     = "ipam-vpc"
   az_count = 3
@@ -10,7 +10,8 @@ module "vpc" {
 
   subnets = {
     public = {
-      netmask                   = 24
+      netmask = 24
+
       nat_gateway_configuration = "all_azs"
     }
     private = {
@@ -22,6 +23,7 @@ module "vpc" {
 
 #####################################
 # Example of a simple IPAM deployment
+# terraform apply -target=module.ipam_base_for_example_only
 #####################################
 
 # module "ipam_base_for_example_only" {
