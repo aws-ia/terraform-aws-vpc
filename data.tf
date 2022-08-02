@@ -2,13 +2,14 @@ locals {
   azs = slice(data.aws_availability_zones.current.names, 0, var.az_count)
 
   # references to module.calculate_subnets output
-  subnets = module.calculate_subnets.subnets_by_type
+  calculated_subnets = module.calculate_subnets.subnets_by_type
+  subnet_keys        = keys(var.subnets)
 
   # default names if no name_prefix is passed
   subnet_names = { for type, v in var.subnets : type => try(v.name_prefix, type) }
 
   singleton_subnet_types = ["public", "transit_gateway"]
-  private_subnet_names   = setsubtract(keys(local.subnets), local.singleton_subnet_types)
+  private_subnet_names   = setsubtract(local.subnet_keys, local.singleton_subnet_types)
 
   # constructed list of <private_subnet_key>/az
   private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])
@@ -31,7 +32,7 @@ locals {
   }
   # if public subnets being built, check how many nats to create
   # options defined by `local.nat_options`
-  nat_configuration = contains(keys(local.subnets), "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
+  nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
 
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false
