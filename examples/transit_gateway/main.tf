@@ -22,20 +22,21 @@ module "vpc" {
     public = {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
-      route_to_transit_gateway  = aws_ec2_managed_prefix_list.example.id
+      route_to_transit_gateway  = true
+      destination_route_to_tgw  = aws_ec2_managed_prefix_list.example.id
     }
 
-    private = {
-      netmask                  = 24
-      route_to_nat             = false
-      route_to_transit_gateway = ["10.0.0.0/8"]
-    }
+    # private = {
+    #   netmask                  = 24
+    #   route_to_nat             = false
+    #   route_to_transit_gateway = ["10.0.0.0/8"]
+    # }
 
-    privatetwo = {
-      netmask                  = 24
-      route_to_nat             = true
-      route_to_transit_gateway = ["10.0.0.0/8"]
-    }
+    # privatetwo = {
+    #   netmask                  = 24
+    #   route_to_nat             = true
+    #   route_to_transit_gateway = ["10.0.0.0/8"]
+    # }
 
     transit_gateway = {
       netmask                                         = 28

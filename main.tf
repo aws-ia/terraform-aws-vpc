@@ -117,10 +117,10 @@ resource "aws_route" "public_to_igw" {
 }
 
 resource "aws_route" "public_to_tgw" {
-  for_each = try(var.subnets.public.route_to_transit_gateway, null) != null ? local.subnets.public : {}
+  for_each = try(var.subnets.public.route_to_transit_gateway, false) != null ? local.subnets.public : {}
 
-  destination_cidr_block     = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? null : var.subnets.public.route_to_transit_gateway
-  destination_prefix_list_id = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? var.subnets.public.route_to_transit_gateway : null
+  destination_cidr_block     = can(regex("^pl-", var.subnets.public.destination_route_to_tgw)) ? null : var.subnets.public.destination_route_to_tgw
+  destination_prefix_list_id = can(regex("^pl-", var.subnets.public.destination_route_to_tgw)) ? var.subnets.public.destination_route_to_tgw : null
 
   transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
   route_table_id     = awscc_ec2_route_table.public[split(":", each.key)[0]].id
