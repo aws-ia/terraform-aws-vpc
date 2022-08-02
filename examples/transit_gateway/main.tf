@@ -1,3 +1,14 @@
+resource "aws_ec2_managed_prefix_list" "example" {
+  name           = "All VPC CIDR-s"
+  address_family = "IPv4"
+  max_entries    = 5
+
+  entry {
+    cidr        = "10.0.0.0/8"
+    description = "Primary"
+  }
+}
+
 module "vpc" {
   # source  = "aws-ia/vpc/aws"
   # version = ">= 1.0.0"
@@ -11,7 +22,7 @@ module "vpc" {
     public = {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
-      route_to_transit_gateway  = ["10.0.0.0/8"]
+      route_to_transit_gateway  = aws_ec2_managed_prefix_list.example.id
     }
 
     private = {
@@ -43,6 +54,6 @@ module "vpc" {
 # terraform apply -target=module.tgw_base_for_example_only
 #####################################
 
-# module "tgw_base_for_example_only" {
-#   source = "../../test/hcl_fixtures/transit_gateway_base"
-# }
+module "tgw_base_for_example_only" {
+  source = "../../test/hcl_fixtures/transit_gateway_base"
+}

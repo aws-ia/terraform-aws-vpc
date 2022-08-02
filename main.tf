@@ -117,13 +117,13 @@ resource "aws_route" "public_to_igw" {
 }
 
 resource "aws_route" "public_to_tgw" {
-  for_each = length(try(var.subnets.public.route_to_transit_gateway, [])) > 0 ? toset([
-    for _, key in keys(local.subnets.public) : "${key}:${var.subnets.public.route_to_transit_gateway[0]}"
-  ]) : toset([])
+  for_each = try(var.subnets.public.route_to_transit_gateway, null) != null ? local.subnets.public : {}
 
-  route_table_id         = awscc_ec2_route_table.public[split(":", each.key)[0]].id
-  destination_cidr_block = var.subnets.public.route_to_transit_gateway[0]
-  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
+  destination_cidr_block     = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? null : var.subnets.public.route_to_transit_gateway
+  destination_prefix_list_id = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? var.subnets.public.route_to_transit_gateway : null
+
+  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
+  route_table_id     = awscc_ec2_route_table.public[split(":", each.key)[0]].id
 }
 
 # Private Subnets
@@ -177,12 +177,7 @@ resource "aws_route" "private_to_nat" {
 }
 
 resource "aws_route" "private_to_tgw" {
-  # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item
   for_each = toset(try(local.private_subnet_key_names_tgw_routed, []))
-
-  # for_each = try(var.subnets.private.route_to_transit_gateway, []) != [] ? toset([
-  #   for _, key in keys(local.subnets.private) : "${key}:${var.subnets.private.route_to_transit_gateway[0]}"
-  # ]) : toset([])
 
   route_table_id         = awscc_ec2_route_table.private[each.key].id
   destination_cidr_block = var.subnets[split("/", each.key)[0]].route_to_transit_gateway[0]
