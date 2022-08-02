@@ -1,10 +1,7 @@
-resource "aws_ec2_transit_gateway" "example" {
-  description = "example"
-}
-
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 1.0.0"
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 1.0.0"
+  source = "../.."
 
   name       = "tgw"
   cidr_block = "10.0.0.0/16"
@@ -31,7 +28,7 @@ module "vpc" {
 
     transit_gateway = {
       netmask                                         = 28
-      transit_gateway_id                              = aws_ec2_transit_gateway.example.id
+      transit_gateway_id                              = module.tgw_base_for_example_only.tgw_id # var.tgw_id
       route_to_nat                                    = false
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
@@ -39,4 +36,13 @@ module "vpc" {
       transit_gateway_dns_support                     = "disable"
     }
   }
+}
+
+#####################################
+# Example of a tgw deployment
+# terraform apply -target=module.tgw_base_for_example_only
+#####################################
+
+module "tgw_base_for_example_only" {
+  source = "../../test/hcl_fixtures/transit_gateway_base"
 }
