@@ -36,7 +36,7 @@ locals {
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false
   vpc        = local.create_vpc ? aws_vpc.main[0] : data.awscc_ec2_vpc.main[0]
-  cidr_block = var.vpc_ipv4_ipam_pool_id == null ? var.cidr_block : data.aws_vpc_ipam_preview_next_cidr.main[0].cidr
+  cidr_block = var.vpc_ipv4_ipam_pool_id == null ? var.cidr_block : aws_vpc_ipam_preview_next_cidr.main[0].cidr
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
 }
@@ -50,7 +50,7 @@ data "awscc_ec2_vpc" "main" {
 }
 
 # preview next available cidr from ipam pool
-data "aws_vpc_ipam_preview_next_cidr" "main" {
+resource "aws_vpc_ipam_preview_next_cidr" "main" {
   count = var.vpc_ipv4_ipam_pool_id == null ? 0 : 1
 
   ipam_pool_id   = var.vpc_ipv4_ipam_pool_id
