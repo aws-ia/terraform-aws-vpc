@@ -202,8 +202,8 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.15.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.22.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | 0.27.0 |
 
 ## Modules
 
