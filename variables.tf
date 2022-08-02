@@ -124,47 +124,47 @@ EOF
   type        = any
 
   # All var.subnets.public valid keys
-  validation {
-    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
-    condition = length(setsubtract(keys(try(var.subnets.public, {})), [
-      "cidrs",
-      "netmask",
-      "name_prefix",
-      "nat_gateway_configuration",
-      "route_to_transit_gateway",
-      "tags"
-    ])) == 0
-  }
+  # validation {
+  #   error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
+  #   condition = length(setsubtract(keys(try(var.subnets.public, {})), [
+  #     "cidrs",
+  #     "netmask",
+  #     "name_prefix",
+  #     "nat_gateway_configuration",
+  #     "route_to_transit_gateway",
+  #     "tags"
+  #   ])) == 0
+  # }
 
-  # All var.subnets.private valid keys
-  validation {
-    error_message = "Invalid key in private subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"route_to_nat\", \"tags\"."
-    condition = length(setsubtract(keys(try(var.subnets.private, {})), [
-      "cidrs",
-      "netmask",
-      "name_prefix",
-      "route_to_nat",
-      "route_to_transit_gateway",
-      "tags"
-    ])) == 0
-  }
+  # # All var.subnets.private valid keys
+  # validation {
+  #   error_message = "Invalid key in private subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"route_to_nat\", \"tags\"."
+  #   condition = length(setsubtract(keys(try(var.subnets.private, {})), [
+  #     "cidrs",
+  #     "netmask",
+  #     "name_prefix",
+  #     "route_to_nat",
+  #     "route_to_transit_gateway",
+  #     "tags"
+  #   ])) == 0
+  # }
 
-  # All var.subnets.transit_gateway valid keys
-  validation {
-    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
-    condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
-      "cidrs",
-      "netmask",
-      "name_prefix",
-      "route_to_nat",
-      "transit_gateway_id",
-      "transit_gateway_default_route_table_association",
-      "transit_gateway_default_route_table_propagation",
-      "transit_gateway_appliance_mode_support",
-      "transit_gateway_dns_support",
-      "tags"
-    ])) == 0
-  }
+  # # All var.subnets.transit_gateway valid keys
+  # validation {
+  #   error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+  #   condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
+  #     "cidrs",
+  #     "netmask",
+  #     "name_prefix",
+  #     "route_to_nat",
+  #     "transit_gateway_id",
+  #     "transit_gateway_default_route_table_association",
+  #     "transit_gateway_default_route_table_propagation",
+  #     "transit_gateway_appliance_mode_support",
+  #     "transit_gateway_dns_support",
+  #     "tags"
+  #   ])) == 0
+  # }
 
   validation {
     error_message = "Each subnet type must contain only 1 key: `cidrs` or `netmask`."

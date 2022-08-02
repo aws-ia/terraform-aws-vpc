@@ -2,14 +2,14 @@ locals {
   azs = slice(data.aws_availability_zones.current.names, 0, var.az_count)
 
   # references to module.calculate_subnets output
-  subnets   = module.calculate_subnets.subnets_by_type
-  v_subnets = keys(var.subnets)
+  subnet_keys   = keys(var.subnets) #module.calculate_subnets.subnets_by_type
+  calculated_subnets = module.calculate_subnets.subnets_by_type
 
   # default names if no name_prefix is passed
   subnet_names = { for type, v in var.subnets : type => try(v.name_prefix, type) }
 
   singleton_subnet_types = ["public", "transit_gateway"]
-  private_subnet_names   = setsubtract(keys(local.subnets), local.singleton_subnet_types)
+  private_subnet_names   = setsubtract(local.subnet_keys, local.singleton_subnet_types)
 
   # constructed list of <private_subnet_key>/az
   private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])
@@ -18,7 +18,7 @@ locals {
   # private subnets with cidrs per az if route_to_nat = true ...  "privatetwo/us-east-1a"
   private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
 
-  private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if can(var.subnets[type].route_to_transit_gateway)]
+  private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_transit_gateway, false)]
   private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
 
   # NAT configurations options, selected based on nat_gateway_configuration
@@ -32,7 +32,7 @@ locals {
   }
   # if public subnets being built, check how many nats to create
   # options defined by `local.nat_options`
-  nat_configuration = contains(local.v_subnets, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
+  nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
 
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false
