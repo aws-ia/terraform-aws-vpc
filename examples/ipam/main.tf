@@ -1,7 +1,6 @@
 module "vpc" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 2.0.0"
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 2.0.0"
 
   name     = "ipam-vpc"
   az_count = 3
@@ -27,6 +26,6 @@ module "vpc" {
 # terraform apply -target=module.ipam_base_for_example_only
 #####################################
 
-module "ipam_base_for_example_only" {
-  source = "../../test/hcl_fixtures/ipam_base"
-}
+# module "ipam_base_for_example_only" {
+#   source = "../../test/hcl_fixtures/ipam_base"
+# }
