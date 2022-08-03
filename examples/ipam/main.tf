@@ -10,8 +10,7 @@ module "vpc" {
 
   subnets = {
     public = {
-      netmask = 24
-
+      netmask                   = 24
       nat_gateway_configuration = "all_azs"
     }
     private = {
