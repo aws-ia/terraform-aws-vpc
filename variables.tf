@@ -77,19 +77,19 @@ variable "subnets" {
   - `name_prefix` = (Optional|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.
   - `tags`        = (Optional|map(string)) Tags to set on the subnet and associated resources.
 
-  **private subnet type options:**
+  **Any private subnet type options:**
   - All shared keys above
-  - `route_to_nat`             = (Optional|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `route_to_transit_gateway` = (Optional|list(string)) Optionally create routes from private subnets to transit gateway subnets.
+  - `route_to_nat`             = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `route_to_transit_gateway` = (Optional|string) Optionally create routes from private subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **public subnet type options:**
   - All shared keys above
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.route_to_nat = true`.
-  - `route_to_transit_gateway`  = (Optional|list(string)) Optionally create routes from private subnets to transit gateway subnets.
+  - `route_to_transit_gateway`  = (Optional|string) Optionally create routes from public subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **transit_gateway subnet type options:**
   - All shared keys above
-  - `route_to_nat`                                    = (Optional|bool) Determines if routes to NAT Gateways should be created. Default = false. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `route_to_nat`                                    = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
   - `transit_gateway_id`                              = (Required|string) Transit gateway to attach VPC to.
   - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
@@ -102,19 +102,19 @@ variable "subnets" {
     public = {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
-      route_to_transit_gateway  = ["10.1.0.0/16"]
+      route_to_transit_gateway  = "10.1.0.0/16"
     }
 
     private = {
       netmask                  = 24
-      route_to_nat             = true
-      route_to_transit_gateway = ["10.1.0.0/16"]
+      route_to_nat             = "0.0.0.0/0"
+      route_to_transit_gateway = "10.1.0.0/16"
     }
 
     transit_gateway = {
       netmask                                         = 24
       transit_gateway_id                              = aws_ec2_transit_gateway.example.id
-      route_to_nat                                    = false
+      route_to_nat                                    = "0.0.0.0/0"
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
     }
@@ -131,19 +131,6 @@ EOF
       "netmask",
       "name_prefix",
       "nat_gateway_configuration",
-      "route_to_transit_gateway",
-      "tags"
-    ])) == 0
-  }
-
-  # All var.subnets.private valid keys
-  validation {
-    error_message = "Invalid key in private subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"route_to_nat\", \"tags\"."
-    condition = length(setsubtract(keys(try(var.subnets.private, {})), [
-      "cidrs",
-      "netmask",
-      "name_prefix",
-      "route_to_nat",
       "route_to_transit_gateway",
       "tags"
     ])) == 0
@@ -177,24 +164,8 @@ EOF
   }
 
   validation {
-    error_message = "If private.route_to_nat == true, then public.nat_gateway_configuration must be either `all_azs` or `single_az`."
-    condition     = try(var.subnets.private.route_to_nat, false) ? can(regex("^(all_azs|single_az)$", var.subnets.public.nat_gateway_configuration)) : true
-  }
-
-  validation {
     error_message = "Any subnet type `name_prefix` must not contain \"/\"."
     condition     = alltrue([for _, v in var.subnets : !can(regex("/", try(v.name_prefix, "")))])
-  }
-
-  validation {
-    error_message = "Private subnet cannot set `route_to_transit_gateway` = \"0.0.0.0/.\" if `route_to_nat` = true."
-    condition     = try(var.subnets.private.route_to_nat, false) ? try(var.subnets.private.route_to_transit_gateway[0] != "0.0.0.0/0", true) : true
-  }
-
-  # TODO: remove once `route_to_transit_gateway` can accept more than 1 argument
-  validation {
-    error_message = "Argument `route_to_transit_gateway` cannot accept more than 1 string."
-    condition     = try(length(var.subnets.private.route_to_transit_gateway), 0) <= 1 || try(length(var.subnets.public.route_to_transit_gateway), 0) <= 1
   }
 }
 

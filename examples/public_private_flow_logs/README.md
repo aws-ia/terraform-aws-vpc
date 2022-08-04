@@ -17,7 +17,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 1.0.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 2.0.0 |
 
 ## Resources
 
@@ -33,5 +33,6 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_subnets"></a> [subnets](#output\_subnets) | Map of subnet types with key/value az = cidr. |
+| <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | Map of private subnet attributes grouped by az. |
+| <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | Map of public subnet attributes grouped by az. |
 <!-- END_TF_DOCS -->
