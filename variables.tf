@@ -124,47 +124,34 @@ EOF
   type        = any
 
   # All var.subnets.public valid keys
-  # validation {
-  #   error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
-  #   condition = length(setsubtract(keys(try(var.subnets.public, {})), [
-  #     "cidrs",
-  #     "netmask",
-  #     "name_prefix",
-  #     "nat_gateway_configuration",
-  #     "route_to_transit_gateway",
-  #     "tags"
-  #   ])) == 0
-  # }
+  validation {
+    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
+    condition = length(setsubtract(keys(try(var.subnets.public, {})), [
+      "cidrs",
+      "netmask",
+      "name_prefix",
+      "nat_gateway_configuration",
+      "route_to_transit_gateway",
+      "tags"
+    ])) == 0
+  }
 
-  # # All var.subnets.private valid keys
-  # validation {
-  #   error_message = "Invalid key in private subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"route_to_nat\", \"tags\"."
-  #   condition = length(setsubtract(keys(try(var.subnets.private, {})), [
-  #     "cidrs",
-  #     "netmask",
-  #     "name_prefix",
-  #     "route_to_nat",
-  #     "route_to_transit_gateway",
-  #     "tags"
-  #   ])) == 0
-  # }
-
-  # # All var.subnets.transit_gateway valid keys
-  # validation {
-  #   error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
-  #   condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
-  #     "cidrs",
-  #     "netmask",
-  #     "name_prefix",
-  #     "route_to_nat",
-  #     "transit_gateway_id",
-  #     "transit_gateway_default_route_table_association",
-  #     "transit_gateway_default_route_table_propagation",
-  #     "transit_gateway_appliance_mode_support",
-  #     "transit_gateway_dns_support",
-  #     "tags"
-  #   ])) == 0
-  # }
+  # All var.subnets.transit_gateway valid keys
+  validation {
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+    condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
+      "cidrs",
+      "netmask",
+      "name_prefix",
+      "route_to_nat",
+      "transit_gateway_id",
+      "transit_gateway_default_route_table_association",
+      "transit_gateway_default_route_table_propagation",
+      "transit_gateway_appliance_mode_support",
+      "transit_gateway_dns_support",
+      "tags"
+    ])) == 0
+  }
 
   validation {
     error_message = "Each subnet type must contain only 1 key: `cidrs` or `netmask`."
@@ -176,26 +163,10 @@ EOF
     condition     = can(regex("^(all_azs|single_az|none)$", var.subnets.public.nat_gateway_configuration)) || try(var.subnets.public.nat_gateway_configuration, null) == null
   }
 
-  # validation {
-  #   error_message = "If private.route_to_nat == true, then public.nat_gateway_configuration must be either `all_azs` or `single_az`."
-  #   condition     = try(var.subnets.private.route_to_nat, false) ? can(regex("^(all_azs|single_az)$", var.subnets.public.nat_gateway_configuration)) : true
-  # }
-
   validation {
     error_message = "Any subnet type `name_prefix` must not contain \"/\"."
     condition     = alltrue([for _, v in var.subnets : !can(regex("/", try(v.name_prefix, "")))])
   }
-
-  # validation {
-  #   error_message = "Private subnet cannot set `route_to_transit_gateway` = \"0.0.0.0/.\" if `route_to_nat` = true."
-  #   condition     = try(var.subnets.private.route_to_nat, false) ? try(var.subnets.private.route_to_transit_gateway[0] != "0.0.0.0/0", true) : true
-  # }
-
-  # TODO: remove once `route_to_transit_gateway` can accept more than 1 argument
-  #   validation {
-  #     error_message = "Argument `route_to_transit_gateway` cannot accept more than 1 string."
-  #     condition     = try(length(var.subnets.private.route_to_transit_gateway), 0) <= 1 || try(length(var.subnets.public.route_to_transit_gateway), 0) <= 1
-  #   }
 }
 
 variable "tags" {

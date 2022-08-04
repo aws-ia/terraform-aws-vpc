@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 1.0.0"
+  version = ">= 2.0.0"
 
   name       = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
@@ -17,7 +17,7 @@ module "vpc" {
       # omitting name_prefix defaults value to "private"
       # name_prefix  = "private"
       netmask      = 24
-      route_to_nat = true
+      route_to_nat = "0.0.0.0/0"
     }
   }
 

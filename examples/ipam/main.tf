@@ -15,7 +15,7 @@ module "vpc" {
     }
     private = {
       netmask      = 24
-      route_to_nat = true
+      route_to_nat = "0.0.0.0/0"
     }
   }
 }
