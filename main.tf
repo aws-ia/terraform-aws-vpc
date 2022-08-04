@@ -109,9 +109,11 @@ resource "aws_route" "public_to_igw" {
 resource "aws_route" "public_to_tgw" {
   for_each = (contains(local.subnet_keys, "public") && can(var.subnets.public.route_to_transit_gateway)) ? toset(local.azs) : toset([])
 
-  route_table_id         = awscc_ec2_route_table.public[each.key].id
-  destination_cidr_block = var.subnets.public.route_to_transit_gateway[0]
-  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
+  destination_cidr_block     = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? null : var.subnets.public.route_to_transit_gateway
+  destination_prefix_list_id = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? var.subnets.public.route_to_transit_gateway : null
+
+  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
+  route_table_id     = awscc_ec2_route_table.public[each.key].id
 }
 
 # Private Subnets
@@ -152,26 +154,22 @@ resource "awscc_ec2_subnet_route_table_association" "private" {
 }
 
 resource "aws_route" "private_to_nat" {
-  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
   for_each = toset(try(local.private_subnet_names_nat_routed, []))
 
   route_table_id         = awscc_ec2_route_table.private[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = var.subnets[split("/", each.key)[0]].route_to_nat
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = try(aws_nat_gateway.main[split("/", each.key)[1]].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
 resource "aws_route" "private_to_tgw" {
-  # TODO: move logic to locals once `route_to_transit_gateway` can accept more than 1 list item
   for_each = toset(try(local.private_subnet_key_names_tgw_routed, []))
 
-  # for_each = try(var.subnets.private.route_to_transit_gateway, []) != [] ? toset([
-  #   for _, key in keys(local.subnet_keys.private) : "${key}:${var.subnets.private.route_to_transit_gateway[0]}"
-  # ]) : toset([])
+  destination_cidr_block     = can(regex("^pl-", var.subnets[split("/", each.key)[0]].route_to_transit_gateway)) ? null : var.subnets[split("/", each.key)[0]].route_to_transit_gateway
+  destination_prefix_list_id = can(regex("^pl-", var.subnets[split("/", each.key)[0]].route_to_transit_gateway)) ? var.subnets[split("/", each.key)[0]].route_to_transit_gateway : null
 
-  route_table_id         = awscc_ec2_route_table.private[each.key].id
-  destination_cidr_block = var.subnets[split("/", each.key)[0]].route_to_transit_gateway[0]
-  transit_gateway_id     = var.subnets.transit_gateway.transit_gateway_id
+  route_table_id     = awscc_ec2_route_table.private[each.key].id
+  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
 }
 
 # Transit Gateway Subnets
@@ -209,11 +207,11 @@ resource "awscc_ec2_subnet_route_table_association" "tgw" {
 }
 
 resource "aws_route" "tgw_to_nat" {
-  # if `route_to_nat` exists & `true` apply to private subnets per az, else do not apply
-  for_each = try(var.subnets.transit_gateway.route_to_nat, false) ? try(local.subnet_keys.public, {}) : {}
+  for_each = (can(var.subnets.transit_gateway.route_to_nat) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
+
 
   route_table_id         = awscc_ec2_route_table.tgw[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = var.subnets.transit_gateway.route_to_nat
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }

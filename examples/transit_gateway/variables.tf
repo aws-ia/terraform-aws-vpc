@@ -3,8 +3,7 @@ variable "tgw_id" {
   description = "(required) Transit Gateway ID."
 }
 
-variable "subnets" {
-  type        = any
+variable "prefix_list_id" {
+  type        = string
   description = "(optional) describe your variable"
-  default     = {}
 }
