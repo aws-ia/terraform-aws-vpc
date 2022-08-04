@@ -55,13 +55,6 @@ resource "awscc_ec2_route_table" "public" {
   )
 }
 
-resource "awscc_ec2_subnet_route_table_association" "public" {
-  for_each = try(local.subnet_keys.public, {})
-
-  subnet_id      = aws_subnet.public[each.key].id
-  route_table_id = awscc_ec2_route_table.public[each.key].id
-}
-
 resource "aws_eip" "nat" {
   for_each = toset(local.nat_configuration)
   vpc      = true
@@ -99,12 +92,20 @@ resource "aws_internet_gateway" "main" {
 }
 
 resource "aws_route" "public_to_igw" {
-  for_each = try(local.subnet_keys.public, {})
+  for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
 
   route_table_id         = awscc_ec2_route_table.public[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.main[0].id
 }
+
+resource "awscc_ec2_subnet_route_table_association" "public" {
+  for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
+
+  subnet_id      = aws_subnet.public[each.key].id
+  route_table_id = awscc_ec2_route_table.public[each.key].id
+}
+
 
 resource "aws_route" "public_to_tgw" {
   for_each = (contains(local.subnet_keys, "public") && can(var.subnets.public.route_to_transit_gateway)) ? toset(local.azs) : toset([])
