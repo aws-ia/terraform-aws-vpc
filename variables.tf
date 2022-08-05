@@ -79,17 +79,17 @@ variable "subnets" {
 
   **Any private subnet type options:**
   - All shared keys above
-  - `route_to_nat`             = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `connect_to_public_natgw`             = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
   - `route_to_transit_gateway` = (Optional|string) Optionally create routes from private subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **public subnet type options:**
   - All shared keys above
-  - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.route_to_nat = true`.
+  - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
   - `route_to_transit_gateway`  = (Optional|string) Optionally create routes from public subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **transit_gateway subnet type options:**
   - All shared keys above
-  - `route_to_nat`                                    = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `connect_to_public_natgw`                                    = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
   - `transit_gateway_id`                              = (Required|string) Transit gateway to attach VPC to.
   - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
@@ -107,14 +107,14 @@ variable "subnets" {
 
     private = {
       netmask                  = 24
-      route_to_nat             = "0.0.0.0/0"
+      connect_to_public_natgw = true
       route_to_transit_gateway = "10.1.0.0/16"
     }
 
     transit_gateway = {
       netmask                                         = 24
       transit_gateway_id                              = aws_ec2_transit_gateway.example.id
-      route_to_nat                                    = "0.0.0.0/0"
+      connect_to_public_natgw = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
     }
@@ -143,7 +143,7 @@ EOF
       "cidrs",
       "netmask",
       "name_prefix",
-      "route_to_nat",
+      "connect_to_public_natgw",
       "transit_gateway_id",
       "transit_gateway_default_route_table_association",
       "transit_gateway_default_route_table_propagation",

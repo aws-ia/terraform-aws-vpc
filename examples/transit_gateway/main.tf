@@ -1,6 +1,7 @@
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 2.0.0"
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 2.0.0"
+  source = "../.."
 
   name       = "tgw"
   cidr_block = "10.0.0.0/16"
@@ -15,7 +16,7 @@ module "vpc" {
 
     private_with_egress = {
       netmask                  = 24
-      route_to_nat             = "0.0.0.0/0"
+      connect_to_public_natgw  = true
       route_to_transit_gateway = var.prefix_list_id
     }
 
@@ -26,7 +27,7 @@ module "vpc" {
     transit_gateway = {
       netmask                                         = 28
       transit_gateway_id                              = var.tgw_id
-      route_to_nat                                    = "0.0.0.0/0"
+      connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
       transit_gateway_appliance_mode_support          = "enable"

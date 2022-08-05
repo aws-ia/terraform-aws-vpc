@@ -14,8 +14,8 @@ module "vpc" {
       nat_gateway_configuration = "all_azs"
     }
     private = {
-      netmask      = 24
-      route_to_nat = "0.0.0.0/0"
+      netmask                 = 24
+      connect_to_public_natgw = true
     }
   }
 }

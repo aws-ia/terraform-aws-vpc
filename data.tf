@@ -13,9 +13,9 @@ locals {
 
   # constructed list of <private_subnet_key>/az
   private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])
-  # list of private subnet keys with route_to_nat = true
-  private_subnets_nat_routed = [for type in local.private_subnet_names : type if can(var.subnets[type].route_to_nat)]
-  # private subnets with cidrs per az if route_to_nat = true ...  "privatetwo/us-east-1a"
+  # list of private subnet keys with connect_to_public_natgw = true
+  private_subnets_nat_routed = [for type in local.private_subnet_names : type if can(var.subnets[type].connect_to_public_natgw)]
+  # private subnets with cidrs per az if connect_to_public_natgw = true ...  "privatetwo/us-east-1a"
   private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
 
   private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if can(var.subnets[type].route_to_transit_gateway)]

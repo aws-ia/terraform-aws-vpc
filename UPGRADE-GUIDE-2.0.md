@@ -2,7 +2,7 @@
 
 - Ability to create arbitrary amounts of subnets types. Previously was only capable of 3 types: public, private, transit gateway. The terms `public` and `transit_gateway` are reserved keywords for those subnet types and all other keys used in var.subnets.<> are assumed to be type **private**.
 - Many private subnet related resources had to be renamed. Most changes are accomplished programatically using a [moved blocks](https://www.terraform.io/language/modules/develop/refactoring) but some require manual `terraform state mv` commands. see below.
-- Can pass cidr or prefix list id to any `route_to_nat` argument. Previously was a boolean that assumed `"0.0.0.0/0"` as the destination cidr.
+- `route_to_nat` has been changed to `connect_to_public_natgw` to clarify the nat is in the public subnet & to diverge from the `route_to` nomenclature which expects a route destination like input.
 - Can pass cidr or prefix list id to `route_to_transit_gateway` argument. Previously was a list of CIDRs that could only accept 1 item.
 - Many changes to Outputs available. Removed outputs marked as deprecated, separated grouped subnet attribute outputs into 3 `public_`, `tgw_`, and `private_`. Since you can have several private subnet declarations we group based on the name scheme `<your_key_name>/az`.
 
@@ -25,7 +25,7 @@ After : `route_to_transit_gateway  = "10.0.0.0/8"`
 
 Before: `route_to_nat = true`
 
-After : `route_to_nat = "0.0.0.0/0"`
+After : `connect_to_public_natgw = true`
 
 ## Statefile Changes
 
@@ -68,7 +68,7 @@ Remediation: See the move commands above.
 
 ### Invalid `for_each` argument
 
-This problem is nuanced. It likely indicates that youre trying to use a prefix list as a `route_to_nat` or `route_to_transit_gateway` value in a subnet argument or transit gateway id. If you're attempting to create a resource and use it as a value in any of subnet definition, you must first [target create](https://learn.hashicorp.com/tutorials/terraform/resource-targeting) those resources. This includes both `aws_ec2_managed_prefix_list` and `aws_ec2_transit_gateway`.
+This problem is nuanced. It likely indicates that youre trying to use a computed value, like a resource id, as an input in the var.subnets map. Common examples would be passing transit_gateway id or prefix_list_id that is created in parallel. You must first [target create](https://learn.hashicorp.com/tutorials/terraform/resource-targeting) those resources. This includes both `aws_ec2_managed_prefix_list` and `aws_ec2_transit_gateway`.
 
 Alternative to target creates, see the [transit_gateway test](https://github.com/aws-ia/terraform-aws-vpc/blob/main/test/examples_transit_gateway__test.go) for an example, we create both in a separate root and pass as variables
 

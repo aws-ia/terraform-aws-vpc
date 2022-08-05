@@ -16,8 +16,8 @@ module "vpc" {
     private = {
       # omitting name_prefix defaults value to "private"
       # name_prefix  = "private"
-      netmask      = 24
-      route_to_nat = "0.0.0.0/0"
+      netmask                 = 24
+      connect_to_public_natgw = true
     }
   }
 

@@ -67,7 +67,7 @@ route_table_attributes_by_type_by_az = {
       ```terraform
         **private subnet type options:**
           - All shared keys above
-          - `route_to_nat`             = (Optional|bool) <>
+          - `connect_to_public_natgw`  = (Optional|bool) <>
           - `route_to_transit_gateway` = (Optional|list(string)) <>
       ```
 
