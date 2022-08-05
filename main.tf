@@ -158,7 +158,7 @@ resource "aws_route" "private_to_nat" {
   for_each = toset(try(local.private_subnet_names_nat_routed, []))
 
   route_table_id         = awscc_ec2_route_table.private[each.key].id
-  destination_cidr_block = var.subnets[split("/", each.key)[0]].route_to_nat
+  destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = try(aws_nat_gateway.main[split("/", each.key)[1]].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
@@ -208,11 +208,11 @@ resource "awscc_ec2_subnet_route_table_association" "tgw" {
 }
 
 resource "aws_route" "tgw_to_nat" {
-  for_each = (can(var.subnets.transit_gateway.route_to_nat) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
+  for_each = (can(var.subnets.transit_gateway.connect_to_public_natgw) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
 
 
   route_table_id         = awscc_ec2_route_table.tgw[each.key].id
-  destination_cidr_block = var.subnets.transit_gateway.route_to_nat
+  destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
