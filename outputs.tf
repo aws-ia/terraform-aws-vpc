@@ -3,48 +3,6 @@ output "vpc_attributes" {
   value       = local.vpc
 }
 
-output "public_subnet_cidrs_by_az" {
-  value       = try(aws_subnet.public, null)
-  description = <<-EOF
-  Map of public subnet resource attributes grouped by AZ.
-
-  Example:
-  ```
-  public_subnets = {
-    "us-east-1a" = {
-      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-028d7f65ccc12ff98"
-      "vpc_id" = "vpc-05601d7778af1ba9c"
-      ...
-    }
-    "us-east-1b" = {
-      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-0091597b2b4c78dda"
-      ...
-    }
-  ```
-EOF
-}
-
-output "tgw_subnet_cidrs_by_az" {
-  value       = try(aws_subnet.tgw, null)
-  description = <<-EOF
-  Map of transit gateway subnet resource attributes grouped by AZ.
-
-  Example:
-  ```
-  tgw_subnets = {
-    "us-east-1a" = {
-      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-028d7f65ccc12ff98"
-      "vpc_id" = "vpc-05601d7778af1ba9c"
-      ...
-    }
-    "us-east-1b" = {
-      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-0091597b2b4c78dda"
-      ...
-    }
-  ```
-EOF
-}
-
 output "transit_gateway_attachment_id" {
   description = "Transit gateway attachment id."
   value       = try(aws_ec2_transit_gateway_vpc_attachment.tgw[0].id, null)

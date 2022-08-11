@@ -3,10 +3,20 @@ locals {
 
   # references to module.calculate_subnets output
   calculated_subnets = module.calculate_subnets.subnets_by_type
-  subnet_keys        = keys(var.subnets)
 
-  # default names if no name_prefix is passed
+  ##################################################################
+  # Subnet names
+  # A subnet's name is the subnet key by default but can be overrided by `name_prefix`.
+  # Subnet names are used for Name tags.
+  # resource name labels always use subnet key
+  subnet_keys  = keys(var.subnets)
   subnet_names = { for type, v in var.subnets : type => try(v.name_prefix, type) }
+
+  ##################################################################
+  # Internal variables for mapping user input from var.subnets to HCL useful values
+  # Notes:
+  # - subnets map contains arbitrary amount of subnet "keys" which are both defined as the subnets type and default name (unless name_prefix is provided).
+  # - resource name labels for subnet use the key as  private subnet keys are constructed
 
   singleton_subnet_types = ["public", "transit_gateway"]
   private_subnet_names   = setsubtract(local.subnet_keys, local.singleton_subnet_types)
@@ -21,7 +31,8 @@ locals {
   private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if can(var.subnets[type].route_to_transit_gateway)]
   private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
 
-  # NAT configurations options, selected based on nat_gateway_configuration
+  ##################################################################
+  # NAT configurations options, maps user string input to HCL usable values. selected based on nat_gateway_configuration
   # null   = none
   # all    = local.azs
   # single = local.azs[0]
@@ -33,6 +44,13 @@ locals {
   # if public subnets being built, check how many nats to create
   # options defined by `local.nat_options`
   nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
+
+
+  ##################################################################
+  # Feature toggles for whether:
+  # - create or reference a VPC
+  # - get cidr block value from AWS IPAM
+  # - create flow logs
 
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false

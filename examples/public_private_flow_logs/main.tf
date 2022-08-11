@@ -4,7 +4,7 @@ module "vpc" {
 
   name       = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
-  az_count   = 3
+  az_count   = 2
 
   subnets = {
     public = {
@@ -25,5 +25,9 @@ module "vpc" {
     log_destination_type = "cloud-watch-logs"
     retention_in_days    = 180
     kms_key_id           = var.kms_key_id
+  }
+
+  tags = {
+    "key" = "value"
   }
 }
