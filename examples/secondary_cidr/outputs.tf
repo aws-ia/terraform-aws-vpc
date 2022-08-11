@@ -5,5 +5,5 @@ output "public_subnets" {
 
 output "private_subnets" {
   description = "Map of private subnet attributes grouped by az."
-  value       = module.secondary.private_subnet_cidrs_by_az
+  value       = module.secondary.private_subnet_attributes_by_az
 }
