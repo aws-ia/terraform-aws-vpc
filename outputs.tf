@@ -3,6 +3,11 @@ output "vpc_attributes" {
   value       = local.vpc
 }
 
+output "azs" {
+  description = "List of AZs where subnets are created."
+  value       = local.azs
+}
+
 output "transit_gateway_attachment_id" {
   description = "Transit gateway attachment id."
   value       = try(aws_ec2_transit_gateway_vpc_attachment.tgw[0].id, null)
