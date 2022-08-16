@@ -9,10 +9,6 @@ module "vpc" {
   vpc_ipv4_netmask_length = 20
 
   subnets = {
-    public = {
-      netmask                   = 24
-      nat_gateway_configuration = "all_azs"
-    }
     private = {
       netmask                 = 24
       connect_to_public_natgw = true

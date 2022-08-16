@@ -222,6 +222,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 |------|--------|---------|
 | <a name="module_calculate_subnets"></a> [calculate\_subnets](#module\_calculate\_subnets) | ./modules/calculate_subnets | n/a |
 | <a name="module_flow_logs"></a> [flow\_logs](#module\_flow\_logs) | ./modules/flow_logs | n/a |
+| <a name="module_subnet_tags"></a> [subnet\_tags](#module\_subnet\_tags) | aws-ia/label/aws | 0.0.5 |
 | <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.5 |
 
 ## Resources
