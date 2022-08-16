@@ -9,8 +9,9 @@ locals {
   # A subnet's name is the subnet key by default but can be overrided by `name_prefix`.
   # Subnet names are used for Name tags.
   # resource name labels always use subnet key
-  subnet_keys  = keys(var.subnets)
-  subnet_names = { for type, v in var.subnets : type => try(v.name_prefix, type) }
+  subnet_keys           = keys(var.subnets)
+  subnet_names          = { for type, v in var.subnets : type => try(v.name_prefix, type) }
+  subnet_keys_with_tags = { for type, v in var.subnets : type => v.tags if can(v.tags) }
 
   ##################################################################
   # Internal variables for mapping user input from var.subnets to HCL useful values
@@ -84,4 +85,13 @@ module "tags" {
   version = "0.0.5"
 
   tags = var.tags
+}
+
+module "subnet_tags" {
+  source  = "aws-ia/label/aws"
+  version = "0.0.5"
+
+  for_each = local.subnet_keys_with_tags
+
+  tags = each.value
 }
