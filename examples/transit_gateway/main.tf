@@ -1,7 +1,8 @@
+data "aws_availability_zones" "current" {}
+
 module "vpc" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 2.0.0"
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 2.0.0"
 
   name       = "tgw"
   cidr_block = "10.0.0.0/16"
@@ -32,6 +33,10 @@ module "vpc" {
       transit_gateway_default_route_table_propagation = true
       transit_gateway_appliance_mode_support          = "enable"
       transit_gateway_dns_support                     = "disable"
+
+      tags = {
+        subnet_type = "tgw"
+      }
     }
   }
 }
