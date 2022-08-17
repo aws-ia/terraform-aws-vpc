@@ -46,6 +46,13 @@ locals {
   # options defined by `local.nat_options`
   nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
 
+  # used to reference which nat gateway id should be used in route
+  nat_per_az = (contains(local.subnet_keys, "public") && !var.vpc_secondary_cidr) ? (
+    # map of az : { id = <nat-id> }, ex: { "us-east-1a" : { "id": "nat-123" }}
+    { for az in local.azs : az => { id : try(aws_nat_gateway.main[az].id, aws_nat_gateway.main[local.nat_configuration[0]].id) } }
+    ) : (
+    var.vpc_secondary_cidr ? var.vpc_secondary_cidr_natgw : {}
+  )
 
   ##################################################################
   # Feature toggles for whether:
