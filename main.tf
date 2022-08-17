@@ -207,7 +207,7 @@ resource "awscc_ec2_route_table" "tgw" {
   tags = concat(
     [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
     module.tags.tags,
-    try(module.subnet_tags[split("/", each.key)[0]].tags, {})
+    try(module.subnet_tags["transit_gateway"].tags, [])
   )
 }
 
