@@ -15,22 +15,29 @@ No requirements.
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_secondary"></a> [secondary](#module\_secondary) | ../.. | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_natgw_id_1"></a> [natgw\_id\_1](#input\_natgw\_id\_1) | nat gw id for az 2 | `string` | n/a | yes |
+| <a name="input_natgw_id_2"></a> [natgw\_id\_2](#input\_natgw\_id\_2) | nat gw id for az 2 | `string` | n/a | yes |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | vpc id to create secondary cidr on | `string` | n/a | yes |
 
 ## Outputs
 

@@ -1,4 +1,4 @@
-# To test this example, uncomment the module blocks for "vpc" and "ipam_base_for_example_only"
+data "aws_region" "current" {}
 
 module "secondary" {
   # source  = "aws-ia/vpc/aws"
@@ -6,40 +6,26 @@ module "secondary" {
   source = "../.."
 
   name       = "secondary-cidr"
+  az_count   = 2
   cidr_block = "10.2.0.0/16"
 
   vpc_secondary_cidr = true
-  vpc_id             = module.vpc.vpc_attributes.id
+  vpc_id             = var.vpc_id
 
-  vpc_secondary_cidr_natgw = module.vpc.nat_gateway_attributes_by_az
-  az_count                 = 2
-
+  # If referencing another instantiation of this module, you can use the output nat_gateway_attributes_by_az, example:
+  # vpc_secondary_cidr_natgw = module.vpc.nat_gateway_attributes_by_az
+  vpc_secondary_cidr_natgw = {
+    "${data.aws_region.current.name}a" : {
+      id : var.natgw_id_1
+    }
+    "${data.aws_region.current.name}b" : {
+      id : var.natgw_id_2
+    }
+  }
   subnets = {
     private = {
       name_prefix             = "secondary-private-natgw-connected"
       netmask                 = 18
-      connect_to_public_natgw = true
-    }
-  }
-}
-
-module "vpc" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 2.0.0"
-  source = "../.."
-
-  name       = "primary-az-vpc"
-  cidr_block = "10.0.0.0/16"
-  az_count   = 3
-
-  subnets = {
-    public = {
-      name_prefix               = "primary-vpc-public" # omit to prefix with "public"
-      netmask                   = 24
-      nat_gateway_configuration = "all_azs" # options: "single_az", "none"
-    }
-    private = {
-      netmask                 = 24
       connect_to_public_natgw = true
     }
   }

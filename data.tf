@@ -44,6 +44,7 @@ locals {
   }
   # if public subnets being built, check how many nats to create
   # options defined by `local.nat_options`
+  # nat_configuration is a list of az names where a nat should be created
   nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
 
   # used to reference which nat gateway id should be used in route
