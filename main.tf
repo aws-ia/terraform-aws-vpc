@@ -169,7 +169,8 @@ resource "aws_route" "private_to_nat" {
   route_table_id         = awscc_ec2_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
-  nat_gateway_id = try(aws_nat_gateway.main[split("/", each.key)[1]].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
+  nat_gateway_id = local.nat_per_az[split("/", each.key)[1]].id
+  //try(aws_nat_gateway.main[split("/", each.key)[1]].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
 resource "aws_route" "private_to_tgw" {
@@ -225,7 +226,8 @@ resource "aws_route" "tgw_to_nat" {
   route_table_id         = awscc_ec2_route_table.tgw[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
-  nat_gateway_id = try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
+  nat_gateway_id = local.nat_per_az[each.key].id
+  //try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
