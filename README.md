@@ -271,7 +271,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="input_vpc_ipv4_ipam_pool_id"></a> [vpc\_ipv4\_ipam\_pool\_id](#input\_vpc\_ipv4\_ipam\_pool\_id) | Set to use IPAM to get CIDR block. | `string` | `null` | no |
 | <a name="input_vpc_ipv4_netmask_length"></a> [vpc\_ipv4\_netmask\_length](#input\_vpc\_ipv4\_netmask\_length) | Set to use IPAM to get CIDR block using a specified netmask. Must be set with var.vpc\_ipv4\_ipam\_pool\_id. | `string` | `null` | no |
 | <a name="input_vpc_secondary_cidr"></a> [vpc\_secondary\_cidr](#input\_vpc\_secondary\_cidr) | If `true` the module will create a `aws_vpc_ipv4_cidr_block_association` and subnets for that secondary cidr. If using IPAM for both primary and secondary CIDRs, you may only call this module serially (aka using `-target`, etc). | `bool` | `false` | no |
-| <a name="input_vpc_secondary_cidr_natgw"></a> [vpc\_secondary\_cidr\_natgw](#input\_vpc\_secondary\_cidr\_natgw) | n/a | `any` | `{}` | no |
+| <a name="input_vpc_secondary_cidr_natgw"></a> [vpc\_secondary\_cidr\_natgw](#input\_vpc\_secondary\_cidr\_natgw) | When invoking module for a secondary\_cidr attachment, you can map your private / tgw subnets to set of nat gateways by passing a map of az : { id: "nat-<id>"} | `any` | `{}` | no |
 
 ## Outputs
 
