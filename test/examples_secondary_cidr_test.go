@@ -6,7 +6,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
-func TestExamplesSecondaryCidr(t *testing.T) {
+func TestExamplesSecondaryCidrAllAzs(t *testing.T) {
 
 	primary := &terraform.Options{
 		TerraformDir: "./hcl_fixtures/secondary_cidr_base",
@@ -14,21 +14,44 @@ func TestExamplesSecondaryCidr(t *testing.T) {
 	defer terraform.Destroy(t, primary)
 	terraform.InitAndApply(t, primary)
 
-	// region := terraform.Output(t, primary, "region")
 	vpcId := terraform.Output(t, primary, "vpc_id")
-	natgwId1 := terraform.Output(t, primary, "natgw_id_1")
-	natgwId2 := terraform.Output(t, primary, "natgw_id_2")
+
+	natIdsOutput := terraform.OutputMapOfObjects(t, primary, "natgw_ids")
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../examples/secondary_cidr",
 		Vars: map[string]interface{}{
-			"vpc_id":     vpcId,
-			"natgw_id_1": natgwId1,
-			"natgw_id_2": natgwId2,
-			// "natgw_attrs": map[string]interface{}{
-			// 	fmt.Sprintf("%v%v", region, "a"): natgwId1,
-			// 	fmt.Sprintf("%v%v", region, "b"): natgwId2,
-			// },
+			"vpc_id":          vpcId,
+			"natgw_id_per_az": natIdsOutput,
+		},
+	}
+
+	defer terraform.Destroy(t, terraformOptions)
+	terraform.InitAndApply(t, terraformOptions)
+	terraform.ApplyAndIdempotent(t, terraformOptions)
+
+}
+
+func TestExamplesSecondaryCidrSingleAz(t *testing.T) {
+
+	primary := &terraform.Options{
+		TerraformDir: "./hcl_fixtures/secondary_cidr_base",
+		Vars: map[string]interface{}{
+			"nat_gw_configuration": "single_az",
+		},
+	}
+	defer terraform.Destroy(t, primary)
+	terraform.InitAndApply(t, primary)
+
+	vpcId := terraform.Output(t, primary, "vpc_id")
+
+	natIdsOutput := terraform.OutputMapOfObjects(t, primary, "natgw_ids")
+
+	terraformOptions := &terraform.Options{
+		TerraformDir: "../examples/secondary_cidr",
+		Vars: map[string]interface{}{
+			"vpc_id":          vpcId,
+			"natgw_id_per_az": natIdsOutput,
 		},
 	}
 

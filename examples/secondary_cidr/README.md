@@ -35,8 +35,7 @@ No requirements.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_natgw_id_1"></a> [natgw\_id\_1](#input\_natgw\_id\_1) | nat gw id for az 2 | `string` | n/a | yes |
-| <a name="input_natgw_id_2"></a> [natgw\_id\_2](#input\_natgw\_id\_2) | nat gw id for az 2 | `string` | n/a | yes |
+| <a name="input_natgw_id_per_az"></a> [natgw\_id\_per\_az](#input\_natgw\_id\_per\_az) | use the modules natgw\_id\_per\_az | `map(map(string))` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | vpc id to create secondary cidr on | `string` | n/a | yes |
 
 ## Outputs
