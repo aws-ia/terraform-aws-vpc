@@ -4,12 +4,8 @@ output "vpc_id" {
 
 }
 
-output "natgw_id_1" {
-  value       = module.vpc.nat_gateway_attributes_by_az[data.aws_availability_zones.current.names[0]].id
-  description = "nat gateway attributes"
+output "natgw_ids" {
+  value       = module.vpc.natgw_id_per_az
+  description = "nat gateway ids per az"
 }
 
-output "natgw_id_2" {
-  value       = module.vpc.nat_gateway_attributes_by_az[data.aws_availability_zones.current.names[1]].id
-  description = "nat gateway attributes"
-}

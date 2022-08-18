@@ -11,16 +11,19 @@ module "secondary" {
   vpc_secondary_cidr = true
   vpc_id             = var.vpc_id
 
-  # If referencing another instantiation of this module, you can use the output nat_gateway_attributes_by_az, example:
-  # vpc_secondary_cidr_natgw = module.vpc.nat_gateway_attributes_by_az
-  vpc_secondary_cidr_natgw = {
-    "${data.aws_region.current.name}a" : {
-      id : var.natgw_id_1
-    }
-    "${data.aws_region.current.name}b" : {
-      id : var.natgw_id_2
-    }
-  }
+  vpc_secondary_cidr_natgw = var.natgw_id_per_az
+
+  # If referencing another instantiation of this module, you can use the output natgw_id_per_az, example:
+  # vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az
+
+  # underly structure is:
+  # {
+  #   az : {
+  #     id : "nat-asdf"
+  #   }
+  # }
+  # but preferably you should just pass the module output natgw_id_per_az
+
   subnets = {
     private = {
       name_prefix             = "secondary-private-natgw-connected"

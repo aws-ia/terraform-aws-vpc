@@ -3,12 +3,7 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "natgw_id_1" {
-  description = "nat gw id for az 2"
-  type        = string
-}
-
-variable "natgw_id_2" {
-  description = "nat gw id for az 2"
-  type        = string
+variable "natgw_id_per_az" {
+  description = "use the modules natgw_id_per_az"
+  type        = map(map(string))
 }

@@ -35,7 +35,7 @@ variable "vpc_secondary_cidr" {
 
 variable "vpc_secondary_cidr_natgw" {
   type        = any
-  description = "When invoking module for a secondary_cidr attachment, you can map your private / tgw subnets to set of nat gateways by passing a map of az : { id: \"nat-<id>\"}"
+  description = "If attaching a secondary CIDR instead of creating a VPC, you can map private/ tgw subnets to your public NAT GW with this argument. Simply pass the output `nat_gateway_attributes_by_az`, ex: `vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az`. If you did not build your primary with this module, you must construct a map { az : { id : nat-123asdb }} for each az."
   default     = {}
 }
 

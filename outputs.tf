@@ -132,3 +132,22 @@ output "nat_gateway_attributes_by_az" {
   ```
 EOF
 }
+
+output "natgw_id_per_az" {
+  value       = try(local.nat_per_az, null)
+  description = <<-EOF
+  Map of nat gateway IDs for each resource. Will be duplicate ids if your var.subnets.public.nat_gateway_configuration = "single_az".
+
+  Example:
+  ```
+  natgw_id_per_az = {
+    "us-east-1a" = {
+      "id" = "nat-0fde39f9550f4abb5"
+    }
+    "us-east-1b" = {
+      "id" = "nat-0fde39f9550f4abb5"
+     }
+  }
+  ```
+EOF
+}
