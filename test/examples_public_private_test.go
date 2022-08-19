@@ -7,7 +7,7 @@ import (
 	"github.com/likexian/gokit/assert"
 )
 
-func TestExamplesPublicPrivate(t *testing.T) {
+func TestExamplesPublicPrivateCWLogs(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../examples/public_private_flow_logs",

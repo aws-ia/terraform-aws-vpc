@@ -23,8 +23,8 @@ variable "vpc_flow_logs" {
     }))
   })
   default = {
-    log_destination_type = "s3"
-    retention_in_days    = null
+    log_destination_type = "cloud-watch-logs"
+    retention_in_days    = 180
     kms_key_id           = null
   }
 }
