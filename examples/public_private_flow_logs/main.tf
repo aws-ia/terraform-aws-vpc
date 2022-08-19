@@ -4,7 +4,7 @@ module "vpc" {
   source  = "aws-ia/vpc/aws"
   version = ">= 2.0.0"
 
-  name       = "tag-test"
+  name       = "public-private-flowlogs"
   cidr_block = "10.0.0.0/20"
   az_count   = 2
 
@@ -26,11 +26,7 @@ module "vpc" {
     }
   }
 
-  vpc_flow_logs = {
-    log_destination_type = "cloud-watch-logs"
-    retention_in_days    = 180
-    kms_key_id           = var.kms_key_id
-  }
+  vpc_flow_logs = var.vpc_flow_logs
 
   tags = {
     "key" = "value"

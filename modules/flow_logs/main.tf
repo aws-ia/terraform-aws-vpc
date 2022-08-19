@@ -4,12 +4,12 @@ locals {
 
   # which log destination to use
   log_destination = local.create_flow_log_destination ? (
-    var.flow_log_defintion.log_destination_type == "cloud-watch-logs" ? module.cloudwatch_log_group[0].log_group.arn : null # change to s3 when implemented
+    var.flow_log_defintion.log_destination_type == "cloud-watch-logs" ? module.cloudwatch_log_group[0].log_group.arn : module.s3_log_bucket[0].bucket_flow_logs_attributes.arn # change to s3 when implemented
   ) : var.flow_log_defintion.log_destination
 
   # Use IAM from submodule if if not passed
   iam_role_arn = local.create_flow_log_destination ? (
-    var.flow_log_defintion.log_destination_type == "cloud-watch-logs" ? module.cloudwatch_log_group[0].iam_role.arn : null # change to s3 when implemented
+    var.flow_log_defintion.log_destination_type == "cloud-watch-logs" ? module.cloudwatch_log_group[0].iam_role.arn : null # s3: unnecessary, svc creates its own bucket policy
   ) : var.flow_log_defintion.iam_role_arn
 }
 
@@ -20,10 +20,18 @@ module "cloudwatch_log_group" {
   version = "1.0.0"
 
   name                  = var.name
-  retention_in_days     = var.flow_log_defintion.retention_in_days
+  retention_in_days     = var.flow_log_defintion.retention_in_days == null ? 180 : var.flow_log_defintion.retention_in_days
   kms_key_id            = var.flow_log_defintion.kms_key_id
   aws_service_principal = "vpc-flow-logs.amazonaws.com"
   tags                  = var.tags
+}
+
+module "s3_log_bucket" {
+  # if create destination and type = s3
+  count  = (local.create_flow_log_destination && var.flow_log_defintion.log_destination_type == "s3") ? 1 : 0
+  source = "./modules/s3_log_bucket"
+
+  name = var.name
 }
 
 resource "aws_flow_log" "main" {
@@ -34,12 +42,12 @@ resource "aws_flow_log" "main" {
   vpc_id               = var.vpc_id
 
   dynamic "destination_options" {
-    for_each = var.flow_log_defintion.log_destination_type == "s3" ? var.flow_log_defintion.destination_options : {}
+    for_each = var.flow_log_defintion.log_destination_type == "s3" ? [true] : []
 
     content {
-      file_format                = each.value.file_format
-      per_hour_partition         = each.value.per_hour_partition
-      hive_compatible_partitions = each.value.hive_compatible_partitions
+      file_format                = var.flow_log_defintion.destination_options.file_format
+      per_hour_partition         = var.flow_log_defintion.destination_options.per_hour_partition
+      hive_compatible_partitions = var.flow_log_defintion.destination_options.hive_compatible_partitions
     }
   }
 
@@ -48,4 +56,3 @@ resource "aws_flow_log" "main" {
     var.tags
   )
 }
-
