@@ -12,9 +12,9 @@ locals {
 
     # sensiblie defaults that can all be overridden
     log_destination_type = var.vpc_flow_logs.log_destination_type == null ? "cloud-watch-logs" : var.vpc_flow_logs.log_destination_type
-    retention_in_days    = var.vpc_flow_logs.retention_in_days == null ? 180 : var.vpc_flow_logs.retention_in_days
+    retention_in_days    = try(var.vpc_flow_logs.retention_in_days, null)
     traffic_type         = var.vpc_flow_logs.traffic_type == null ? "ALL" : var.vpc_flow_logs.traffic_type
-    destination_options = var.vpc_flow_logs.destination_options == null ? {
+    destination_options = can(var.vpc_flow_logs.destination_options) ? {
       file_format                = "plain-text"
       hive_compatible_partitions = false
       per_hour_partition         = false
