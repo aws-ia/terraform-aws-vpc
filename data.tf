@@ -25,7 +25,7 @@ locals {
   # constructed list of <private_subnet_key>/az
   private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])
   # list of private subnet keys with connect_to_public_natgw = true
-  private_subnets_nat_routed = [for type in local.private_subnet_names : type if can(var.subnets[type].connect_to_public_natgw)]
+  private_subnets_nat_routed = [for type in local.private_subnet_names : type if try(var.subnets[type].connect_to_public_natgw == true, false)]
   # private subnets with cidrs per az if connect_to_public_natgw = true ...  "privatetwo/us-east-1a"
   private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
 
@@ -42,16 +42,19 @@ locals {
     "single_az" = [local.azs[0]]
     "none"      = [] # explicit "none" or omitted
   }
+  nat_gateway_configuration = try(length(var.subnets.public.nat_gateway_configuration), 0) != 0 ? var.subnets.public.nat_gateway_configuration : "none"
+
   # if public subnets being built, check how many nats to create
   # options defined by `local.nat_options`
   # nat_configuration is a list of az names where a nat should be created
-  nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[try(var.subnets.public.nat_gateway_configuration, "none")] : local.nat_options["none"]
+  nat_configuration = contains(local.subnet_keys, "public") ? local.nat_options[local.nat_gateway_configuration] : local.nat_options["none"]
 
   # used to reference which nat gateway id should be used in route
   nat_per_az = (contains(local.subnet_keys, "public") && !var.vpc_secondary_cidr) ? (
     # map of az : { id = <nat-id> }, ex: { "us-east-1a" : { "id": "nat-123" }}
-    { for az in local.azs : az => { id : try(aws_nat_gateway.main[az].id, aws_nat_gateway.main[local.nat_configuration[0]].id) } }
-    ) : (
+    { for az in local.azs : az => {
+      id : try(aws_nat_gateway.main[az].id, aws_nat_gateway.main[local.nat_configuration[0]].id) } if local.nat_gateway_configuration != "none"
+    }) : (
     var.vpc_secondary_cidr ? var.vpc_secondary_cidr_natgw : {}
   )
 
