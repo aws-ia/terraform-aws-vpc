@@ -10,7 +10,7 @@ import (
 func TestExamplesNATGWRoutesNoNATGWNoRoute(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/nat_gw_routes",
+		TerraformDir: "./hcl_fixtures/nat_gw_routes",
 		Vars: map[string]interface{}{
 			"nat_gateway_configuration" : "none",
 			"route_to_nw" : false,
@@ -25,7 +25,7 @@ func TestExamplesNATGWRoutesNoNATGWNoRoute(t *testing.T) {
 func TestExamplesNATGWRoutesSingleAZNATGWNoRoute(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/nat_gw_routes",
+		TerraformDir: "./hcl_fixtures/nat_gw_routes",
 		Vars: map[string]interface{}{
 			"nat_gateway_configuration" : "single_az",
 			"route_to_nw" : false,
@@ -40,7 +40,7 @@ func TestExamplesNATGWRoutesSingleAZNATGWNoRoute(t *testing.T) {
 func TestExamplesNATGWRoutesAllAZsNATGWNoRoute(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/nat_gw_routes",
+		TerraformDir: "./hcl_fixtures/nat_gw_routes",
 		Vars: map[string]interface{}{
 			"nat_gateway_configuration" : "all_azs",
 			"route_to_nw" : false,
@@ -55,7 +55,7 @@ func TestExamplesNATGWRoutesAllAZsNATGWNoRoute(t *testing.T) {
 func TestExamplesNATGWRoutesSingleAZNATGWWithRoute(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/nat_gw_routes",
+		TerraformDir: "./hcl_fixtures/nat_gw_routes",
 		Vars: map[string]interface{}{
 			"nat_gateway_configuration" : "single_az",
 			"route_to_nw" : true,
@@ -70,7 +70,7 @@ func TestExamplesNATGWRoutesSingleAZNATGWWithRoute(t *testing.T) {
 func TestExamplesNATGWRoutesAllAZsNATGWWithRoute(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/nat_gw_routes",
+		TerraformDir: "./hcl_fixtures/nat_gw_routes",
 		Vars: map[string]interface{}{
 			"nat_gateway_configuration" : "all_azs",
 			"route_to_nw" : true,
