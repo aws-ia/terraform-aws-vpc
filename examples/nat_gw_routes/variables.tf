@@ -4,6 +4,6 @@ variable "nat_gateway_configuration" {
 }
 
 variable "route_to_nw" {
-  description = "Tags for the public subnets"
+  description = "Should route to NATGW be created?"
   type        = bool
 }
