@@ -7,7 +7,6 @@ variable "cidr_block" {
   description = "CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc_id output from data.aws_vpc."
   default     = null
   type        = string
-
 }
 
 variable "vpc_id" {

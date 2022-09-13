@@ -168,12 +168,6 @@ Terraform Plan:
 ...
 ```
 
-## IPAM Users
-
-If you're building VPCs using AWS IP Address Manager, this module can help you with building 1 VPC at a time from the same IPAM Pool. It is **not possible** to iterate over this module regarding IPAM VPCs. The technical reason due to the fact that we must [preview a cidr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam_preview_next_cidr) before making the VPC in order to calculate the subnet prefixes. You can only preview 1 CIDR at a time since subsequent calls will yield the same CIDR until a VPC allocates it from IPAM.
-
-You can use this module to build multiple IPAM VPCs but they must be created in manual sequence (`-target`).
-
 # Common Errors and their Fixes
 
 ## Resource Not Found
@@ -243,7 +237,6 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
-| [aws_vpc_ipam_preview_next_cidr.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam_preview_next_cidr) | resource |
 | [aws_vpc_ipv4_cidr_block_association.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipv4_cidr_block_association) | resource |
 | [awscc_ec2_route_table.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
 | [awscc_ec2_route_table.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |

@@ -1,8 +1,9 @@
 data "aws_availability_zones" "current" {}
 
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 2.0.0"
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 2.0.0"
+  source = "../.."
 
   name       = "tgw"
   cidr_block = "10.0.0.0/16"
@@ -18,7 +19,7 @@ module "vpc" {
     private_with_egress = {
       netmask                  = 24
       connect_to_public_natgw  = true
-      route_to_transit_gateway = var.prefix_list_id
+      route_to_transit_gateway = "0.0.0.0/0" # module.tgw_base_for_example_only.prefix_list_id
     }
 
     truly_private = {
@@ -27,7 +28,7 @@ module "vpc" {
 
     transit_gateway = {
       netmask                                         = 28
-      transit_gateway_id                              = var.tgw_id
+      transit_gateway_id                              = module.tgw_base_for_example_only.tgw_id
       connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
@@ -46,6 +47,6 @@ module "vpc" {
 # terraform apply -target=module.tgw_base_for_example_only
 #####################################
 
-# module "tgw_base_for_example_only" {
-#   source = "../../test/hcl_fixtures/transit_gateway_base"
-# }
+module "tgw_base_for_example_only" {
+  source = "../../test/hcl_fixtures/transit_gateway_base"
+}
