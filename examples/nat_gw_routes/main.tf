@@ -1,5 +1,5 @@
 module "nat_gw_vpc" {
-  source  = "../.."
+  source = "../.."
 
   name       = "nat-gw-options-vpc"
   cidr_block = "10.51.0.0/16"
