@@ -149,7 +149,6 @@ EOF
       "netmask",
       "name_prefix",
       "connect_to_public_natgw",
-      "transit_gateway_id",
       "transit_gateway_default_route_table_association",
       "transit_gateway_default_route_table_propagation",
       "transit_gateway_appliance_mode_support",
@@ -207,4 +206,9 @@ variable "vpc_flow_logs" {
     condition     = contains(["cloud-watch-logs", "s3", "none"], var.vpc_flow_logs.log_destination_type)
     error_message = "Invalid input, options: \"cloud-watch-logs\", \"s3\", or \"none\"."
   }
+}
+
+variable "transit_gateway_id" {
+  type        = string
+  description = "(optional) describe your variable"
 }

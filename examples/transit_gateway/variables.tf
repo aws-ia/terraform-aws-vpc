@@ -1,4 +1,4 @@
-variable "tgw_id" {
+variable "transit_gateway_id" {
   type        = string
   description = "(required) Transit Gateway ID."
 }

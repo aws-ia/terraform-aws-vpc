@@ -5,9 +5,10 @@ module "vpc" {
   # version = ">= 2.0.0"
   source = "../.."
 
-  name       = "tgw"
-  cidr_block = "10.0.0.0/16"
-  az_count   = 2
+  name               = "tgw"
+  cidr_block         = "10.0.0.0/16"
+  az_count           = 2
+  transit_gateway_id = module.tgw_base_for_example_only.tgw_id
 
   subnets = {
     public = {
@@ -19,7 +20,7 @@ module "vpc" {
     private_with_egress = {
       netmask                  = 24
       connect_to_public_natgw  = true
-      route_to_transit_gateway = "0.0.0.0/0" # module.tgw_base_for_example_only.prefix_list_id
+      route_to_transit_gateway = "192.168.1.0/16"
     }
 
     truly_private = {
@@ -28,7 +29,6 @@ module "vpc" {
 
     transit_gateway = {
       netmask                                         = 28
-      transit_gateway_id                              = module.tgw_base_for_example_only.tgw_id
       connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true

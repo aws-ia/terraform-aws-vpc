@@ -1,10 +1,37 @@
 # Changes from 2.x to 3.x
 
 - IPAM vpcs no longer rely on the `aws_vpc_ipam_preview_next_cidr` resource. This is a breaking change for VPCs were built with this resource dependency, with a workaround available. Removing this dependency was the last major [known] sore thumb of this module. With this removed we can now build vpcs in the same module as IPAMs, or, more importantly, prefix lists / transit gateways in the same `apply` as the vpc.
+- transit gateway id is now passed as a root level variable. Previously it was passed in var.subnets.transit_gateway.transit_gateway_id. While this was logically a nice way to organize variable references it lead to race conditions if you were trying to create a transit gateway in the same root module as the VPC call.
 
 # Required Changes to Make
 
-## NOTE: Changes are only required if you have built your VPCs with IPAM
+## Regarding changes to Transit Gateway users
+
+Before:
+
+```hcl
+module "vpc" {
+  ...
+  subnets = {
+    transit_gateway = {
+      transit_gateway_id = <>
+      ...
+    }
+  }
+}
+```
+
+After:
+
+```hcl
+module "vpc" {
+  ...
+  transit_gateway_id = <>
+  subnets = {...}
+}
+```
+
+## Regarding changes to IPAM users
 
 Using you were using the [IPAM Example](https://github.com/aws-ia/terraform-aws-vpc/blob/main/examples/ipam/main.tf) and you upgrde to v3, you must make the following changes to avoid a re-build.
 
