@@ -208,6 +208,6 @@ variable "vpc_flow_logs" {
 
 variable "transit_gateway_id" {
   type        = string
-  description = "(optional) describe your variable"
+  description = "Transit gateway id to attach the VPC to. Required when `transit_gateway` subnet is defined."
   default     = null
 }
