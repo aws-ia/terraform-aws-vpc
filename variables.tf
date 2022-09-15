@@ -95,7 +95,6 @@ variable "subnets" {
   **transit_gateway subnet type options:**
   - All shared keys above
   - `connect_to_public_natgw`                                    = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `transit_gateway_id`                              = (Required|string) Transit gateway to attach VPC to.
   - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_appliance_mode_support`          = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
@@ -118,7 +117,6 @@ variable "subnets" {
 
     transit_gateway = {
       netmask                                         = 24
-      transit_gateway_id                              = aws_ec2_transit_gateway.example.id
       connect_to_public_natgw = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
@@ -143,7 +141,7 @@ EOF
 
   # All var.subnets.transit_gateway valid keys
   validation {
-    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
       "cidrs",
       "netmask",
@@ -211,4 +209,5 @@ variable "vpc_flow_logs" {
 variable "transit_gateway_id" {
   type        = string
   description = "(optional) describe your variable"
+  default     = null
 }
