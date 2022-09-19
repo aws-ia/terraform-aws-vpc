@@ -20,7 +20,7 @@ module "vpc" {
     private_with_egress = {
       netmask                  = 24
       connect_to_public_natgw  = true
-      route_to_transit_gateway = "192.168.1.0/16"
+      route_to_transit_gateway = "192.168.0.0/16"
     }
 
     truly_private = {
