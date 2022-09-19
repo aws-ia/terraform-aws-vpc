@@ -9,18 +9,20 @@ module "vpc" {
   cidr_block         = "10.0.0.0/16"
   az_count           = 2
   transit_gateway_id = module.tgw_base_for_example_only.tgw_id
+  transit_gateway_routes = {
+    public              = "10.0.0.0/8"
+    private_with_egress = "192.168.0.0/16"
+  }
 
   subnets = {
     public = {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
-      route_to_transit_gateway  = "10.0.0.0/8"
     }
 
     private_with_egress = {
-      netmask                  = 24
-      connect_to_public_natgw  = true
-      route_to_transit_gateway = "192.168.0.0/16"
+      netmask                 = 24
+      connect_to_public_natgw = true
     }
 
     truly_private = {

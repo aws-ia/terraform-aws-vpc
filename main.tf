@@ -113,12 +113,11 @@ resource "awscc_ec2_subnet_route_table_association" "public" {
   route_table_id = awscc_ec2_route_table.public[each.key].id
 }
 
-
 resource "aws_route" "public_to_tgw" {
-  for_each = (contains(local.subnet_keys, "public") && can(var.subnets.public.route_to_transit_gateway)) ? toset(local.azs) : toset([])
+  for_each = (contains(local.subnet_keys, "public") && contains(local.subnets_tgw_routed, "public")) ? toset(local.azs) : toset([])
 
-  destination_cidr_block     = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? null : var.subnets.public.route_to_transit_gateway
-  destination_prefix_list_id = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? var.subnets.public.route_to_transit_gateway : null
+  destination_cidr_block     = can(regex("^pl-", var.transit_gateway_routes["public"])) ? null : var.transit_gateway_routes["public"]
+  destination_prefix_list_id = can(regex("^pl-", var.transit_gateway_routes["public"])) ? var.transit_gateway_routes["public"] : null
 
   transit_gateway_id = var.transit_gateway_id
   route_table_id     = awscc_ec2_route_table.public[each.key].id
@@ -174,10 +173,10 @@ resource "aws_route" "private_to_nat" {
 }
 
 resource "aws_route" "private_to_tgw" {
-  for_each = toset(try(local.private_subnet_key_names_tgw_routed, []))
+  for_each = toset(local.private_subnet_key_names_tgw_routed)
 
-  destination_cidr_block     = can(regex("^pl-", var.subnets[split("/", each.key)[0]].route_to_transit_gateway)) ? null : var.subnets[split("/", each.key)[0]].route_to_transit_gateway
-  destination_prefix_list_id = can(regex("^pl-", var.subnets[split("/", each.key)[0]].route_to_transit_gateway)) ? var.subnets[split("/", each.key)[0]].route_to_transit_gateway : null
+  destination_cidr_block     = can(regex("^pl-", var.transit_gateway_routes[each.key])) ? null : var.transit_gateway_routes[each.key]
+  destination_prefix_list_id = can(regex("^pl-", var.transit_gateway_routes[each.key])) ? var.transit_gateway_routes[each.key] : null
 
   route_table_id     = awscc_ec2_route_table.private[each.key].id
   transit_gateway_id = var.transit_gateway_id

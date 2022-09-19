@@ -85,12 +85,10 @@ variable "subnets" {
   **Any private subnet type options:**
   - All shared keys above
   - `connect_to_public_natgw`             = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `route_to_transit_gateway` = (Optional|string) Optionally create routes from private subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **public subnet type options:**
   - All shared keys above
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
-  - `route_to_transit_gateway`  = (Optional|string) Optionally create routes from public subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **transit_gateway subnet type options:**
   - All shared keys above
@@ -106,13 +104,11 @@ variable "subnets" {
     public = {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
-      route_to_transit_gateway  = "10.1.0.0/16"
     }
 
     private = {
       netmask                  = 24
       connect_to_public_natgw  = true
-      route_to_transit_gateway = "10.1.0.0/16"
     }
 
     transit_gateway = {
@@ -134,7 +130,6 @@ EOF
       "netmask",
       "name_prefix",
       "nat_gateway_configuration",
-      "route_to_transit_gateway",
       "tags"
     ])) == 0
   }
@@ -210,4 +205,21 @@ variable "transit_gateway_id" {
   type        = string
   description = "Transit gateway id to attach the VPC to. Required when `transit_gateway` subnet is defined."
   default     = null
+}
+
+variable "transit_gateway_routes" {
+  description = <<-EOF
+  Configuration of route(s) to transit gateway. 
+  For each `public` and/or `private` subnets named in the `subnets` variable, 
+  Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
+  Example:
+  ```
+  transit_gateway_routes = {
+    public  = "10.0.0.0/8"
+    private = "pl-123"
+  }
+  ```
+EOF
+  type        = any
+  default     = {}
 }

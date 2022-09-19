@@ -29,8 +29,11 @@ locals {
   # private subnets with cidrs per az if connect_to_public_natgw = true ...  "privatetwo/us-east-1a"
   private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
 
-  private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_transit_gateway, "") != ""]
-  private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
+  # removed to support transit_gateway_routes
+  #private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_transit_gateway, "") != ""]
+  #private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
+  subnets_tgw_routed = keys(var.transit_gateway_routes)
+  private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.subnets_tgw_routed, split("/", subnet)[0])]
 
   ##################################################################
   # NAT configurations options, maps user string input to HCL usable values. selected based on nat_gateway_configuration

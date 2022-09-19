@@ -2,6 +2,7 @@
 
 - IPAM vpcs no longer rely on the `aws_vpc_ipam_preview_next_cidr` resource. This is a breaking change for VPCs were built with this resource dependency, with a workaround available. Removing this dependency was the last major [known] sore thumb of this module. With this removed we can now build vpcs in the same module as IPAMs, or, more importantly, prefix lists / transit gateways in the same `apply` as the vpc.
 - transit gateway id is now passed as a root level variable. Previously it was passed in var.subnets.transit_gateway.transit_gateway_id. While this was logically a nice way to organize variable references it lead to race conditions if you were trying to create a transit gateway in the same root module as the VPC call.
+- route to transit gateway is now passed at a root level via variable `transit_gateway_routes`. Previously it was passed in var.subnets.<subnet-name>.route_to_transit_gateway. While this was logically a nice way to organize variable references it lead to race conditions if you were trying to create the prefix list in the same root module as the VPC call.
 
 # Required Changes to Make
 
@@ -27,6 +28,38 @@ After:
 module "vpc" {
   ...
   transit_gateway_id = <>
+  subnets = {...}
+}
+```
+
+## Regarding changes to Transit Gateway Routes using prefix list
+
+Before:
+
+```hcl
+module "vpc" {
+  ...
+  subnets = {
+    public = {
+      route_to_transit_gateway = <prefix-list-id>
+    }
+    private = {
+      route_to_transit_gateway = <prefix-list-id>
+    }
+  }
+}
+```
+
+After:
+
+```hcl
+module "vpc" {
+  ...
+  transit_gateway_id = <>
+  transit_gateway_routes = {
+    public = <prefix-list-id>
+    private   = <prefix-list-id>
+  }
   subnets = {...}
 }
 ```
