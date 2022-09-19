@@ -111,13 +111,13 @@ variable "subnets" {
 
     private = {
       netmask                  = 24
-      connect_to_public_natgw = true
+      connect_to_public_natgw  = true
       route_to_transit_gateway = "10.1.0.0/16"
     }
 
     transit_gateway = {
       netmask                                         = 24
-      connect_to_public_natgw = true
+      connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
     }
