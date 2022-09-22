@@ -1,9 +1,8 @@
 data "aws_availability_zones" "current" {}
 
 module "vpc" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 2.0.0"
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 3.0.0"
 
   name               = "tgw"
   cidr_block         = "10.0.0.0/16"
@@ -46,7 +45,6 @@ module "vpc" {
 
 #####################################
 # Example of a tgw deployment
-# terraform apply -target=module.tgw_base_for_example_only
 #####################################
 
 module "tgw_base_for_example_only" {
