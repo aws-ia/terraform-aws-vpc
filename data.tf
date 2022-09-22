@@ -32,7 +32,7 @@ locals {
   # removed to support transit_gateway_routes
   #private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_transit_gateway, "") != ""]
   #private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
-  subnets_tgw_routed = keys(var.transit_gateway_routes)
+  subnets_tgw_routed                  = keys(var.transit_gateway_routes)
   private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.subnets_tgw_routed, split("/", subnet)[0])]
 
   ##################################################################

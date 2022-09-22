@@ -209,8 +209,8 @@ variable "transit_gateway_id" {
 
 variable "transit_gateway_routes" {
   description = <<-EOF
-  Configuration of route(s) to transit gateway. 
-  For each `public` and/or `private` subnets named in the `subnets` variable, 
+  Configuration of route(s) to transit gateway.
+  For each `public` and/or `private` subnets named in the `subnets` variable,
   Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
   Example:
   ```
