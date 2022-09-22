@@ -7,7 +7,6 @@ variable "cidr_block" {
   description = "CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc_id output from data.aws_vpc."
   default     = null
   type        = string
-
 }
 
 variable "vpc_id" {
@@ -86,17 +85,14 @@ variable "subnets" {
   **Any private subnet type options:**
   - All shared keys above
   - `connect_to_public_natgw`             = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `route_to_transit_gateway` = (Optional|string) Optionally create routes from private subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **public subnet type options:**
   - All shared keys above
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
-  - `route_to_transit_gateway`  = (Optional|string) Optionally create routes from public subnets to transit gateway subnets. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
 
   **transit_gateway subnet type options:**
   - All shared keys above
   - `connect_to_public_natgw`                                    = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `transit_gateway_id`                              = (Required|string) Transit gateway to attach VPC to.
   - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_appliance_mode_support`          = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
@@ -108,19 +104,16 @@ variable "subnets" {
     public = {
       netmask                   = 24
       nat_gateway_configuration = "single_az"
-      route_to_transit_gateway  = "10.1.0.0/16"
     }
 
     private = {
       netmask                  = 24
-      connect_to_public_natgw = true
-      route_to_transit_gateway = "10.1.0.0/16"
+      connect_to_public_natgw  = true
     }
 
     transit_gateway = {
       netmask                                         = 24
-      transit_gateway_id                              = aws_ec2_transit_gateway.example.id
-      connect_to_public_natgw = true
+      connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
     }
@@ -137,20 +130,18 @@ EOF
       "netmask",
       "name_prefix",
       "nat_gateway_configuration",
-      "route_to_transit_gateway",
       "tags"
     ])) == 0
   }
 
   # All var.subnets.transit_gateway valid keys
   validation {
-    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_id\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
       "connect_to_public_natgw",
-      "transit_gateway_id",
       "transit_gateway_default_route_table_association",
       "transit_gateway_default_route_table_propagation",
       "transit_gateway_appliance_mode_support",
@@ -208,4 +199,27 @@ variable "vpc_flow_logs" {
     condition     = contains(["cloud-watch-logs", "s3", "none"], var.vpc_flow_logs.log_destination_type)
     error_message = "Invalid input, options: \"cloud-watch-logs\", \"s3\", or \"none\"."
   }
+}
+
+variable "transit_gateway_id" {
+  type        = string
+  description = "Transit gateway id to attach the VPC to. Required when `transit_gateway` subnet is defined."
+  default     = null
+}
+
+variable "transit_gateway_routes" {
+  description = <<-EOF
+  Configuration of route(s) to transit gateway.
+  For each `public` and/or `private` subnets named in the `subnets` variable,
+  Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
+  Example:
+  ```
+  transit_gateway_routes = {
+    public  = "10.0.0.0/8"
+    private = "pl-123"
+  }
+  ```
+EOF
+  type        = any
+  default     = {}
 }

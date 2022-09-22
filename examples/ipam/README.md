@@ -15,7 +15,8 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 2.0.0 |
+| <a name="module_ipam_base_for_example_only"></a> [ipam\_base\_for\_example\_only](#module\_ipam\_base\_for\_example\_only) | ../../test/hcl_fixtures/ipam_base | n/a |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 3.0.0 |
 
 ## Resources
 
@@ -23,9 +24,7 @@ No resources.
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_ipam_pool_id"></a> [ipam\_pool\_id](#input\_ipam\_pool\_id) | pool id to request CIDR from. | `string` | n/a | yes |
+No inputs.
 
 ## Outputs
 

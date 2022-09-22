@@ -10,11 +10,12 @@ module "calculate_subnets" {
 resource "aws_vpc" "main" {
   count = local.create_vpc ? 1 : 0
 
-  cidr_block           = local.cidr_block
+  cidr_block           = var.cidr_block
   enable_dns_hostnames = var.vpc_enable_dns_hostnames
   enable_dns_support   = var.vpc_enable_dns_support
   instance_tenancy     = var.vpc_instance_tenancy
   ipv4_ipam_pool_id    = var.vpc_ipv4_ipam_pool_id
+  ipv4_netmask_length  = var.vpc_ipv4_netmask_length
 
   tags = merge(
     { "Name" = var.name },
@@ -112,14 +113,13 @@ resource "awscc_ec2_subnet_route_table_association" "public" {
   route_table_id = awscc_ec2_route_table.public[each.key].id
 }
 
-
 resource "aws_route" "public_to_tgw" {
-  for_each = (contains(local.subnet_keys, "public") && can(var.subnets.public.route_to_transit_gateway)) ? toset(local.azs) : toset([])
+  for_each = (contains(local.subnet_keys, "public") && contains(local.subnets_tgw_routed, "public")) ? toset(local.azs) : toset([])
 
-  destination_cidr_block     = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? null : var.subnets.public.route_to_transit_gateway
-  destination_prefix_list_id = can(regex("^pl-", var.subnets.public.route_to_transit_gateway)) ? var.subnets.public.route_to_transit_gateway : null
+  destination_cidr_block     = can(regex("^pl-", var.transit_gateway_routes["public"])) ? null : var.transit_gateway_routes["public"]
+  destination_prefix_list_id = can(regex("^pl-", var.transit_gateway_routes["public"])) ? var.transit_gateway_routes["public"] : null
 
-  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
+  transit_gateway_id = var.transit_gateway_id
   route_table_id     = awscc_ec2_route_table.public[each.key].id
 }
 
@@ -170,17 +170,16 @@ resource "aws_route" "private_to_nat" {
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = local.nat_per_az[split("/", each.key)[1]].id
-  //try(aws_nat_gateway.main[split("/", each.key)[1]].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
 resource "aws_route" "private_to_tgw" {
-  for_each = toset(try(local.private_subnet_key_names_tgw_routed, []))
+  for_each = toset(local.private_subnet_key_names_tgw_routed)
 
-  destination_cidr_block     = can(regex("^pl-", var.subnets[split("/", each.key)[0]].route_to_transit_gateway)) ? null : var.subnets[split("/", each.key)[0]].route_to_transit_gateway
-  destination_prefix_list_id = can(regex("^pl-", var.subnets[split("/", each.key)[0]].route_to_transit_gateway)) ? var.subnets[split("/", each.key)[0]].route_to_transit_gateway : null
+  destination_cidr_block     = can(regex("^pl-", var.transit_gateway_routes[split("/", each.key)[0]])) ? null : var.transit_gateway_routes[split("/", each.key)[0]]
+  destination_prefix_list_id = can(regex("^pl-", var.transit_gateway_routes[split("/", each.key)[0]])) ? var.transit_gateway_routes[split("/", each.key)[0]] : null
 
   route_table_id     = awscc_ec2_route_table.private[each.key].id
-  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
+  transit_gateway_id = var.transit_gateway_id
 }
 
 # Transit Gateway Subnets
@@ -220,21 +219,20 @@ resource "awscc_ec2_subnet_route_table_association" "tgw" {
 }
 
 resource "aws_route" "tgw_to_nat" {
-  for_each = (can(var.subnets.transit_gateway.connect_to_public_natgw) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
+  for_each = (try(var.subnets.transit_gateway.connect_to_public_natgw == true, false) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
 
 
   route_table_id         = awscc_ec2_route_table.tgw[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = local.nat_per_az[each.key].id
-  //try(aws_nat_gateway.main[each.key].id, aws_nat_gateway.main[local.nat_configuration[0]].id)
 }
 
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
   count = contains(local.subnet_keys, "transit_gateway") ? 1 : 0
 
   subnet_ids         = values(aws_subnet.tgw)[*].id
-  transit_gateway_id = var.subnets.transit_gateway.transit_gateway_id
+  transit_gateway_id = var.transit_gateway_id
   vpc_id             = local.vpc.id
 
   transit_gateway_default_route_table_association = try(var.subnets.transit_gateway.transit_gateway_default_route_table_association, null)

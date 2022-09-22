@@ -56,7 +56,6 @@ route_table_attributes_by_type_by_az = {
               "netmask",
               "name_prefix",
               "nat_gateway_configuration",
-              "route_to_transit_gateway",
               "tags"
           ])) == 0
         }
@@ -68,7 +67,6 @@ route_table_attributes_by_type_by_az = {
         **private subnet type options:**
           - All shared keys above
           - `connect_to_public_natgw`  = (Optional|bool) <>
-          - `route_to_transit_gateway` = (Optional|list(string)) <>
       ```
 
 2. Write configuration code
