@@ -192,7 +192,7 @@ variable "vpc_flow_logs" {
   })
 
   default = {
-    log_destination_type = "cloud-watch-logs"
+    log_destination_type = "none"
   }
 
   validation {

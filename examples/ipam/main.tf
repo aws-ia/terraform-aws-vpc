@@ -1,5 +1,6 @@
 module "vpc" {
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 3.0.0"
 
   name     = "ipam-vpc"
   az_count = 3

@@ -1,5 +1,6 @@
 module "nat_gw_vpc" {
-  source = "../../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 3.0.0"
 
   name       = "nat-gw-options-vpc"
   cidr_block = "10.51.0.0/16"
