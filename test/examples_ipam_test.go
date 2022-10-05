@@ -9,9 +9,6 @@ import (
 func TestExamplesIPAM(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../examples/ipam",
-		Vars: map[string]interface{}{
-			"ipam_pool_id": "test",
-		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)

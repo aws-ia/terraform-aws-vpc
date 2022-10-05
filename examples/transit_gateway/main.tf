@@ -1,8 +1,7 @@
 data "aws_availability_zones" "current" {}
 
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 3.0.0"
+  source = "../.."
 
   name               = "tgw"
   cidr_block         = "10.0.0.0/16"
