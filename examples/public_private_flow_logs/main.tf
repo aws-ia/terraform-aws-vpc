@@ -2,9 +2,9 @@ data "aws_availability_zones" "current" {}
 
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 2.0.0"
+  version = ">= 3.0.1"
 
-  name       = "public-private-flowlogs"
+  name       = "flowlogs"
   cidr_block = "10.0.0.0/20"
   az_count   = 2
 

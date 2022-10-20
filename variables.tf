@@ -183,11 +183,11 @@ variable "vpc_flow_logs" {
     log_destination_type = string
     retention_in_days    = optional(number)
     tags                 = optional(map(string))
-    traffic_type         = optional(string)
+    traffic_type         = optional(string, "ALL")
     destination_options = optional(object({
-      file_format                = optional(string)
-      hive_compatible_partitions = optional(bool)
-      per_hour_partition         = optional(bool)
+      file_format                = optional(string, "plain-text")
+      hive_compatible_partitions = optional(bool, false)
+      per_hour_partition         = optional(bool, false)
     }))
   })
 

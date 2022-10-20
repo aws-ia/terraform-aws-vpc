@@ -255,9 +255,8 @@ module "flow_logs" {
 
   source = "./modules/flow_logs"
 
-  name = var.name
-  # see defaults.tf for local definition
-  flow_log_defintion = local.flow_logs_definition
-  vpc_id             = local.vpc.id
-  tags               = module.tags.tags_aws
+  name                = var.name
+  flow_log_definition = var.vpc_flow_logs
+  vpc_id              = local.vpc.id
+  tags                = module.tags.tags_aws
 }

@@ -3,7 +3,7 @@ variable "name" {
   type        = string
 }
 
-variable "flow_log_defintion" {
+variable "flow_log_definition" {
   description = "Definition of the Flow Logs (FL) to create. Can define pre-existing log_destination / iam_role_arn or theyll be created, default is Cloud Watch."
   type        = any
 }

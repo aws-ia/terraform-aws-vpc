@@ -2,7 +2,7 @@ data "aws_region" "current" {}
 
 module "ipam" {
   source  = "aws-ia/ipam/aws"
-  version = ">= 1.0.0"
+  version = ">= 1.1.4"
 
   top_cidr = ["172.0.0.0/8"]
 
