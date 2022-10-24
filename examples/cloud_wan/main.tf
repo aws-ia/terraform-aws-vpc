@@ -1,9 +1,9 @@
 
 # VPC module (North Virginia)
 module "nvirginia_vpc" {
-  #source  = "aws-ia/vpc/aws"
-  #version = ">= 3.0.2"
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 3.0.2"
+
   providers = {
     aws   = aws.awsnvirginia
     awscc = awscc.awsccnvirginia
