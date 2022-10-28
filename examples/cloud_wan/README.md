@@ -16,28 +16,28 @@ This example shows how you can use this module with `core_network` subnets, and 
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.27.0 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | = 0.33.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.36.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.27.0 |
-| <a name="provider_awscc.awsccnvirginia"></a> [awscc.awsccnvirginia](#provider\_awscc.awsccnvirginia) | = 0.33.0 |
+| <a name="provider_awscc.awsccnvirginia"></a> [awscc.awsccnvirginia](#provider\_awscc.awsccnvirginia) | >= 0.36.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ireland_vpc"></a> [ireland\_vpc](#module\_ireland\_vpc) | ../.. | n/a |
-| <a name="module_nvirginia_vpc"></a> [nvirginia\_vpc](#module\_nvirginia\_vpc) | ../.. | n/a |
+| <a name="module_ireland_vpc"></a> [ireland\_vpc](#module\_ireland\_vpc) | aws-ia/vpc/aws | >= 3.0.2 |
+| <a name="module_nvirginia_vpc"></a> [nvirginia\_vpc](#module\_nvirginia\_vpc) | aws-ia/vpc/aws | >= 3.0.2 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [awscc_networkmanager_core_network.core_network](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/networkmanager_core_network) | resource |
-| [awscc_networkmanager_global_network.global_network](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/networkmanager_global_network) | resource |
+| [awscc_networkmanager_core_network.core_network](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/networkmanager_core_network) | resource |
+| [awscc_networkmanager_global_network.global_network](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/networkmanager_global_network) | resource |
 | [aws_networkmanager_core_network_policy_document.policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document) | data source |
 
 ## Inputs

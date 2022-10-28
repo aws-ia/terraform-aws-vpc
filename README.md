@@ -290,14 +290,14 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.73.0 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | = 0.33.0 |
+| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.36.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | = 0.33.0 |
+| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.36.0 |
 
 ## Modules
 
@@ -333,16 +333,16 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | [aws_subnet.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_vpc_ipv4_cidr_block_association.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipv4_cidr_block_association) | resource |
-| [awscc_ec2_route_table.cwan](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_route_table.private](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_route_table.public](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_route_table.tgw](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_subnet_route_table_association.cwan](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_subnet_route_table_association) | resource |
-| [awscc_ec2_subnet_route_table_association.private](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_subnet_route_table_association) | resource |
-| [awscc_ec2_subnet_route_table_association.public](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_subnet_route_table_association) | resource |
-| [awscc_ec2_subnet_route_table_association.tgw](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/resources/ec2_subnet_route_table_association) | resource |
+| [awscc_ec2_route_table.cwan](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
+| [awscc_ec2_route_table.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
+| [awscc_ec2_route_table.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
+| [awscc_ec2_route_table.tgw](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
+| [awscc_ec2_subnet_route_table_association.cwan](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
+| [awscc_ec2_subnet_route_table_association.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
+| [awscc_ec2_subnet_route_table_association.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
+| [awscc_ec2_subnet_route_table_association.tgw](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
 | [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
-| [awscc_ec2_vpc.main](https://registry.terraform.io/providers/hashicorp/awscc/0.33.0/docs/data-sources/ec2_vpc) | data source |
+| [awscc_ec2_vpc.main](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/data-sources/ec2_vpc) | data source |
 
 ## Inputs
 
