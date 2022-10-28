@@ -1,9 +1,9 @@
 
 # VPC module (North Virginia)
 module "nvirginia_vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 3.0.2"
-
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 3.0.2"
+  source = "../.."
   providers = {
     aws   = aws.awsnvirginia
     awscc = awscc.awsccnvirginia
@@ -77,11 +77,6 @@ resource "awscc_networkmanager_global_network" "global_network" {
   provider = awscc.awsccnvirginia
 
   description = "Global Network - VPC module"
-
-  tags = [{
-    Key   = "Name",
-    Value = "Global Network - VPC module"
-  }]
 }
 
 # Core Network
