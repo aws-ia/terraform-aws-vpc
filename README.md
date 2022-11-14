@@ -42,7 +42,7 @@ module "vpc" {
 
 ## Reserved Subnet Key Names
 
-There are 3 reserved keys for subnet key names in var.subnets corresponding to types "public", "transit\_gateway", and "core\_network". Other custom subnet key names are valid are and those subnets will be private subnets.
+There are 3 reserved keys for subnet key names in var.subnets corresponding to types "public", "transit\_gateway", and "core\_network" [(an AWS Cloud WAN feature)](https://docs.aws.amazon.com/vpc/latest/cloudwan/cloudwan-networks-working-with.html). Other custom subnet key names are valid are and those subnets will be private subnets.
 
 ```terraform
 transit_gateway_id = <>
