@@ -98,6 +98,13 @@ variable "subnets" {
   - `transit_gateway_appliance_mode_support`          = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
   - `transit_gateway_dns_support`                     = (Optional|string) DNS Support is used if you need the VPC to resolve public IPv4 DNS host names to private IPv4 addresses when queried from instances in another VPC attached to the transit gateway. Valid values: `enable` (default) and `disable`.
 
+  **core_network subnet type options:**
+  - All shared keys abovce
+  - `connect_to_public_natgw` = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `ipv6_support`            = (Optional|bool) Boolean whether IPv6 is supported or not in the Cloud WAN's VPC attachment. Default to `false`.
+  - `require_acceptance`      = (Optional|bool) Boolean whether the core network VPC attachment to create requires acceptance or not. Defaults to `false`.
+  - `accept_attachment`       = (Optional|bool) Boolean whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
+
   Example:
   ```
   subnets = {
@@ -116,6 +123,14 @@ variable "subnets" {
       connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
+    }
+
+    core_network = {
+      netmask                 = 24
+      connect_to_public_natgw = true
+      ipv6_support            = true
+      require_acceptance      = true
+      accept_attachment       = true
     }
   }
   ```
@@ -146,6 +161,21 @@ EOF
       "transit_gateway_default_route_table_propagation",
       "transit_gateway_appliance_mode_support",
       "transit_gateway_dns_support",
+      "tags"
+    ])) == 0
+  }
+
+  # All var.subnets.core_network valid keys
+  validation {
+    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"ipv6_support\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
+    condition = length(setsubtract(keys(try(var.subnets.core_network, {})), [
+      "cidrs",
+      "netmask",
+      "name_prefix",
+      "connect_to_public_natgw",
+      "ipv6_support",
+      "require_acceptance",
+      "accept_attachment",
       "tags"
     ])) == 0
   }
@@ -215,6 +245,36 @@ variable "transit_gateway_routes" {
   Example:
   ```
   transit_gateway_routes = {
+    public  = "10.0.0.0/8"
+    private = "pl-123"
+  }
+  ```
+EOF
+  type        = any
+  default     = {}
+}
+
+variable "core_network" {
+  type = object({
+    id  = string
+    arn = string
+  })
+  description = "AWS Cloud WAN's core network information - to create a VPC attachment. Required when `cloud_wan` subnet is defined. Two attributes are required: the `id` and `arn` of the resource."
+
+  default = {
+    id  = null
+    arn = null
+  }
+}
+
+variable "core_network_routes" {
+  description = <<-EOF
+  Configuration of route(s) to AWS Cloud WAN's core network.
+  For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network. 
+  You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.
+  Example:
+  ```
+  core_network_routes = {
     public  = "10.0.0.0/8"
     private = "pl-123"
   }

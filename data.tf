@@ -19,7 +19,7 @@ locals {
   # - subnets map contains arbitrary amount of subnet "keys" which are both defined as the subnets type and default name (unless name_prefix is provided).
   # - resource name labels for subnet use the key as  private subnet keys are constructed
 
-  singleton_subnet_types = ["public", "transit_gateway"]
+  singleton_subnet_types = ["public", "transit_gateway", "core_network"]
   private_subnet_names   = setsubtract(local.subnet_keys, local.singleton_subnet_types)
 
   # constructed list of <private_subnet_key>/az
@@ -34,6 +34,14 @@ locals {
   #private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
   subnets_tgw_routed                  = keys(var.transit_gateway_routes)
   private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.subnets_tgw_routed, split("/", subnet)[0])]
+
+  # support variables for core_network_routes
+  subnets_cwan_routed                  = keys(var.core_network_routes)
+  private_subnet_key_names_cwan_routes = [for subnet in local.private_per_az : subnet if contains(local.subnets_cwan_routed, split("/", subnet)[0])]
+  require_acceptance                   = try(var.subnets.core_network.require_acceptance, false) # value to default
+  accept_attachment                    = try(var.subnets.core_network.accept_attachment, true)   # value to default
+  create_acceptance                    = (local.require_acceptance == true && local.accept_attachment == true)
+  create_cwan_routes                   = (local.require_acceptance == false) || local.create_acceptance
 
   ##################################################################
   # NAT configurations options, maps user string input to HCL usable values. selected based on nat_gateway_configuration

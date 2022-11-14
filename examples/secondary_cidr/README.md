@@ -23,7 +23,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_secondary"></a> [secondary](#module\_secondary) | aws-ia/vpc/aws | >= 2.0.0 |
+| <a name="module_secondary"></a> [secondary](#module\_secondary) | aws-ia/vpc/aws | >= 3.0.2 |
 
 ## Resources
 

@@ -13,6 +13,11 @@ output "transit_gateway_attachment_id" {
   value       = try(aws_ec2_transit_gateway_vpc_attachment.tgw[0].id, null)
 }
 
+output "core_network_attachment" {
+  description = "AWS Cloud WAN's core network attachment. Full output of aws_networkmanager_vpc_attachment."
+  value       = try(aws_networkmanager_vpc_attachment.cwan[0], null)
+}
+
 output "private_subnet_attributes_by_az" {
   value       = try(aws_subnet.private, null)
   description = <<-EOF
@@ -73,12 +78,33 @@ output "tgw_subnet_attributes_by_az" {
 EOF
 }
 
+output "core_network_subnet_attributes_by_az" {
+  value       = try(aws_subnet.cwan, null)
+  description = <<-EOF
+  Map of all core_network subnets containing their attributes.
+
+  Example:
+  ```
+  core_network_subnet_attributes = {
+    "us-east-1a" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
+      "assign_ipv6_address_on_creation" = false
+      ...
+      <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference>
+    }
+    "us-east-1b" = {...)
+  }
+  ```
+EOF
+}
+
 output "rt_attributes_by_type_by_az" {
   value = {
     # TODO: omit keys if value is null
     "private"         = awscc_ec2_route_table.private,
     "public"          = awscc_ec2_route_table.public
     "transit_gateway" = awscc_ec2_route_table.tgw
+    "core_network"    = awscc_ec2_route_table.cwan
   }
   description = <<-EOF
   Map of route tables by type => az => route table attributes. Example usage: module.vpc.route_table_by_subnet_type.private.id
