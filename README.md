@@ -262,7 +262,7 @@ subnets = {
   core_network = {
     netmaks            = 28
     require_acceptance = true
-    accept_attachment  = true
+    accept_attachment  = false
   }
 }
 ```
