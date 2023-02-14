@@ -18,10 +18,9 @@ resource "aws_vpc" "main" {
   ipv4_ipam_pool_id    = var.vpc_ipv4_ipam_pool_id
   ipv4_netmask_length  = var.vpc_ipv4_netmask_length
 
-  tags = merge(
-    { "Name" = var.name },
-    module.tags.tags_aws
-  )
+  tags = {
+    "Name" = var.name
+    }
 }
 
 # Secondary CIDR blocks - if configured
@@ -45,29 +44,27 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     { Name = "${local.subnet_names["public"]}-${each.key}" },
-    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
 
 # Public subnet Route Table and association
-resource "awscc_ec2_route_table" "public" {
+resource "aws_route_table" "public" {
   for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
 
   vpc_id = local.vpc.id
 
-  tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["public"]}-${each.key}" }],
-    module.tags.tags,
-    try(module.subnet_tags["public"].tags, [])
+  tags = merge(
+    { Name = "${local.subnet_names["public"]}-${each.key}" },
+    try(module.subnet_tags["public"].tags_aws, {})
   )
 }
 
-resource "awscc_ec2_subnet_route_table_association" "public" {
+resource "aws_route_table_association" "public" {
   for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
 
   subnet_id      = aws_subnet.public[each.key].id
-  route_table_id = awscc_ec2_route_table.public[each.key].id
+  route_table_id = aws_route_table.public[each.key].id
 }
 
 # Elastic IP - used in NAT gateways (if configured)
@@ -77,7 +74,6 @@ resource "aws_eip" "nat" {
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
-    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
@@ -91,7 +87,6 @@ resource "aws_nat_gateway" "main" {
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
-    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 
@@ -107,7 +102,6 @@ resource "aws_internet_gateway" "main" {
 
   tags = merge(
     { Name = var.name },
-    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
@@ -116,7 +110,7 @@ resource "aws_internet_gateway" "main" {
 resource "aws_route" "public_to_igw" {
   for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
 
-  route_table_id         = awscc_ec2_route_table.public[each.key].id
+  route_table_id         = aws_route_table.public[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.main[0].id
 }
@@ -129,7 +123,7 @@ resource "aws_route" "public_to_tgw" {
   destination_prefix_list_id = can(regex("^pl-", var.transit_gateway_routes["public"])) ? var.transit_gateway_routes["public"] : null
 
   transit_gateway_id = var.transit_gateway_id
-  route_table_id     = awscc_ec2_route_table.public[each.key].id
+  route_table_id     = aws_route_table.public[each.key].id
 }
 
 # Route: from public subnets to AWS Cloud WAN's core network (if configured in var.core_network_routes)
@@ -140,7 +134,7 @@ resource "aws_route" "public_to_cwan" {
   destination_prefix_list_id = can(regex("^pl-", var.core_network_routes["public"])) ? var.core_network_routes["public"] : null
 
   core_network_arn = var.core_network.arn
-  route_table_id   = awscc_ec2_route_table.public[each.key].id
+  route_table_id   = aws_route_table.public[each.key].id
 
   depends_on = [
     aws_networkmanager_vpc_attachment.cwan,
@@ -161,7 +155,6 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     { Name = "${local.subnet_names[split("/", each.key)[0]]}-${split("/", each.key)[1]}" },
-    module.tags.tags_aws,
     try(module.subnet_tags[split("/", each.key)[0]].tags_aws, {})
   )
 
@@ -171,30 +164,29 @@ resource "aws_subnet" "private" {
 }
 
 # Private subnet Route Table and association
-resource "awscc_ec2_route_table" "private" {
+resource "aws_route_table" "private" {
   for_each = toset(try(local.private_per_az, []))
 
   vpc_id = local.vpc.id
 
-  tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names[split("/", each.key)[0]]}-${split("/", each.key)[1]}" }],
-    module.tags.tags,
-    try(module.subnet_tags[split("/", each.key)[0]].tags, [])
+  tags = merge(
+    { Name = "${local.subnet_names["private"]}-${each.key}" },
+    try(module.subnet_tags["private"].tags_aws, {})
   )
 }
 
-resource "awscc_ec2_subnet_route_table_association" "private" {
+resource "aws_route_table_association" "private" {
   for_each = toset(try(local.private_per_az, []))
 
   subnet_id      = aws_subnet.private[each.key].id
-  route_table_id = awscc_ec2_route_table.private[each.key].id
+  route_table_id = aws_route_table.private[each.key].id
 }
 
 # Route: from the private subnet to the NAT gateway (if Internet access configured)
 resource "aws_route" "private_to_nat" {
   for_each = toset(try(local.private_subnet_names_nat_routed, []))
 
-  route_table_id         = awscc_ec2_route_table.private[each.key].id
+  route_table_id         = aws_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = local.nat_per_az[split("/", each.key)[1]].id
@@ -207,7 +199,7 @@ resource "aws_route" "private_to_tgw" {
   destination_cidr_block     = can(regex("^pl-", var.transit_gateway_routes[split("/", each.key)[0]])) ? null : var.transit_gateway_routes[split("/", each.key)[0]]
   destination_prefix_list_id = can(regex("^pl-", var.transit_gateway_routes[split("/", each.key)[0]])) ? var.transit_gateway_routes[split("/", each.key)[0]] : null
 
-  route_table_id     = awscc_ec2_route_table.private[each.key].id
+  route_table_id     = aws_route_table.private[each.key].id
   transit_gateway_id = var.transit_gateway_id
 }
 
@@ -222,7 +214,7 @@ resource "aws_route" "private_to_cwan" {
   destination_prefix_list_id = can(regex("^pl-", var.core_network_routes[split("/", each.key)[0]])) ? var.core_network_routes[split("/", each.key)[0]] : null
 
   core_network_arn = var.core_network.arn
-  route_table_id   = awscc_ec2_route_table.private[each.key].id
+  route_table_id   = aws_route_table.private[each.key].id
 
   depends_on = [
     aws_networkmanager_vpc_attachment.cwan,
@@ -242,30 +234,28 @@ resource "aws_subnet" "tgw" {
 
   tags = merge(
     { Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
-    module.tags.tags_aws,
     try(module.subnet_tags["transit_gateway"].tags_aws, {})
   )
 
 }
 
 # Transit Gateway subnet Route Table and association
-resource "awscc_ec2_route_table" "tgw" {
+resource "aws_route_table" "tgw" {
   for_each = contains(local.subnet_keys, "transit_gateway") ? toset(local.azs) : toset([])
 
   vpc_id = local.vpc.id
 
-  tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["transit_gateway"]}-${each.key}" }],
-    module.tags.tags,
-    try(module.subnet_tags["transit_gateway"].tags, [])
+  tags = merge(
+    { Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
+    try(module.subnet_tags["transit_gateway"].tags_aws, {})
   )
 }
 
-resource "awscc_ec2_subnet_route_table_association" "tgw" {
+resource "aws_route_table_association" "tgw" {
   for_each = contains(local.subnet_keys, "transit_gateway") ? toset(local.azs) : toset([])
 
   subnet_id      = aws_subnet.tgw[each.key].id
-  route_table_id = awscc_ec2_route_table.tgw[each.key].id
+  route_table_id = aws_route_table.tgw[each.key].id
 }
 
 # Route: from transit_gateway subnet to NAT gateway (if Internet access configured)
@@ -273,7 +263,7 @@ resource "aws_route" "tgw_to_nat" {
   for_each = (try(var.subnets.transit_gateway.connect_to_public_natgw == true, false) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
 
 
-  route_table_id         = awscc_ec2_route_table.tgw[each.key].id
+  route_table_id         = aws_route_table.tgw[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = local.nat_per_az[each.key].id
@@ -312,36 +302,34 @@ resource "aws_subnet" "cwan" {
 
   tags = merge(
     { Name = "${local.subnet_names["core_network"]}-${each.key}" },
-    module.tags.tags_aws,
     try(module.subnet_tags["core_network"].tags_aws, {})
   )
 }
 
 # Core Network subnet Route Table and association
-resource "awscc_ec2_route_table" "cwan" {
+resource "aws_route_table" "cwan" {
   for_each = contains(local.subnet_keys, "core_network") ? toset(local.azs) : toset([])
 
   vpc_id = local.vpc.id
 
-  tags = concat(
-    [{ "key" = "Name", "value" = "${local.subnet_names["core_network"]}-${each.key}" }],
-    module.tags.tags,
-    try(module.subnet_tags["core_network"].tags, [])
+  tags = merge(
+    { Name = "${local.subnet_names["core_network"]}-${each.key}" },
+    try(module.subnet_tags["core_network"].tags_aws, {})
   )
 }
 
-resource "awscc_ec2_subnet_route_table_association" "cwan" {
+resource "aws_route_table_association" "cwan" {
   for_each = contains(local.subnet_keys, "core_network") ? toset(local.azs) : toset([])
 
   subnet_id      = aws_subnet.cwan[each.key].id
-  route_table_id = awscc_ec2_route_table.cwan[each.key].id
+  route_table_id = aws_route_table.cwan[each.key].id
 }
 
 # Route: from core_network subnet to NAT gateway (if Internet access configured)
 resource "aws_route" "cwan_to_nat" {
   for_each = (try(var.subnets.core_network.connect_to_public_natgw == true, false) && contains(local.subnet_keys, "public")) ? toset(local.azs) : toset([])
 
-  route_table_id         = awscc_ec2_route_table.cwan[each.key].id
+  route_table_id         = aws_route_table.cwan[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   # try to get nat for AZ, else use singular nat
   nat_gateway_id = local.nat_per_az[each.key].id
@@ -385,5 +373,4 @@ module "flow_logs" {
   name                = var.name
   flow_log_definition = var.vpc_flow_logs
   vpc_id              = local.vpc.id
-  tags                = module.tags.tags_aws
 }

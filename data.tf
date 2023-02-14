@@ -30,8 +30,6 @@ locals {
   private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
 
   # removed to support transit_gateway_routes
-  #private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_transit_gateway, "") != ""]
-  #private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
   subnets_tgw_routed                  = keys(var.transit_gateway_routes)
   private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.subnets_tgw_routed, split("/", subnet)[0])]
 
@@ -94,12 +92,6 @@ data "awscc_ec2_vpc" "main" {
 # santizes tags for both aws / awscc providers
 # aws   tags = module.tags.tags_aws
 # awscc tags = module.tags.tags
-module "tags" {
-  source  = "aws-ia/label/aws"
-  version = "0.0.5"
-
-  tags = var.tags
-}
 
 module "subnet_tags" {
   source  = "aws-ia/label/aws"

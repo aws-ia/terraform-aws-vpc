@@ -196,12 +196,6 @@ EOF
   }
 }
 
-variable "tags" {
-  description = "Tags to apply to all resources."
-  type        = map(string)
-  default     = {}
-}
-
 variable "vpc_flow_logs" {
   description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
 
@@ -270,7 +264,7 @@ variable "core_network" {
 variable "core_network_routes" {
   description = <<-EOF
   Configuration of route(s) to AWS Cloud WAN's core network.
-  For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network. 
+  For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network.
   You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.
   Example:
   ```

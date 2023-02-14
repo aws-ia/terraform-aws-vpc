@@ -12,9 +12,3 @@ variable "vpc_id" {
   description = "VPC ID to create flow logs for."
   type        = string
 }
-
-variable "tags" {
-  description = "Tags."
-  type        = map(string)
-  default     = null
-}
