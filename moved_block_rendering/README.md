@@ -1,3 +1,7 @@
+# Notice
+
+These files were used for the v2->v3 upgrade. Please disregard
+
 # Moved Resources
 
 While upgrading this module to allow for multiple private subnets, we had to adjust how we name private subnet related resources. To ease user pain we created the moved.tf file which creates corresponding entries for each private resource. However, we were unable to update `aws_route.private_to_tgw` because we used the user provided CIDR in the key. If you see a `CREATE/DELETE` for these resources you can either allow TF to force create the new routes (momentary blip in traffic) or you can manully update the name, example below:

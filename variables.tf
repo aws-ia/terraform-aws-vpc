@@ -270,7 +270,7 @@ variable "core_network" {
 variable "core_network_routes" {
   description = <<-EOF
   Configuration of route(s) to AWS Cloud WAN's core network.
-  For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network. 
+  For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network.
   You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.
   Example:
   ```

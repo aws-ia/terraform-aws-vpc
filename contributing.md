@@ -74,8 +74,8 @@ route_table_attributes_by_type_by_az = {
 *Note: each for_each loop must account for if a user does not want to create the particular subnet type. Follow examples from other subnet types in main.tf*
 
     * Create new `aws_subnet`
-    * Create new `awscc_ec2_route_table`
-    * Create new `awscc_ec2_subnet_route_table_association`
+    * Create new `aws_route_table`
+    * Create new `aws_route_table_association`
     * Consider and create appropriate `aws_route`
 
 

@@ -3,7 +3,7 @@
 
 This module can be used to deploy a pragmatic VPC with various subnets types in # AZs. Common deployment examples can be found in [examples/](https://github.com/aws-ia/terraform-aws-vpc/tree/main/examples). Subnet CIDRs can be explicitly set via list of string argument `cidrs` or set via a number `netmask` argument.
 
-\_Note: For information regarding the 3.0 upgrade see our [upgrade guide](https://github.com/aws-ia/terraform-aws-vpc/blob/main/UPGRADE-GUIDE-3.0.md).\_
+\_\_Note: For information regarding the 4.0 upgrade see our [upgrade guide](https://github.com/aws-ia/terraform-aws-vpc/blob/main/UPGRADE-GUIDE-4.0.md).\_\_
 
 ## Usage
 
@@ -12,7 +12,7 @@ The example below builds a VPC with public and private subnets in 3 AZs. Each su
 ```hcl
 module "vpc" {
   source   = "aws-ia/vpc/aws"
-  version = ">= 2.0.0"
+  version = ">= 4.0.0"
 
   name       = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
@@ -166,7 +166,7 @@ Example Configuration:
 ```terraform
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 2.0.0"
+  version = ">= 4.0.0"
 
   name       = "multi-az-vpc"
   cidr_block = "10.0.0.0/20"
@@ -214,27 +214,6 @@ Terraform Plan:
 
 # Common Errors and their Fixes
 
-## Resource Not Found
-
-Error:
-
-> Warning: AWS Resource Not Found
-
-Because this module uses 2 providers, `aws` and `awscc`, if your `AWS_DEFAULT_REGION` environment varaible is different than what is hard-coded in your HCL, the AWSCC provider will use the default region. This will result in no ability to find the resources with a hardcoded region. You can fix this by hardcoding a region for both environments or updating your environment variable:
-
-```terraform
-provider "aws" {
-  region = <>
-}
-provider "awscc" {
-  region = <>
-}
-```
-
-or
-
-`export AWS_DEFAULT_REGION=<>`
-
 ## Error creating routes to Core Network
 
 Error:
@@ -262,7 +241,7 @@ subnets = {
   core_network = {
     netmaks            = 28
     require_acceptance = true
-    accept_attachment  = false
+    accept_attachment  = true
   }
 }
 ```
@@ -290,14 +269,12 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.27.0 |
-| <a name="requirement_awscc"></a> [awscc](#requirement\_awscc) | >= 0.36.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.27.0 |
-| <a name="provider_awscc"></a> [awscc](#provider\_awscc) | >= 0.36.0 |
 
 ## Modules
 
@@ -327,22 +304,22 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | [aws_route.public_to_igw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.public_to_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.tgw_to_nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route_table.cwan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table_association.cwan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_route_table_association.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_subnet.cwan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_vpc_ipv4_cidr_block_association.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipv4_cidr_block_association) | resource |
-| [awscc_ec2_route_table.cwan](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_route_table.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_route_table.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_route_table.tgw](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_route_table) | resource |
-| [awscc_ec2_subnet_route_table_association.cwan](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
-| [awscc_ec2_subnet_route_table_association.private](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
-| [awscc_ec2_subnet_route_table_association.public](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
-| [awscc_ec2_subnet_route_table_association.tgw](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/ec2_subnet_route_table_association) | resource |
 | [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
-| [awscc_ec2_vpc.main](https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/data-sources/ec2_vpc) | data source |
+| [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
@@ -353,7 +330,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit\_gateway". Each Subnet type offers its own set of available arguments detailed below.<br><br>**Attributes shared across subnet types:**<br>- `cidrs`       = (Optional\|list(string)) **Cannot set if `netmask` is set.** List of CIDRs to set to subnets. Count of CIDRs defined must match quatity of azs in `az_count`.<br>- `netmask`     = (Optional\|Int) Netmask of the `var.cidr_block` to calculate for each subnet. **Cannot set if `cidrs` is set.**<br>- `name_prefix` = (Optional\|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit\_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.<br>- `tags`        = (Optional\|map(string)) Tags to set on the subnet and associated resources.<br><br>**Any private subnet type options:**<br>- All shared keys above<br>- `connect_to_public_natgw`             = (Optional\|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.<br><br>**public subnet type options:**<br>- All shared keys above<br>- `nat_gateway_configuration` = (Optional\|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.<br><br>**transit\_gateway subnet type options:**<br>- All shared keys above<br>- `connect_to_public_natgw`                                    = (Optional\|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.<br>- `transit_gateway_default_route_table_association` = (Optional\|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.<br>- `transit_gateway_default_route_table_propagation` = (Optional\|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.<br>- `transit_gateway_appliance_mode_support`          = (Optional\|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.<br>- `transit_gateway_dns_support`                     = (Optional\|string) DNS Support is used if you need the VPC to resolve public IPv4 DNS host names to private IPv4 addresses when queried from instances in another VPC attached to the transit gateway. Valid values: `enable` (default) and `disable`.<br><br>**core\_network subnet type options:**<br>- All shared keys abovce<br>- `connect_to_public_natgw` = (Optional\|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.<br>- `ipv6_support`            = (Optional\|bool) Boolean whether IPv6 is supported or not in the Cloud WAN's VPC attachment. Default to `false`.<br>- `require_acceptance`      = (Optional\|bool) Boolean whether the core network VPC attachment to create requires acceptance or not. Defaults to `false`.<br>- `accept_attachment`       = (Optional\|bool) Boolean whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.<br><br>Example:<pre>subnets = {<br>  public = {<br>    netmask                   = 24<br>    nat_gateway_configuration = "single_az"<br>  }<br><br>  private = {<br>    netmask                  = 24<br>    connect_to_public_natgw  = true<br>  }<br><br>  transit_gateway = {<br>    netmask                                         = 24<br>    connect_to_public_natgw                         = true<br>    transit_gateway_default_route_table_association = true<br>    transit_gateway_default_route_table_propagation = true<br>  }<br><br>  core_network = {<br>    netmask                 = 24<br>    connect_to_public_natgw = true<br>    ipv6_support            = true<br>    require_acceptance      = true<br>    accept_attachment       = true<br>  }<br>}</pre> | `any` | n/a | yes |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc\_id output from data.aws\_vpc. | `string` | `null` | no |
 | <a name="input_core_network"></a> [core\_network](#input\_core\_network) | AWS Cloud WAN's core network information - to create a VPC attachment. Required when `cloud_wan` subnet is defined. Two attributes are required: the `id` and `arn` of the resource. | <pre>object({<br>    id  = string<br>    arn = string<br>  })</pre> | <pre>{<br>  "arn": null,<br>  "id": null<br>}</pre> | no |
-| <a name="input_core_network_routes"></a> [core\_network\_routes](#input\_core\_network\_routes) | Configuration of route(s) to AWS Cloud WAN's core network.<br>For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network. <br>You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.<br>Example:<pre>core_network_routes = {<br>  public  = "10.0.0.0/8"<br>  private = "pl-123"<br>}</pre> | `any` | `{}` | no |
+| <a name="input_core_network_routes"></a> [core\_network\_routes](#input\_core\_network\_routes) | Configuration of route(s) to AWS Cloud WAN's core network.<br>For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network.<br>You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.<br>Example:<pre>core_network_routes = {<br>  public  = "10.0.0.0/8"<br>  private = "pl-123"<br>}</pre> | `any` | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 | <a name="input_transit_gateway_id"></a> [transit\_gateway\_id](#input\_transit\_gateway\_id) | Transit gateway id to attach the VPC to. Required when `transit_gateway` subnet is defined. | `string` | `null` | no |
 | <a name="input_transit_gateway_routes"></a> [transit\_gateway\_routes](#input\_transit\_gateway\_routes) | Configuration of route(s) to transit gateway.<br>For each `public` and/or `private` subnets named in the `subnets` variable,<br>Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.<br>Example:<pre>transit_gateway_routes = {<br>  public  = "10.0.0.0/8"<br>  private = "pl-123"<br>}</pre> | `any` | `{}` | no |

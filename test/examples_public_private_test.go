@@ -18,9 +18,9 @@ func TestExamplesPublicPrivateCWLogs(t *testing.T) {
 	terraform.ApplyAndIdempotent(t, terraformOptions)
 
 	publicTagsLength := terraform.Output(t, terraformOptions, "public_subnets_tags_length")
-	assert.Equal(t, "3", publicTagsLength)
+	assert.Equal(t, "2", publicTagsLength)
 	privateTagsLength := terraform.Output(t, terraformOptions, "private_subnets_tags_length")
-	assert.Equal(t, "2", privateTagsLength)
+	assert.Equal(t, "1", privateTagsLength)
 }
 
 func TestExamplesPublicPrivateS3FlowLogs(t *testing.T) {

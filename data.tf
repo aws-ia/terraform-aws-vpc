@@ -30,8 +30,6 @@ locals {
   private_subnet_names_nat_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_nat_routed, split("/", subnet)[0])]
 
   # removed to support transit_gateway_routes
-  #private_subnets_tgw_routed          = [for type in local.private_subnet_names : type if try(var.subnets[type].route_to_transit_gateway, "") != ""]
-  #private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_tgw_routed, split("/", subnet)[0])]
   subnets_tgw_routed                  = keys(var.transit_gateway_routes)
   private_subnet_key_names_tgw_routed = [for subnet in local.private_per_az : subnet if contains(local.subnets_tgw_routed, split("/", subnet)[0])]
 
@@ -77,7 +75,7 @@ locals {
 
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false
-  vpc        = local.create_vpc ? aws_vpc.main[0] : data.awscc_ec2_vpc.main[0]
+  vpc        = local.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
   cidr_block = var.cidr_block == null ? aws_vpc.main[0].cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
@@ -86,7 +84,7 @@ locals {
 data "aws_availability_zones" "current" {}
 
 # search for existing vpc with var.vpc_id if not creating
-data "awscc_ec2_vpc" "main" {
+data "aws_vpc" "main" {
   count = local.create_vpc ? 0 : 1
   id    = var.vpc_id
 }
