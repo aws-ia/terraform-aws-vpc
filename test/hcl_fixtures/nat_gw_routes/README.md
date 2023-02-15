@@ -1,7 +1,17 @@
 <!-- BEGIN_TF_DOCS -->
+# NAT Gateway Options
+
+This example builds a VPC with public and private subnets in 2 availability zones.
+It creates NAT GW in public subnet with either "none", "single\_az" or "all\_azs" option.
+It creates routes from private subnets to NAT GW if `connect_to_public_natgw` is true otherwise no route is created.
+It creates an internet gateway and appropriately routes subnet traffic from "0.0.0.0/0" to the IGW.
+
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.27.0 |
 
 ## Providers
 
@@ -11,7 +21,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_nat_gw_vpc"></a> [nat\_gw\_vpc](#module\_nat\_gw\_vpc) | ../.. | n/a |
+| <a name="module_nat_gw_vpc"></a> [nat\_gw\_vpc](#module\_nat\_gw\_vpc) | ../../.. | n/a |
 
 ## Resources
 

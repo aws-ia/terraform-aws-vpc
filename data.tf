@@ -75,7 +75,7 @@ locals {
 
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false
-  vpc        = local.create_vpc ? aws_vpc.main[0] : data.awscc_ec2_vpc.main[0]
+  vpc        = local.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
   cidr_block = var.cidr_block == null ? aws_vpc.main[0].cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
@@ -84,7 +84,7 @@ locals {
 data "aws_availability_zones" "current" {}
 
 # search for existing vpc with var.vpc_id if not creating
-data "awscc_ec2_vpc" "main" {
+data "aws_vpc" "main" {
   count = local.create_vpc ? 0 : 1
   id    = var.vpc_id
 }
@@ -92,6 +92,12 @@ data "awscc_ec2_vpc" "main" {
 # santizes tags for both aws / awscc providers
 # aws   tags = module.tags.tags_aws
 # awscc tags = module.tags.tags
+module "tags" {
+  source  = "aws-ia/label/aws"
+  version = "0.0.5"
+
+  tags = var.tags
+}
 
 module "subnet_tags" {
   source  = "aws-ia/label/aws"

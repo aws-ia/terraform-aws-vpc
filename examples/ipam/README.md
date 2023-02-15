@@ -16,7 +16,7 @@ No providers.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_ipam_base_for_example_only"></a> [ipam\_base\_for\_example\_only](#module\_ipam\_base\_for\_example\_only) | ../../test/hcl_fixtures/ipam_base | n/a |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 3.0.2 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources
 

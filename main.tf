@@ -18,9 +18,10 @@ resource "aws_vpc" "main" {
   ipv4_ipam_pool_id    = var.vpc_ipv4_ipam_pool_id
   ipv4_netmask_length  = var.vpc_ipv4_netmask_length
 
-  tags = {
-    "Name" = var.name
-    }
+  tags = merge(
+    { "Name" = var.name },
+    module.tags.tags_aws
+  )
 }
 
 # Secondary CIDR blocks - if configured
@@ -44,6 +45,7 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     { Name = "${local.subnet_names["public"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
@@ -56,6 +58,7 @@ resource "aws_route_table" "public" {
 
   tags = merge(
     { Name = "${local.subnet_names["public"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
@@ -74,6 +77,7 @@ resource "aws_eip" "nat" {
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
@@ -87,6 +91,7 @@ resource "aws_nat_gateway" "main" {
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 
@@ -102,6 +107,7 @@ resource "aws_internet_gateway" "main" {
 
   tags = merge(
     { Name = var.name },
+    module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
 }
@@ -155,6 +161,7 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     { Name = "${local.subnet_names[split("/", each.key)[0]]}-${split("/", each.key)[1]}" },
+    module.tags.tags_aws,
     try(module.subnet_tags[split("/", each.key)[0]].tags_aws, {})
   )
 
@@ -170,8 +177,9 @@ resource "aws_route_table" "private" {
   vpc_id = local.vpc.id
 
   tags = merge(
-    { Name = "${local.subnet_names["private"]}-${each.key}" },
-    try(module.subnet_tags["private"].tags_aws, {})
+    { Name = "${local.subnet_names[split("/", each.key)[0]]}-${split("/", each.key)[1]}" },
+    module.tags.tags_aws,
+    try(module.subnet_tags[split("/", each.key)[0]].tags_aws, {})
   )
 }
 
@@ -234,6 +242,7 @@ resource "aws_subnet" "tgw" {
 
   tags = merge(
     { Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["transit_gateway"].tags_aws, {})
   )
 
@@ -247,6 +256,7 @@ resource "aws_route_table" "tgw" {
 
   tags = merge(
     { Name = "${local.subnet_names["transit_gateway"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["transit_gateway"].tags_aws, {})
   )
 }
@@ -302,6 +312,7 @@ resource "aws_subnet" "cwan" {
 
   tags = merge(
     { Name = "${local.subnet_names["core_network"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["core_network"].tags_aws, {})
   )
 }
@@ -314,6 +325,7 @@ resource "aws_route_table" "cwan" {
 
   tags = merge(
     { Name = "${local.subnet_names["core_network"]}-${each.key}" },
+    module.tags.tags_aws,
     try(module.subnet_tags["core_network"].tags_aws, {})
   )
 }
@@ -349,6 +361,7 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
 
   tags = merge(
     { Name = "${var.name}-vpc_attachment" },
+    module.tags.tags_aws,
     module.subnet_tags["core_network"].tags_aws
   )
 }
@@ -373,4 +386,6 @@ module "flow_logs" {
   name                = var.name
   flow_log_definition = var.vpc_flow_logs
   vpc_id              = local.vpc.id
+
+  tags = module.tags.tags_aws
 }

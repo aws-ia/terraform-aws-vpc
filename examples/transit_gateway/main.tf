@@ -1,13 +1,15 @@
 data "aws_availability_zones" "current" {}
 
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 3.0.2"
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 3.0.2"
+  source = "../.."
 
   name               = "tgw"
   cidr_block         = "10.0.0.0/16"
   az_count           = 2
   transit_gateway_id = module.tgw_base_for_example_only.tgw_id
+
   transit_gateway_routes = {
     public              = "10.0.0.0/8"
     private_with_egress = "192.168.0.0/16"

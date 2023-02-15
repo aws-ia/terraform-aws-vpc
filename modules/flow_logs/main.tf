@@ -23,6 +23,7 @@ module "cloudwatch_log_group" {
   retention_in_days     = var.flow_log_definition.retention_in_days == null ? 180 : var.flow_log_definition.retention_in_days
   kms_key_id            = var.flow_log_definition.kms_key_id
   aws_service_principal = "vpc-flow-logs.amazonaws.com"
+  tags                  = var.tags
 }
 
 module "s3_log_bucket" {
@@ -52,5 +53,5 @@ resource "aws_flow_log" "main" {
 
   tags = {
     Name = var.name
-    }
+  }
 }
