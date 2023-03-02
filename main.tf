@@ -7,16 +7,29 @@ module "calculate_subnets" {
   subnets = var.subnets
 }
 
+module "calculate_subnets_ipv6" {
+  source = "./modules/calculate_subnets_ipv6"
+
+  cidr_ipv6 = local.vpc_ipv6_cidr_block
+  azs       = local.azs
+
+  subnets = var.subnets
+}
+
 # VPC RESOURCE (and secondary CIDR blocks - if configured)
 resource "aws_vpc" "main" {
   count = local.create_vpc ? 1 : 0
 
-  cidr_block           = var.cidr_block
-  enable_dns_hostnames = var.vpc_enable_dns_hostnames
-  enable_dns_support   = var.vpc_enable_dns_support
-  instance_tenancy     = var.vpc_instance_tenancy
-  ipv4_ipam_pool_id    = var.vpc_ipv4_ipam_pool_id
-  ipv4_netmask_length  = var.vpc_ipv4_netmask_length
+  cidr_block                       = var.cidr_block
+  enable_dns_hostnames             = var.vpc_enable_dns_hostnames
+  enable_dns_support               = var.vpc_enable_dns_support
+  instance_tenancy                 = var.vpc_instance_tenancy
+  ipv4_ipam_pool_id                = var.vpc_ipv4_ipam_pool_id
+  ipv4_netmask_length              = var.vpc_ipv4_netmask_length
+  assign_generated_ipv6_cidr_block = var.vpc_assign_generated_ipv6_cidr_block
+  ipv6_cidr_block                  = var.vpc_ipv6_cidr_block
+  ipv6_ipam_pool_id                = var.vpc_ipv6_ipam_pool_id
+  ipv6_netmask_length              = var.vpc_ipv6_netmask_length
 
   tags = merge(
     { "Name" = var.name },
@@ -39,9 +52,11 @@ resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
 resource "aws_subnet" "public" {
   for_each = contains(local.subnet_keys, "public") ? toset(local.azs) : toset([])
 
-  availability_zone = each.key
-  vpc_id            = local.vpc.id
-  cidr_block        = local.calculated_subnets["public"][each.key]
+  availability_zone               = each.key
+  vpc_id                          = local.vpc.id
+  cidr_block                      = local.calculated_subnets["public"][each.key]
+  assign_ipv6_address_on_creation = can(local.calculated_subnets_ipv6["public"][each.key])
+  ipv6_cidr_block                 = can(local.calculated_subnets_ipv6["public"][each.key]) ? local.calculated_subnets_ipv6["public"][each.key] : null
 
   tags = merge(
     { Name = "${local.subnet_names["public"]}-${each.key}" },
@@ -154,10 +169,14 @@ resource "aws_route" "public_to_cwan" {
 resource "aws_subnet" "private" {
   for_each = toset(try(local.private_per_az, []))
 
-  availability_zone       = split("/", each.key)[1]
-  vpc_id                  = local.vpc.id
-  cidr_block              = local.calculated_subnets[split("/", each.key)[0]][split("/", each.key)[1]]
-  map_public_ip_on_launch = false
+  availability_zone                              = split("/", each.key)[1]
+  vpc_id                                         = local.vpc.id
+  cidr_block                                     = can(local.calculated_subnets[split("/", each.key)[0]][split("/", each.key)[1]]) ? local.calculated_subnets[split("/", each.key)[0]][split("/", each.key)[1]] : null
+  map_public_ip_on_launch                        = false
+  assign_ipv6_address_on_creation                = can(local.calculated_subnets_ipv6[split("/", each.key)[0]][split("/", each.key)[1]])
+  ipv6_cidr_block                                = can(local.calculated_subnets_ipv6[split("/", each.key)[0]][split("/", each.key)[1]]) ? local.calculated_subnets_ipv6[split("/", each.key)[0]][split("/", each.key)[1]] : null
+  ipv6_native                                    = contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) ? true : false
+  enable_resource_name_dns_aaaa_record_on_launch = contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) ? true : false
 
   tags = merge(
     { Name = "${local.subnet_names[split("/", each.key)[0]]}-${split("/", each.key)[1]}" },
@@ -389,4 +408,33 @@ module "flow_logs" {
   vpc_id              = local.vpc.id
 
   tags = module.tags.tags_aws
+}
+
+# IPv6 Routing
+resource "aws_egress_only_internet_gateway" "eigw" {
+  count  = var.vpc_egress_only_internet_gateway ? 1 : 0
+  vpc_id = local.vpc.id
+
+  tags = merge(
+    { "Name" = var.name },
+    module.tags.tags_aws
+  )
+}
+
+resource "aws_route" "private_to_egress_only" {
+  for_each = toset(try(local.private_subnet_names_egress_routed, []))
+
+  route_table_id              = aws_route_table.private[each.key].id
+  destination_ipv6_cidr_block = "0::/0"
+  # try to get nat for AZ, else use singular nat
+  egress_only_gateway_id = aws_egress_only_internet_gateway.eigw[0].id
+}
+
+resource "aws_route" "public_to_egress_only" {
+  for_each = local.public_with_eigw ? toset(local.azs) : toset([])
+
+  route_table_id              = aws_route_table.public[each.key].id
+  destination_ipv6_cidr_block = "0::/0"
+  # try to get nat for AZ, else use singular nat
+  egress_only_gateway_id = aws_egress_only_internet_gateway.eigw[0].id
 }

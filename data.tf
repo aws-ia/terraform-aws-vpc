@@ -2,7 +2,11 @@ locals {
   azs = slice(data.aws_availability_zones.current.names, 0, var.az_count)
 
   # references to module.calculate_subnets output
-  calculated_subnets = module.calculate_subnets.subnets_by_type
+  calculated_subnets       = module.calculate_subnets.subnets_by_type
+  subnets_with_ipv6_native = module.calculate_subnets.subnets_with_ipv6_native
+
+  # references to module.caluclate_subnets_ipv6
+  calculated_subnets_ipv6 = module.calculate_subnets_ipv6.subnets_ipv6
 
   ##################################################################
   # Subnet names
@@ -79,6 +83,17 @@ locals {
   cidr_block = var.cidr_block == null ? aws_vpc.main[0].cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
+
+  # IPv6 ############################################################
+  # Ipv6 cidr block (To change when multiple Ipv6 CIDR blocks)
+  vpc_ipv6_cidr_block = var.vpc_ipv6_cidr_block == null ? aws_vpc.main[0].ipv6_cidr_block : var.vpc_ipv6_cidr_block
+
+  # Egress Only Internet Gateway for IPv6
+  # list of private subnet keys with connect_to_public_eigw = true
+  private_subnets_egress_routed = [for type in local.private_subnet_names : type if try(var.subnets[type].connect_to_eigw == true, false)]
+  # private subnets with cidrs per az if connect_to_public_eoigw = true ...  "privatetwo/us-east-1a"
+  private_subnet_names_egress_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_egress_routed, split("/", subnet)[0])]
+  public_with_eigw                   = can(var.subnets["public"].connect_to_eigw) ? true : false
 }
 
 data "aws_availability_zones" "current" {}
