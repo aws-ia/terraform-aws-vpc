@@ -102,6 +102,7 @@ variable "subnets" {
   - All shared keys abovce
   - `connect_to_public_natgw` = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
   - `ipv6_support`            = (Optional|bool) Boolean whether IPv6 is supported or not in the Cloud WAN's VPC attachment. Default to `false`.
+  - `appliance_mode_support`  = (Optional|bool) Indicates whether appliance mode is supported. If enabled, traffic flow between a source and destination use the same Availability Zone for the VPC attachment for the lifetime of that flow. Defaults to `false`.
   - `require_acceptance`      = (Optional|bool) Boolean whether the core network VPC attachment to create requires acceptance or not. Defaults to `false`.
   - `accept_attachment`       = (Optional|bool) Boolean whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
@@ -129,6 +130,7 @@ variable "subnets" {
       netmask                 = 24
       connect_to_public_natgw = true
       ipv6_support            = true
+      appliance_mode_support  = true
       require_acceptance      = true
       accept_attachment       = true
     }
@@ -167,13 +169,14 @@ EOF
 
   # All var.subnets.core_network valid keys
   validation {
-    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"ipv6_support\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
+    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"ipv6_support\", \"appliance_mode_support\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.core_network, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
       "connect_to_public_natgw",
       "ipv6_support",
+      "appliance_mode_support",
       "require_acceptance",
       "accept_attachment",
       "tags"

@@ -356,7 +356,8 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
   vpc_arn         = local.vpc.arn
 
   options {
-    ipv6_support = try(var.subnets.core_nework.ipv6_support, false)
+    ipv6_support           = try(var.subnets.core_nework.ipv6_support, false)
+    appliance_mode_support = try(var.subnets.core_network.appliance_mode_support, false)
   }
 
   tags = merge(
