@@ -5,10 +5,10 @@ module "nvirginia_vpc" {
   version   = ">= 4.2.0"
   providers = { aws = aws.awsnvirginia }
 
-  name       = "nvirginia-vpc"
-  cidr_block = "10.0.0.0/24"
+  name                                 = "nvirginia-vpc"
+  cidr_block                           = "10.0.0.0/24"
   vpc_assign_generated_ipv6_cidr_block = true
-  az_count   = 2
+  az_count                             = 2
 
   core_network = {
     id  = aws_networkmanager_core_network.core_network.id
@@ -46,10 +46,10 @@ module "ireland_vpc" {
   version   = ">= 4.2.0"
   providers = { aws = aws.awsireland }
 
-  name       = "ireland-vpc"
-  cidr_block = "10.0.1.0/24"
+  name                                 = "ireland-vpc"
+  cidr_block                           = "10.0.1.0/24"
   vpc_assign_generated_ipv6_cidr_block = true
-  az_count   = 2
+  az_count                             = 2
 
   core_network = {
     id  = aws_networkmanager_core_network.core_network.id
@@ -103,5 +103,5 @@ resource "aws_networkmanager_core_network_policy_attachment" "core_network_polic
   provider = aws.awsnvirginia
 
   core_network_id = aws_networkmanager_core_network.core_network.id
-  policy_document   = data.aws_networkmanager_core_network_policy_document.policy.json
+  policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
 }

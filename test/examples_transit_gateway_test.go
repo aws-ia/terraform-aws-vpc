@@ -10,7 +10,6 @@ import (
 func TestExamplesTransitGateway(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../examples/transit_gateway",
-		Vars:         map[string]interface{}{},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)
