@@ -24,15 +24,16 @@ resource "aws_vpc" "main" {
   count = local.create_vpc ? 1 : 0
 
   cidr_block                       = var.cidr_block
-  enable_dns_hostnames             = var.vpc_enable_dns_hostnames
-  enable_dns_support               = var.vpc_enable_dns_support
-  instance_tenancy                 = var.vpc_instance_tenancy
   ipv4_ipam_pool_id                = var.vpc_ipv4_ipam_pool_id
   ipv4_netmask_length              = var.vpc_ipv4_netmask_length
   assign_generated_ipv6_cidr_block = var.vpc_assign_generated_ipv6_cidr_block
   ipv6_cidr_block                  = var.vpc_ipv6_cidr_block
   ipv6_ipam_pool_id                = var.vpc_ipv6_ipam_pool_id
   ipv6_netmask_length              = var.vpc_ipv6_netmask_length
+
+  enable_dns_hostnames = var.vpc_enable_dns_hostnames
+  enable_dns_support   = var.vpc_enable_dns_support
+  instance_tenancy     = var.vpc_instance_tenancy
 
   tags = merge(
     { "Name" = var.name },
@@ -283,7 +284,7 @@ resource "aws_route" "private_to_egress_only" {
   for_each = toset(try(local.private_subnet_names_egress_routed, []))
 
   route_table_id              = aws_route_table.private[each.key].id
-  destination_ipv6_cidr_block = "0::/0"
+  destination_ipv6_cidr_block = "::/0"
   egress_only_gateway_id      = aws_egress_only_internet_gateway.eigw[0].id
 }
 
