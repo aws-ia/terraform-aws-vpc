@@ -85,7 +85,7 @@ variable "vpc_ipv6_ipam_pool_id" {
 }
 
 variable "vpc_ipv6_cidr_block" {
-  description = "IPv6 CIDR range to assign to VPC if creating VPC or to associate as a secondary IPv6 CIDR. Can be set explicitly or derived from IPAM using `vpc_ipv6_ipam_pool_id`. Overridden by `var.vpc_id` output from `data.aws_vpc`."
+  description = "IPv6 CIDR range to assign to VPC if creating VPC. You need to use `vpc_ipv6_ipam_pool_id` and set explicitly the CIDR block to use, or derived from IPAM using using `vpc_ipv6_netmask_lenght`."
   type        = string
   default     = null
 }
@@ -313,7 +313,7 @@ variable "transit_gateway_ipv6_routes" {
   Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
   Example:
   ```
-  transit_gateway_routes = {
+  transit_gateway_ipv6_routes = {
     public  = "::/0"
     private = "pl-123"
   }
@@ -360,7 +360,7 @@ variable "core_network_ipv6_routes" {
   You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.
   Example:
   ```
-  core_network_routes = {
+  core_network_ivp6_routes = {
     public  = "::/0"
     private = "pl-123"
   }
