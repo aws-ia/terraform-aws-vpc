@@ -18,7 +18,7 @@ locals {
 }
 
 module "subnet_calculator" {
-  count = local.types_to_calculate == [] ? 0 : 1
+  count = length(local.types_to_calculate) == 0 ? 0 : 1
 
   source  = "drewmullen/subnets/cidr"
   version = "1.0.2"
