@@ -177,3 +177,8 @@ output "natgw_id_per_az" {
   ```
 EOF
 }
+
+output "egress_only_internet_gateway" {
+  value       = try(aws_egress_only_internet_gateway.eigw, null)
+  description = "Egress-only Internet gateway attributes. Full output of aws_egress_only_internet_gateway."
+}

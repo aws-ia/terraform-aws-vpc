@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "cidr_block" {
-  description = "CIDR range to assign to VPC if creating VPC or to associte as a secondary CIDR. Overridden by var.vpc_id output from data.aws_vpc."
+  description = "IPv4 CIDR range to assign to VPC if creating VPC or to associte as a secondary IPv6 CIDR. Overridden by var.vpc_id output from data.aws_vpc."
   default     = null
   type        = string
 }
@@ -34,7 +34,7 @@ variable "vpc_secondary_cidr" {
 
 variable "vpc_secondary_cidr_natgw" {
   type        = any
-  description = "If attaching a secondary CIDR instead of creating a VPC, you can map private/ tgw subnets to your public NAT GW with this argument. Simply pass the output `nat_gateway_attributes_by_az`, ex: `vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az`. If you did not build your primary with this module, you must construct a map { az : { id : nat-123asdb }} for each az."
+  description = "If attaching a secondary IPv4 CIDR instead of creating a VPC, you can map private/ tgw subnets to your public NAT GW with this argument. Simply pass the output `nat_gateway_attributes_by_az`, ex: `vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az`. If you did not build your primary with this module, you must construct a map { az : { id : nat-123asdb }} for each az."
   default     = {}
 }
 
@@ -61,38 +61,73 @@ variable "vpc_instance_tenancy" {
 }
 
 variable "vpc_ipv4_ipam_pool_id" {
-  description = "Set to use IPAM to get CIDR block."
+  description = "Set to use IPAM to get an IPv4 CIDR block."
   type        = string
   default     = null
 }
 
 variable "vpc_ipv4_netmask_length" {
-  description = "Set to use IPAM to get CIDR block using a specified netmask. Must be set with var.vpc_ipv4_ipam_pool_id."
+  description = "Set to use IPAM to get an IPv4 CIDR block using a specified netmask. Must be set with var.vpc_ipv4_ipam_pool_id."
   type        = string
   default     = null
 }
 
+variable "vpc_assign_generated_ipv6_cidr_block" {
+  description = "Requests and Amazon-provided IPv6 CIDR block with a /56 prefix length. You cannot specify the range of IP addresses, or the size of the CIDR block. Conflics with `vpc_ipv6_ipam_pool_id`."
+  type        = bool
+  default     = null
+}
+
+variable "vpc_ipv6_ipam_pool_id" {
+  description = "Set to use IPAM to get an IPv6 CIDR block."
+  type        = string
+  default     = null
+}
+
+variable "vpc_ipv6_cidr_block" {
+  description = "IPv6 CIDR range to assign to VPC if creating VPC. You need to use `vpc_ipv6_ipam_pool_id` and set explicitly the CIDR block to use, or derived from IPAM using using `vpc_ipv6_netmask_lenght`."
+  type        = string
+  default     = null
+}
+
+variable "vpc_ipv6_netmask_length" {
+  description = "Set to use IPAM to get an IPv6 CIDR block using a specified netmask. Must be set with `var.vpc_ipv6_ipam_pool_id`."
+  type        = string
+  default     = null
+}
+
+variable "vpc_egress_only_internet_gateway" {
+  description = "Set to use the Egress-only Internet gateway for all IPv6 traffic going to the Internet."
+  type        = bool
+  default     = false
+}
+
 variable "subnets" {
   description = <<-EOF
-  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway". Each Subnet type offers its own set of available arguments detailed below.
+  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway", "core_network". Each Subnet type offers its own set of available arguments detailed below.
 
   **Attributes shared across subnet types:**
-  - `cidrs`       = (Optional|list(string)) **Cannot set if `netmask` is set.** List of CIDRs to set to subnets. Count of CIDRs defined must match quatity of azs in `az_count`.
-  - `netmask`     = (Optional|Int) Netmask of the `var.cidr_block` to calculate for each subnet. **Cannot set if `cidrs` is set.**
-  - `name_prefix` = (Optional|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.
-  - `tags`        = (Optional|map(string)) Tags to set on the subnet and associated resources.
+  - `cidrs`            = (Optional|list(string)) **Cannot set if `netmask` is set.** List of IPv4 CIDRs to set to subnets. Count of CIDRs defined must match quantity of azs in `az_count`.
+  - `netmask`          = (Optional|Int) **Cannot set if `cidrs` is set.** Netmask of the `var.cidr_block` to calculate for each subnet.
+  - `assign_ipv6_cidr` = (Optional|bool) **Cannot set if `ipv6_cidrs` is set.** If true, it will calculate a /64 block from the IPv6 VPC CIDR to set in the subnets.
+  - `ipv6_cidrs`       = (Optional|list(string)) **Cannot set if `assign_ipv6_cidr` is set.** List of IPv6 CIDRs to set to subnets. The subnet size must use a /64 prefix length. Count of CIDRs defined must match quantity of azs in `az_count`.
+  - `name_prefix`      = (Optional|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.
+  - `tags`             = (Optional|map(string)) Tags to set on the subnet and associated resources.
 
   **Any private subnet type options:**
   - All shared keys above
-  - `connect_to_public_natgw`             = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `connect_to_public_natgw` = (Optional|bool) Determines if routes to NAT Gateways should be created. Must also set `var.subnets.public.nat_gateway_configuration` in public subnets.
+  - `ipv6_native`             = (Optional|bool) Indicates whether to create an IPv6-ony subnet. Either `var.assign_ipv6_cidr` or `var.ipv6_cidrs` should be defined to allocate an IPv6 CIDR block.
+  - `connect_to_eigw`         = (Optional|bool) Determines if routes to the Egress-only Internet gateway should be created. Must also set `var.vpc_egress_only_internet_gateway`.
 
   **public subnet type options:**
   - All shared keys above
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
+  - `ipv6_native`               = (Optional|bool) Indicates whether to create an IPv6-ony subnet. Either `var.assign_ipv6_cidr` or `var.ipv6_cidrs` should be defined to allocate an IPv6 CIDR block.
 
   **transit_gateway subnet type options:**
   - All shared keys above
-  - `connect_to_public_natgw`                                    = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `connect_to_public_natgw`                         = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
   - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
   - `transit_gateway_appliance_mode_support`          = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
@@ -101,7 +136,6 @@ variable "subnets" {
   **core_network subnet type options:**
   - All shared keys abovce
   - `connect_to_public_natgw` = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `ipv6_support`            = (Optional|bool) Boolean whether IPv6 is supported or not in the Cloud WAN's VPC attachment. Default to `false`.
   - `appliance_mode_support`  = (Optional|bool) Indicates whether appliance mode is supported. If enabled, traffic flow between a source and destination use the same Availability Zone for the VPC attachment for the lifetime of that flow. Defaults to `false`.
   - `require_acceptance`      = (Optional|bool) Boolean whether the core network VPC attachment to create requires acceptance or not. Defaults to `false`.
   - `accept_attachment`       = (Optional|bool) Boolean whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
@@ -109,27 +143,36 @@ variable "subnets" {
   Example:
   ```
   subnets = {
+    # Dual-stack subnet
     public = {
       netmask                   = 24
+      assign_ipv6_cidr          = true
       nat_gateway_configuration = "single_az"
     }
-
+    # IPv4 only subnet
     private = {
       netmask                  = 24
       connect_to_public_natgw  = true
     }
-
+    # IPv6 only subnet
+    ipv6 = {
+      ipv6_native      = true
+      assign_ipv6_cidr = true
+      connect_to_eigw  = true
+    }
+    # Transit gateway subnets (dual-stack)
     transit_gateway = {
       netmask                                         = 24
+      assign_ipv6_cidr                                = true
       connect_to_public_natgw                         = true
       transit_gateway_default_route_table_association = true
       transit_gateway_default_route_table_propagation = true
     }
-
+    # Core Network subnets (dual-stack)
     core_network = {
       netmask                 = 24
+      assign_ipv6_cidr        = true
       connect_to_public_natgw = true
-      ipv6_support            = true
       appliance_mode_support  = true
       require_acceptance      = true
       accept_attachment       = true
@@ -141,24 +184,29 @@ EOF
 
   # All var.subnets.public valid keys
   validation {
-    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
+    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"ipv6_native\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.public, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
       "nat_gateway_configuration",
+      "ipv6_native",
+      "assign_ipv6_cidr",
+      "ipv6_cidrs",
       "tags"
     ])) == 0
   }
 
   # All var.subnets.transit_gateway valid keys
   validation {
-    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
       "connect_to_public_natgw",
+      "assign_ipv6_cidr",
+      "ipv6_cidrs",
       "transit_gateway_default_route_table_association",
       "transit_gateway_default_route_table_propagation",
       "transit_gateway_appliance_mode_support",
@@ -169,13 +217,14 @@ EOF
 
   # All var.subnets.core_network valid keys
   validation {
-    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"ipv6_support\", \"appliance_mode_support\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
+    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"appliance_mode_support\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.core_network, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
       "connect_to_public_natgw",
-      "ipv6_support",
+      "assign_ipv6_cidr",
+      "ipv6_cidrs",
       "appliance_mode_support",
       "require_acceptance",
       "accept_attachment",
@@ -184,8 +233,8 @@ EOF
   }
 
   validation {
-    error_message = "Each subnet type must contain only 1 key: `cidrs` or `netmask`."
-    condition     = alltrue([for subnet_type, v in var.subnets : length(setintersection(keys(v), ["cidrs", "netmask"])) == 1])
+    error_message = "Each subnet type must contain only 1 key: `cidrs` or `netmask` or `ipv6_native`."
+    condition     = alltrue([for subnet_type, v in var.subnets : length(setintersection(keys(v), ["cidrs", "netmask", "ipv6_native"])) == 1])
   }
 
   validation {
@@ -257,6 +306,23 @@ EOF
   default     = {}
 }
 
+variable "transit_gateway_ipv6_routes" {
+  description = <<-EOF
+  Configuration of IPv6 route(s) to transit gateway.
+  For each `public` and/or `private` subnets named in the `subnets` variable,
+  Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.
+  Example:
+  ```
+  transit_gateway_ipv6_routes = {
+    public  = "::/0"
+    private = "pl-123"
+  }
+  ```
+EOF
+  type        = any
+  default     = {}
+}
+
 variable "core_network" {
   type = object({
     id  = string
@@ -279,6 +345,23 @@ variable "core_network_routes" {
   ```
   core_network_routes = {
     public  = "10.0.0.0/8"
+    private = "pl-123"
+  }
+  ```
+EOF
+  type        = any
+  default     = {}
+}
+
+variable "core_network_ipv6_routes" {
+  description = <<-EOF
+  Configuration of IPv6 route(s) to AWS Cloud WAN's core network.
+  For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network.
+  You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.
+  Example:
+  ```
+  core_network_ivp6_routes = {
+    public  = "::/0"
     private = "pl-123"
   }
   ```

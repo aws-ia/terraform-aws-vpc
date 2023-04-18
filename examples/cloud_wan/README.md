@@ -8,7 +8,7 @@ This example shows how you can use this module with `core_network` subnets, and 
 * The VPC module creates the following (in two AWS Regions):
   * Two sets of subnets (workloads and core\_network)
   * Cloud WAN's VPC attachment - with attachment acceptance for the VPC to associate to the *prod* segment.
-  * Routing to Core Network (0.0.0.0/0) in workload subnets.
+  * Routing to Core Network (0.0.0.0/0 & ::/0) in workload subnets.
 
 ## Requirements
 
@@ -28,14 +28,15 @@ This example shows how you can use this module with `core_network` subnets, and 
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ireland_vpc"></a> [ireland\_vpc](#module\_ireland\_vpc) | aws-ia/vpc/aws | >= 4.0.0 |
-| <a name="module_nvirginia_vpc"></a> [nvirginia\_vpc](#module\_nvirginia\_vpc) | aws-ia/vpc/aws | >= 4.0.0 |
+| <a name="module_ireland_vpc"></a> [ireland\_vpc](#module\_ireland\_vpc) | aws-ia/vpc/aws | >= 4.2.0 |
+| <a name="module_nvirginia_vpc"></a> [nvirginia\_vpc](#module\_nvirginia\_vpc) | aws-ia/vpc/aws | >= 4.2.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
 | [aws_networkmanager_core_network.core_network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkmanager_core_network) | resource |
+| [aws_networkmanager_core_network_policy_attachment.core_network_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkmanager_core_network_policy_attachment) | resource |
 | [aws_networkmanager_global_network.global_network](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkmanager_global_network) | resource |
 | [aws_networkmanager_core_network_policy_document.policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/networkmanager_core_network_policy_document) | data source |
 
