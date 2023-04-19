@@ -3,7 +3,7 @@
 
 This module can be used to deploy a pragmatic VPC with various subnets types in # AZs. Common deployment examples can be found in [examples/](https://github.com/aws-ia/terraform-aws-vpc/tree/main/examples).
 
-\_\_Note: For information regarding the 4.0 upgrade see our [upgrade guide](https://github.com/aws-ia/terraform-aws-vpc/blob/main/UPGRADE-GUIDE-4.0.md).\_\_
+<i>Note: For information regarding the 4.0 upgrade see our [upgrade guide](https://github.com/aws-ia/terraform-aws-vpc/blob/main/docs/UPGRADE-GUIDE-4.0.md).</i>
 
 ## Usage
 
@@ -192,6 +192,8 @@ The above example will cause only creating 2 new subnets in az `c` of the region
 ## Output usage examples
 
 The outputs in this module attempt to align to a methodology of outputting resource attributes in a reasonable collection. The benefit of this is that, most likely, attributes you want access to are already present without having to create new `output {}` for each possible attribute. The [potential] downside is that you will have to extract it yourself using HCL logic. Below are some common examples:
+
+For more examples and explanation see [output docs]((https://github.com/aws-ia/terraform-aws-vpc/blob/main/docs/how-to-use-module-outputs.md)
 
 ### Extracting subnet IDs for private subnets
 
