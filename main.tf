@@ -146,7 +146,7 @@ resource "aws_egress_only_internet_gateway" "eigw" {
 
 # Route: 0.0.0.0/0 from public subnets to the Internet gateway
 resource "aws_route" "public_to_igw" {
-  for_each = contains(local.subnet_keys, "public") && !local.public_ipv6only ? toset(local.azs) : toset([])
+  for_each = contains(local.subnet_keys, "public") && !local.public_ipv6only && local.connect_to_igw ? toset(local.azs) : toset([])
 
   route_table_id         = aws_route_table.public[each.key].id
   destination_cidr_block = "0.0.0.0/0"
@@ -155,7 +155,7 @@ resource "aws_route" "public_to_igw" {
 
 # Route: ::/0 from public subnets to the Internet gateway
 resource "aws_route" "public_ipv6_to_igw" {
-  for_each = contains(local.subnet_keys, "public") && (local.public_ipv6only || local.public_dualstack) ? toset(local.azs) : toset([])
+  for_each = contains(local.subnet_keys, "public") && (local.public_ipv6only || local.public_dualstack) && local.connect_to_igw ? toset(local.azs) : toset([])
 
   route_table_id              = aws_route_table.public[each.key].id
   destination_ipv6_cidr_block = "::/0"
