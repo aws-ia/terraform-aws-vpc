@@ -123,6 +123,7 @@ variable "subnets" {
   **public subnet type options:**
   - All shared keys above
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
+  - `connect_to_igw`            = (Optional|bool) Determines if the default route (0.0.0.0/0 or ::/0) is created in the public subnets with destination the Internet gateway. Defaults to `true`.
   - `ipv6_native`               = (Optional|bool) Indicates whether to create an IPv6-ony subnet. Either `var.assign_ipv6_cidr` or `var.ipv6_cidrs` should be defined to allocate an IPv6 CIDR block.
 
   **transit_gateway subnet type options:**
@@ -184,11 +185,12 @@ EOF
 
   # All var.subnets.public valid keys
   validation {
-    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"ipv6_native\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"tags\"."
+    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_igw\", \"nat_gateway_configuration\", \"ipv6_native\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.public, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
+      "connect_to_igw",
       "nat_gateway_configuration",
       "ipv6_native",
       "assign_ipv6_cidr",
