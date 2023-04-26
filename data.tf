@@ -54,6 +54,9 @@ locals {
   create_acceptance  = (local.require_acceptance == true && local.accept_attachment == true)
   create_cwan_routes = (local.require_acceptance == false) || local.create_acceptance
 
+  # default value for var.subnets.public.connect_to_igw (default to true)
+  connect_to_igw = try(var.subnets.public.connect_to_igw, true)
+
   ##################################################################
   # NAT configurations options, maps user string input to HCL usable values. selected based on nat_gateway_configuration
   # null   = none

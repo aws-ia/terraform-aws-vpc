@@ -1,9 +1,8 @@
 data "aws_availability_zones" "current" {}
 
 module "vpc" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 4.0."
-  source = "../.."
+  source  = "aws-ia/vpc/aws"
+  version = ">= 4.2.0"
 
   name       = "flowlogs"
   cidr_block = "10.0.0.0/20"
