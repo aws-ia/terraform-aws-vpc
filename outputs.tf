@@ -179,11 +179,16 @@ EOF
 }
 
 output "internet_gateway" {
-  value       = try(aws_internet_gateway.main, null)
+  value       = try(aws_internet_gateway.main[0], null)
   description = "Internet gateway attributes. Full output of aws_internet_gateway."
 }
 
 output "egress_only_internet_gateway" {
-  value       = try(aws_egress_only_internet_gateway.eigw, null)
+  value       = try(aws_egress_only_internet_gateway.eigw[0], null)
   description = "Egress-only Internet gateway attributes. Full output of aws_egress_only_internet_gateway."
+}
+
+output "vpc_lattice_service_network_association" {
+  value       = try(aws_vpclattice_service_network_vpc_association.vpc_lattice_service_network_association[0], null)
+  description = "VPC Lattice Service Network VPC association. Full output of aws_vpclattice_service_network_vpc_association"
 }

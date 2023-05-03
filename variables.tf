@@ -371,3 +371,26 @@ EOF
   type        = any
   default     = {}
 }
+
+variable "vpc_lattice" {
+  description = <<-EOF
+  Amazon VPC Lattice Service Network VPC association. You can only associate one Service Network to the VPC. This association also support Security Groups (more than 1).
+  This variable expects the following attributes:
+  - `service_network_identifier` = (Required|string) The ID or ARN of the Service Network to associate. You must use the ARN if the Service Network and VPC resources are in different AWS Accounts.
+  - `security_group_ids          = (Optional|list(string)) The IDs of the security groups to attach to the association.
+  - `tags` =                     = (Optional|map(string)) Tags to set on the Lattice VPC association resource.
+EOF
+  type        = any
+
+  default = {}
+
+  # All var.vpc_lattice valid keys
+  validation {
+    error_message = "Invalid key in var.vpc_lattice. Valid options include: \"service_network_identifier\", \"security_group_ids\", \"tags\"."
+    condition = length(setsubtract(keys(var.vpc_lattice), [
+      "service_network_identifier",
+      "security_group_ids",
+      "tags"
+    ])) == 0
+  }
+}

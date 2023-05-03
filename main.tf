@@ -508,3 +508,17 @@ module "flow_logs" {
 
   tags = module.tags.tags_aws
 }
+
+# ---------- VPC LATTICE SERVICE NETWORK VPC ASSOCIATION ----------
+resource "aws_vpclattice_service_network_vpc_association" "vpc_lattice_service_network_association" {
+  count = local.lattice_association ? 1 : 0
+
+  vpc_identifier             = aws_vpc.main[0].id
+  service_network_identifier = var.vpc_lattice.service_network_identifier
+  security_group_ids         = try(var.vpc_lattice.security_group_ids, null)
+
+  tags = merge(
+    module.tags.tags_aws,
+    module.vpc_lattice_tags.tags_aws
+  )
+}
