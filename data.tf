@@ -118,7 +118,12 @@ locals {
   lattice_association = length(keys(var.vpc_lattice)) > 0
 }
 
-data "aws_availability_zones" "current" {}
+data "aws_availability_zones" "current" {
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
 
 # search for existing vpc with var.vpc_id if not creating
 data "aws_vpc" "main" {
