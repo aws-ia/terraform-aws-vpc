@@ -1,8 +1,7 @@
 
 # VPC module (North Virginia)
 module "nvirginia_vpc" {
-  source    = "aws-ia/vpc/aws"
-  version   = ">= 4.2.0"
+  source    = "../.."
   providers = { aws = aws.awsnvirginia }
 
   name                                 = "nvirginia-vpc"
@@ -42,13 +41,12 @@ module "nvirginia_vpc" {
 
 # VPC module (Ireland)
 module "ireland_vpc" {
-  source    = "aws-ia/vpc/aws"
-  version   = ">= 4.2.0"
+  source    = "../.."
   providers = { aws = aws.awsireland }
 
   name                                 = "ireland-vpc"
   cidr_block                           = "10.0.1.0/24"
-  vpc_assign_generated_ipv6_cidr_block = true
+  vpc_assign_generated_ipv6_cidr_block = false
   az_count                             = 2
 
   core_network = {
@@ -58,18 +56,14 @@ module "ireland_vpc" {
   core_network_routes = {
     workload = "0.0.0.0/0"
   }
-  core_network_ipv6_routes = {
-    workload = "::/0"
-  }
-
   subnets = {
     workload = {
       netmask          = 28
-      assign_ipv6_cidr = true
+      assign_ipv6_cidr = false
     }
     core_network = {
       netmask            = 28
-      assign_ipv6_cidr   = true
+      assign_ipv6_cidr   = false
       require_acceptance = false
 
       tags = {
