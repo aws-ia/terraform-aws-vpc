@@ -50,7 +50,7 @@ module "ireland_vpc" {
 
   name                                 = "ireland-vpc"
   cidr_block                           = "10.0.1.0/24"
-  vpc_assign_generated_ipv6_cidr_block = false
+  vpc_assign_generated_ipv6_cidr_block = true
   az_count                             = 2
 
   core_network = {
@@ -60,14 +60,17 @@ module "ireland_vpc" {
   core_network_routes = {
     workload = "0.0.0.0/0"
   }
+  core_network_ipv6_routes = {
+    workload = "::/0"
+  }
   subnets = {
     workload = {
       netmask          = 28
-      assign_ipv6_cidr = false
+      assign_ipv6_cidr = true
     }
     core_network = {
       netmask            = 28
-      assign_ipv6_cidr   = false
+      assign_ipv6_cidr   = true
       require_acceptance = false
 
       tags = {
