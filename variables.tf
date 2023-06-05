@@ -73,7 +73,7 @@ variable "vpc_ipv4_netmask_length" {
 }
 
 variable "vpc_assign_generated_ipv6_cidr_block" {
-  description = "Requests and Amazon-provided IPv6 CIDR block with a /56 prefix length. You cannot specify the range of IP addresses, or the size of the CIDR block. Conflics with `vpc_ipv6_ipam_pool_id`."
+  description = "Requests and Amazon-provided IPv6 CIDR block with a /56 prefix length. You cannot specify the range of IP addresses, or the size of the CIDR block. Conflicts with `vpc_ipv6_ipam_pool_id`."
   type        = bool
   default     = null
 }
@@ -85,7 +85,7 @@ variable "vpc_ipv6_ipam_pool_id" {
 }
 
 variable "vpc_ipv6_cidr_block" {
-  description = "IPv6 CIDR range to assign to VPC if creating VPC. You need to use `vpc_ipv6_ipam_pool_id` and set explicitly the CIDR block to use, or derived from IPAM using using `vpc_ipv6_netmask_lenght`."
+  description = "IPv6 CIDR range to assign to VPC if creating VPC. You need to use `vpc_ipv6_ipam_pool_id` and set explicitly the CIDR block to use, or derived from IPAM using using `vpc_ipv6_netmask_length`."
   type        = string
   default     = null
 }
