@@ -14,7 +14,7 @@ locals {
   ]])
 
   # map of explicit cidrs to az
-  explict_cidrs_grouped = { for _, type in local.types_with_explicit : type => zipmap(var.azs, var.subnets[type].ipv6_cidrs[*]) }
+  explicit_cidrs_grouped = { for _, type in local.types_with_explicit : type => zipmap(var.azs, var.subnets[type].ipv6_cidrs[*]) }
 }
 
 module "subnet_calculator" {
