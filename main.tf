@@ -305,6 +305,26 @@ resource "aws_route" "private_to_tgw" {
   ]
 }
 
+resource "aws_route" "private_subnets_custom_route_to_tgw" {
+  for_each = toset(local.custom_route_to_tgw_subnet_names)
+
+  destination_cidr_block     = var.custom_route_to_tgw[split("/", each.key)[0]].destination_cidr_block
+  destination_prefix_list_id = var.custom_route_to_tgw[split("/", each.key)[0]].destination_prefix_list_id
+
+  route_table_id     = aws_route_table.private[each.key].id
+  transit_gateway_id = var.custom_route_to_tgw[split("/", each.key)[0]].transit_gateway_id
+}
+
+resource "aws_route" "public_subnets_custom_route_to_tgw" {
+  for_each = lookup(var.custom_route_to_tgw, "public", null) != null ? toset(local.azs) : toset([])
+
+  destination_cidr_block     = var.custom_route_to_tgw["public"].destination_cidr_block
+  destination_prefix_list_id = var.custom_route_to_tgw["public"].destination_prefix_list_id
+
+  route_table_id     = aws_route_table.public[each.key].id
+  transit_gateway_id = var.custom_route_to_tgw["public"].transit_gateway_id
+}
+
 # Route: IPv6 routes from private subnets to the Transit Gateway (if configured in var.transit_gateway_ipv6_routes)
 resource "aws_route" "ipv6_private_to_tgw" {
   for_each = toset(local.ipv6_private_subnet_key_names_tgw_routed)

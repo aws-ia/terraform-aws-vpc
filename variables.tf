@@ -250,6 +250,44 @@ EOF
   }
 }
 
+variable "custom_route_to_tgw" {
+  description = <<-EOF
+    Add a custom route to a transit gateway in a subnet.
+    The subnet is determined based on a map key that matches the key
+    provided in the var.subnets variable. This allows you to define
+    the specific subnet where the custom route should be applied.
+
+  Example:
+  ```
+  subnets = {
+    # Dual-stack subnet
+    public = {
+      netmask                   = 24
+      assign_ipv6_cidr          = true
+      nat_gateway_configuration = "single_az"
+    }
+    # IPv4 only subnet
+    private = {
+      netmask                  = 24
+      connect_to_public_natgw  = true
+    }
+  }
+  custom_route_to_tgw = {
+    private = {
+      destination_cidr_block = "10.0.0.0/16"
+      transit_gateway_id     = "tgw-0282179847129898sd"
+    }
+  }
+  ```
+  EOF
+  type = map(object({
+    destination_cidr_block     = optional(string)
+    destination_prefix_list_id = optional(string)
+    transit_gateway_id         = string
+  }))
+  default = {}
+}
+
 variable "tags" {
   description = "Tags to apply to all resources."
   type        = map(string)

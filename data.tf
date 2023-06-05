@@ -27,6 +27,16 @@ locals {
 
   # constructed list of <private_subnet_key>/az
   private_per_az = flatten([for az in local.azs : [for subnet in local.private_subnet_names : "${subnet}/${az}"]])
+  # List of private subnets names where will be added a route to a TGW.
+  # The tricky part here is that we have to identify the subnet names where a route
+  # should be added because the subnet name has suffix /az in the name.
+  custom_route_to_tgw_subnet_names = flatten([
+    for subnet_name, _ in var.custom_route_to_tgw :
+    [
+      for subnet_name_az in local.private_per_az :
+      subnet_name_az if startswith(subnet_name_az, "${subnet_name}/")
+    ]
+  ])
   # list of private subnet keys with connect_to_public_natgw = true
   private_subnets_nat_routed = [for type in local.private_subnet_names : type if try(var.subnets[type].connect_to_public_natgw == true, false)]
   # private subnets with cidrs per az if connect_to_public_natgw = true ...  "privatetwo/us-east-1a"
