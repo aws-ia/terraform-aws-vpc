@@ -92,13 +92,13 @@ locals {
   # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
   create_vpc = var.vpc_id == null ? true : false
   vpc        = local.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
-  cidr_block = var.cidr_block == null ? aws_vpc.main[0].cidr_block : var.cidr_block
+  cidr_block = var.cidr_block == null ? local.vpc.cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
 
   # IPv6 ############################################################
   # Ipv6 cidr block (To change when multiple Ipv6 CIDR blocks)
-  vpc_ipv6_cidr_block = var.vpc_ipv6_cidr_block == null ? aws_vpc.main[0].ipv6_cidr_block : var.vpc_ipv6_cidr_block
+  vpc_ipv6_cidr_block = var.vpc_ipv6_cidr_block == null ? local.vpc.ipv6_cidr_block : var.vpc_ipv6_cidr_block
   # Checking if public subnets are dual-stack or IPv6-only
   public_ipv6only  = can(var.subnets.public.ipv6_native)
   public_dualstack = !local.public_ipv6only && (can(var.subnets.public.assign_ipv6_cidr) || can(var.subnets.public.ipv6_cidrs))
