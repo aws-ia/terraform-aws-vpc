@@ -112,9 +112,18 @@ locals {
   private_subnets_egress_routed = [for type in local.private_subnet_names : type if try(var.subnets[type].connect_to_eigw == true, false)]
   # private subnets with cidrs per az if connect_to_public_eigw = true ...  "privatetwo/us-east-1a"
   private_subnet_names_egress_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_egress_routed, split("/", subnet)[0])]
+
+  # VPC LATTICE ############################################################
+  # If var.vpc_lattice is defined (default = {}), the VPC association is created.
+  lattice_association = length(keys(var.vpc_lattice)) > 0
 }
 
-data "aws_availability_zones" "current" {}
+data "aws_availability_zones" "current" {
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
 
 # search for existing vpc with var.vpc_id if not creating
 data "aws_vpc" "main" {
@@ -139,4 +148,11 @@ module "subnet_tags" {
   for_each = local.subnet_keys_with_tags
 
   tags = each.value
+}
+
+module "vpc_lattice_tags" {
+  source  = "aws-ia/label/aws"
+  version = "0.0.5"
+
+  tags = try(var.vpc_lattice.tags, {})
 }

@@ -323,6 +323,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="module_flow_logs"></a> [flow\_logs](#module\_flow\_logs) | ./modules/flow_logs | n/a |
 | <a name="module_subnet_tags"></a> [subnet\_tags](#module\_subnet\_tags) | aws-ia/label/aws | 0.0.5 |
 | <a name="module_tags"></a> [tags](#module\_tags) | aws-ia/label/aws | 0.0.5 |
+| <a name="module_vpc_lattice_tags"></a> [vpc\_lattice\_tags](#module\_vpc\_lattice\_tags) | aws-ia/label/aws | 0.0.5 |
 
 ## Resources
 
@@ -363,6 +364,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | [aws_subnet.tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_vpc_ipv4_cidr_block_association.secondary](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipv4_cidr_block_association) | resource |
+| [aws_vpclattice_service_network_vpc_association.vpc_lattice_service_network_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpclattice_service_network_vpc_association) | resource |
 | [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
@@ -393,6 +395,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="input_vpc_ipv6_cidr_block"></a> [vpc\_ipv6\_cidr\_block](#input\_vpc\_ipv6\_cidr\_block) | IPv6 CIDR range to assign to VPC if creating VPC. You need to use `vpc_ipv6_ipam_pool_id` and set explicitly the CIDR block to use, or derived from IPAM using using `vpc_ipv6_netmask_length`. | `string` | `null` | no |
 | <a name="input_vpc_ipv6_ipam_pool_id"></a> [vpc\_ipv6\_ipam\_pool\_id](#input\_vpc\_ipv6\_ipam\_pool\_id) | Set to use IPAM to get an IPv6 CIDR block. | `string` | `null` | no |
 | <a name="input_vpc_ipv6_netmask_length"></a> [vpc\_ipv6\_netmask\_length](#input\_vpc\_ipv6\_netmask\_length) | Set to use IPAM to get an IPv6 CIDR block using a specified netmask. Must be set with `var.vpc_ipv6_ipam_pool_id`. | `string` | `null` | no |
+| <a name="input_vpc_lattice"></a> [vpc\_lattice](#input\_vpc\_lattice) | Amazon VPC Lattice Service Network VPC association. You can only associate one Service Network to the VPC. This association also support Security Groups (more than 1).<br>This variable expects the following attributes:<br>- `service_network_identifier` = (Required\|string) The ID or ARN of the Service Network to associate. You must use the ARN if the Service Network and VPC resources are in different AWS Accounts.<br>- `security_group_ids          = (Optional|list(string)) The IDs of the security groups to attach to the association.<br>- `tags` =                     = (Optional|map(string)) Tags to set on the Lattice VPC association resource.<br>` | `any` | `{}` | no |
 | <a name="input_vpc_secondary_cidr"></a> [vpc\_secondary\_cidr](#input\_vpc\_secondary\_cidr) | If `true` the module will create a `aws_vpc_ipv4_cidr_block_association` and subnets for that secondary cidr. If using IPAM for both primary and secondary CIDRs, you may only call this module serially (aka using `-target`, etc). | `bool` | `false` | no |
 | <a name="input_vpc_secondary_cidr_natgw"></a> [vpc\_secondary\_cidr\_natgw](#input\_vpc\_secondary\_cidr\_natgw) | If attaching a secondary IPv4 CIDR instead of creating a VPC, you can map private/ tgw subnets to your public NAT GW with this argument. Simply pass the output `nat_gateway_attributes_by_az`, ex: `vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az`. If you did not build your primary with this module, you must construct a map { az : { id : nat-123asdb }} for each az. | `any` | `{}` | no |
 
@@ -413,4 +416,5 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="output_tgw_subnet_attributes_by_az"></a> [tgw\_subnet\_attributes\_by\_az](#output\_tgw\_subnet\_attributes\_by\_az) | Map of all tgw subnets containing their attributes.<br><br>Example:<pre>tgw_subnet_attributes = {<br>  "us-east-1a" = {<br>    "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"<br>    "assign_ipv6_address_on_creation" = false<br>    ...<br>    <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference><br>  }<br>  "us-east-1b" = {...)<br>}</pre> |
 | <a name="output_transit_gateway_attachment_id"></a> [transit\_gateway\_attachment\_id](#output\_transit\_gateway\_attachment\_id) | Transit gateway attachment id. |
 | <a name="output_vpc_attributes"></a> [vpc\_attributes](#output\_vpc\_attributes) | VPC resource attributes. Full output of aws\_vpc. |
+| <a name="output_vpc_lattice_service_network_association"></a> [vpc\_lattice\_service\_network\_association](#output\_vpc\_lattice\_service\_network\_association) | VPC Lattice Service Network VPC association. Full output of aws\_vpclattice\_service\_network\_vpc\_association |
 <!-- END_TF_DOCS -->
