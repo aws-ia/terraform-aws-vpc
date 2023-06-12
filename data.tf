@@ -45,7 +45,7 @@ locals {
   private_subnet_key_names_cwan_routes = [for subnet in local.private_per_az : subnet if contains(local.subnets_cwan_routed, split("/", subnet)[0])]
 
   # support variables for core_network_ipv6_routes
-  ipv6_subnets_cwan_routed                   = keys(var.core_network_routes)
+  ipv6_subnets_cwan_routed                   = keys(var.core_network_ipv6_routes)
   ipv6_private_subnet_keys_names_cwan_routes = [for subnet in local.private_per_az : subnet if contains(local.ipv6_subnets_cwan_routed, split("/", subnet)[0])]
 
   # support variables for core_network subnets
