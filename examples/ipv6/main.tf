@@ -2,7 +2,7 @@
 # VPC module
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 4.2.0"
+  version = ">= 4.3.1"
 
   name                                 = "vpc-ipv6-generated"
   cidr_block                           = "10.0.0.0/16"

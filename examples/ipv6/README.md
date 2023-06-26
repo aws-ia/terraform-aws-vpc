@@ -26,7 +26,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 4.2.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources
 
@@ -36,7 +36,7 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Regions to create in Cloud WAN's core network. | `string` | `"eu-west-2"` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"eu-west-2"` | no |
 
 ## Outputs
 

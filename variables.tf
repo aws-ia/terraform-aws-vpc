@@ -125,6 +125,7 @@ variable "subnets" {
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
   - `connect_to_igw`            = (Optional|bool) Determines if the default route (0.0.0.0/0 or ::/0) is created in the public subnets with destination the Internet gateway. Defaults to `true`.
   - `ipv6_native`               = (Optional|bool) Indicates whether to create an IPv6-ony subnet. Either `var.assign_ipv6_cidr` or `var.ipv6_cidrs` should be defined to allocate an IPv6 CIDR block.
+  - `map_public_ip_on_launch`   = (Optional|bool) Specify true to indicate that instances launched into the subnet should be assigned a public IP address. Default to `false`.
 
   **transit_gateway subnet type options:**
   - All shared keys above
@@ -195,6 +196,7 @@ EOF
       "ipv6_native",
       "assign_ipv6_cidr",
       "ipv6_cidrs",
+      "map_public_ip_on_launch",
       "tags"
     ])) == 0
   }
@@ -377,8 +379,8 @@ variable "vpc_lattice" {
   Amazon VPC Lattice Service Network VPC association. You can only associate one Service Network to the VPC. This association also support Security Groups (more than 1).
   This variable expects the following attributes:
   - `service_network_identifier` = (Required|string) The ID or ARN of the Service Network to associate. You must use the ARN if the Service Network and VPC resources are in different AWS Accounts.
-  - `security_group_ids          = (Optional|list(string)) The IDs of the security groups to attach to the association.
-  - `tags` =                     = (Optional|map(string)) Tags to set on the Lattice VPC association resource.
+  - `security_group_ids`         = (Optional|list(string)) The IDs of the security groups to attach to the association.
+  - `tags`                       = (Optional|map(string)) Tags to set on the Lattice VPC association resource.
 EOF
   type        = any
 

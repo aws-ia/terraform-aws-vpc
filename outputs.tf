@@ -107,11 +107,11 @@ output "rt_attributes_by_type_by_az" {
     "core_network"    = aws_route_table.cwan
   }
   description = <<-EOF
-  Map of route tables by type => az => route table attributes. Example usage: module.vpc.route_table_by_subnet_type.private.id
+  Map of route tables by type => az => route table attributes. Example usage: module.vpc.rt_attributes_by_type_by_az.private.id
 
   Example:
   ```
-  route_table_attributes_by_type_by_az = {
+  rt_attributes_by_type_by_az = {
     "private" = {
       "us-east-1a" = {
         "id" = "rtb-0e77040c0598df003"
