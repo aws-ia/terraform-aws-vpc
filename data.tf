@@ -134,9 +134,21 @@ data "aws_availability_zones" "current" {
   }
 
   lifecycle {
-    # Check if `var.azs` was provided that the filter returns the correct number of AZs
+    # Check at least one variable `var.azs` or `var.az_count` has been provided
+    precondition {
+      condition     = (var.azs != null && var.az_count != null) ? false : true
+      error_message = "Both `var.azs` and `var.az_count` provided. You must provide a value for `var.azs` or `var.az_count` but not both."
+    }
+
+    # Check that only `var.azs` or `var.az_count` was provided (and not both)
+    precondition {
+      condition     = (var.azs == null && var.az_count == null) ? false : true
+      error_message = "You must provide a value for the variable `var.az_count` or `var.azs`."
+    }
+
+    # Check if `var.azs` was provided that the filter returns the correct number of AZs (i.e. all exist in the current partition/region)
     postcondition {
-      condition     = var.azs == null ? true : (length(self.names) == length(var.azs) ? true : false)
+      condition     = (var.azs == null) ? true : (length(self.names) == length(var.azs) ? true : false)
       error_message = "One or more of the Availability Zones provided in `var.azs` does not exist. Please check the availability zones are available in the current region."
     }
   }
