@@ -1,5 +1,6 @@
 locals {
-  azs = slice(data.aws_availability_zones.current.names, 0, var.az_count)
+  # az_count has been provided slice based on az_count otherwise return those provided
+  azs = var.az_count != null ? slice(data.aws_availability_zones.current.names, 0, var.az_count) : data.aws_availability_zones.current.names
 
   # references to module.calculate_subnets output
   calculated_subnets       = module.calculate_subnets.subnets_by_type
@@ -122,6 +123,22 @@ data "aws_availability_zones" "current" {
   filter {
     name   = "opt-in-status"
     values = ["opt-in-not-required"]
+  }
+
+  dynamic "filter" {
+    for_each = var.azs != null ? [1] : []
+    content {
+      name   = "zone-name"
+      values = var.azs
+    }
+  }
+
+  lifecycle {
+    # Check if `var.azs` was provided that the filter returns the correct number of AZs
+    postcondition {
+      condition     = var.azs == null ? true : (length(self.names) == length(var.azs) ? true : false)
+      error_message = "One or more of the Availability Zones provided in `var.azs` does not exist. Please check the availability zones are available in the current region."
+    }
   }
 }
 
