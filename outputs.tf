@@ -115,7 +115,6 @@ output "rt_attributes_by_type_by_az" {
     "private" = {
       "us-east-1a" = {
         "id" = "rtb-0e77040c0598df003"
-        "route_table_id" = "rtb-0e77040c0598df003"
         "tags" = tolist([
           {
             "key" = "Name"
@@ -123,6 +122,8 @@ output "rt_attributes_by_type_by_az" {
           },
         ])
         "vpc_id" = "vpc-033e054f49409592a"
+        ...
+        <all attributes of route: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table#attributes-reference>
       }
       "us-east-1b" = { ... }
     "public" = { ... }
