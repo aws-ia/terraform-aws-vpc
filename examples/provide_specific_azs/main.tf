@@ -5,7 +5,7 @@ module "vpc_specific_azs" {
 
   name       = "specific-azs"
   cidr_block = var.cidr_block
-  azs        = var.availability_zones
+  azs        = var.azs
 
 
   subnets = {

@@ -1,4 +1,4 @@
-variable "availability_zones" {
+variable "azs" {
   type        = list(string)
   description = "A list of AZs to use. e.g. `azs = [\"us-east-1a\",\"us-east-1c\"]` Incompatible with `az_count`"
   default = [
