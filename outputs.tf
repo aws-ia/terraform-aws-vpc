@@ -25,7 +25,7 @@ output "private_subnet_attributes_by_az" {
 
   Example:
   ```
-  private_subnet_attributes = {
+  private_subnet_attributes_by_az = {
     "private/us-east-1a" = {
       "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
       "assign_ipv6_address_on_creation" = false
@@ -45,7 +45,7 @@ output "public_subnet_attributes_by_az" {
 
   Example:
   ```
-  public_subnet_attributes = {
+  public_subnet_attributes_by_az = {
     "us-east-1a" = {
       "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
       "assign_ipv6_address_on_creation" = false
@@ -65,7 +65,7 @@ output "tgw_subnet_attributes_by_az" {
 
   Example:
   ```
-  tgw_subnet_attributes = {
+  tgw_subnet_attributes_by_az = {
     "us-east-1a" = {
       "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
       "assign_ipv6_address_on_creation" = false
@@ -85,7 +85,7 @@ output "core_network_subnet_attributes_by_az" {
 
   Example:
   ```
-  core_network_subnet_attributes = {
+  core_network_subnet_attributes_by_az = {
     "us-east-1a" = {
       "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
       "assign_ipv6_address_on_creation" = false
@@ -115,7 +115,6 @@ output "rt_attributes_by_type_by_az" {
     "private" = {
       "us-east-1a" = {
         "id" = "rtb-0e77040c0598df003"
-        "route_table_id" = "rtb-0e77040c0598df003"
         "tags" = tolist([
           {
             "key" = "Name"
@@ -123,6 +122,8 @@ output "rt_attributes_by_type_by_az" {
           },
         ])
         "vpc_id" = "vpc-033e054f49409592a"
+        ...
+        <all attributes of route: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table#attributes-reference>
       }
       "us-east-1b" = { ... }
     "public" = { ... }
