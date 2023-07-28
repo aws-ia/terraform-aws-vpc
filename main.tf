@@ -210,6 +210,28 @@ resource "aws_route" "public_to_cwan" {
   ]
 }
 
+# Configure routes provided in the input variable `subnets` for the public subnet(s).
+resource "aws_route" "public_routes" {
+  count = length(local.public_subnet_az_routes)
+
+  destination_cidr_block      = lookup(local.public_subnet_az_routes[count.index], "destination_cidr_block", null)
+  destination_prefix_list_id  = lookup(local.public_subnet_az_routes[count.index], "destination_prefix_list_id", null)
+  destination_ipv6_cidr_block = lookup(local.public_subnet_az_routes[count.index], "destination_ipv6_cidr_block", null)
+
+  carrier_gateway_id        = lookup(local.public_subnet_az_routes[count.index], "carrier_gateway_id", null)
+  core_network_arn          = lookup(local.public_subnet_az_routes[count.index], "core_network_arn", null)
+  egress_only_gateway_id    = lookup(local.public_subnet_az_routes[count.index], "egress_only_gateway_id", null)
+  gateway_id                = lookup(local.public_subnet_az_routes[count.index], "gateway_id", null)
+  nat_gateway_id            = lookup(local.public_subnet_az_routes[count.index], "nat_gateway_id", null)
+  local_gateway_id          = lookup(local.public_subnet_az_routes[count.index], "local_gateway_id", null)
+  network_interface_id      = lookup(local.public_subnet_az_routes[count.index], "network_interface_id", null)
+  transit_gateway_id        = lookup(local.public_subnet_az_routes[count.index], "transit_gateway_id", null)
+  vpc_endpoint_id           = lookup(local.public_subnet_az_routes[count.index], "vpc_endpoint_id", null)
+  vpc_peering_connection_id = lookup(local.public_subnet_az_routes[count.index], "vpc_peering_connection_id", null)
+
+  route_table_id = aws_route_table.private[local.public_subnet_az_routes[count.index].route_table_name].id
+}
+
 # Route: IPv6 routes from public subnets to AWS Cloud WAN's core network (if configured in var.core_network_routes)
 resource "aws_route" "ipv6_public_to_cwan" {
   for_each = (contains(local.subnet_keys, "public") && contains(local.ipv6_subnets_cwan_routed, "public") && local.create_cwan_routes) ? toset(local.azs) : toset([])
@@ -288,6 +310,28 @@ resource "aws_route" "private_to_egress_only" {
   route_table_id              = aws_route_table.private[each.key].id
   destination_ipv6_cidr_block = "::/0"
   egress_only_gateway_id      = aws_egress_only_internet_gateway.eigw[0].id
+}
+
+# Configure routes provided in the input variable `subnets` for the private subnet(s).
+resource "aws_route" "private_routes" {
+  count = length(local.private_subnets_az_routes)
+
+  destination_cidr_block      = lookup(local.private_subnets_az_routes[count.index], "destination_cidr_block", null)
+  destination_prefix_list_id  = lookup(local.private_subnets_az_routes[count.index], "destination_prefix_list_id", null)
+  destination_ipv6_cidr_block = lookup(local.private_subnets_az_routes[count.index], "destination_ipv6_cidr_block", null)
+
+  carrier_gateway_id        = lookup(local.private_subnets_az_routes[count.index], "carrier_gateway_id", null)
+  core_network_arn          = lookup(local.private_subnets_az_routes[count.index], "core_network_arn", null)
+  egress_only_gateway_id    = lookup(local.private_subnets_az_routes[count.index], "egress_only_gateway_id", null)
+  gateway_id                = lookup(local.private_subnets_az_routes[count.index], "gateway_id", null)
+  nat_gateway_id            = lookup(local.private_subnets_az_routes[count.index], "nat_gateway_id", null)
+  local_gateway_id          = lookup(local.private_subnets_az_routes[count.index], "local_gateway_id", null)
+  network_interface_id      = lookup(local.private_subnets_az_routes[count.index], "network_interface_id", null)
+  transit_gateway_id        = lookup(local.private_subnets_az_routes[count.index], "transit_gateway_id", null)
+  vpc_endpoint_id           = lookup(local.private_subnets_az_routes[count.index], "vpc_endpoint_id", null)
+  vpc_peering_connection_id = lookup(local.private_subnets_az_routes[count.index], "vpc_peering_connection_id", null)
+
+  route_table_id = aws_route_table.private[local.private_subnets_az_routes[count.index].route_table_name].id
 }
 
 # Route: IPv4 routes from private subnets to the Transit Gateway (if configured in var.transit_gateway_routes)

@@ -113,6 +113,37 @@ locals {
   # private subnets with cidrs per az if connect_to_public_eigw = true ...  "privatetwo/us-east-1a"
   private_subnet_names_egress_routed = [for subnet in local.private_per_az : subnet if contains(local.private_subnets_egress_routed, split("/", subnet)[0])]
 
+  # Configure additional routes.
+  # List of private subnets with additional routes.
+  private_subnets_routes = [for type in local.private_subnet_names : type if length(lookup(var.subnets[type], "routes", [])) > 0]
+  # List of routes for the private subnets.
+  # The tricky part here is that we have to identify the subnet names where a route
+  # should be added because the subnet name has suffix /az_name e.g. subnet is created for each zone.
+  private_subnets_az_routes = flatten([
+    for subnet_name in local.private_subnets_routes :
+    [
+      for subnet_name_az in local.private_per_az :
+      [
+        for route in var.subnets[subnet_name].routes :
+        merge(route, { "route_table_name" : subnet_name_az })
+      ] if startswith(subnet_name_az, "${subnet_name}/")
+    ]
+  ])
+  # List of routes for the public subnets.
+  # There is just 1 public subnet and route table names are based on AZ names.
+  public_subnet_az_routes = (length(try(var.subnets.public.routes, [])) > 0
+    ? flatten(
+      [
+        for az in local.azs :
+        [
+          for route in var.subnets.public.routes :
+          merge(route, { "route_table_name" : az })
+        ]
+      ]
+    )
+    : []
+  )
+
   # VPC LATTICE ############################################################
   # If var.vpc_lattice is defined (default = {}), the VPC association is created.
   lattice_association = length(keys(var.vpc_lattice)) > 0
