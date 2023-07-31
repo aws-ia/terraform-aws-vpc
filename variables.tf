@@ -257,6 +257,24 @@ EOF
     error_message = "Any subnet type `name_prefix` must not contain \"/\"."
     condition     = alltrue([for _, v in var.subnets : !can(regex("/", try(v.name_prefix, "")))])
   }
+
+  # We check here if there exists at least one subnet that meets the following criteria:
+  # a. The subnet has a route with the destination CIDR block of "0.0.0.0/0".
+  # b. The subnet has the 'connect_to_public_natgw' attribute set to true.
+  validation {
+    error_message = "Route with CIDR '0.0.0.0/0' is mutually exclusive with 'connect_to_public_natgw'."
+    condition = !anytrue(
+      [
+        for name, subnet in var.subnets :
+        anytrue(
+          [
+            for route in lookup(subnet, "routes", []) :
+            lookup(route, "destination_cidr_block", "") == "0.0.0.0/0"
+          ]
+        ) && lookup(subnet, "connect_to_public_natgw", false)
+      ]
+    )
+  }
 }
 
 variable "tags" {
