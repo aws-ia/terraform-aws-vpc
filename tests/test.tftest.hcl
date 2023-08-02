@@ -1,4 +1,4 @@
-run "validate_locals" {
+run "validate_public_private_example_root" {
   command = plan
 
   module {
