@@ -22,8 +22,12 @@ At this point, only cloud-watch logs are support, pending: https://github.com/aw
 
 | Name | Source | Version |
 |------|--------|---------|
+<<<<<<< HEAD
 | <a name="module_vpc1"></a> [vpc1](#module\_vpc1) | ../.. | n/a |
 | <a name="module_vpc2"></a> [vpc2](#module\_vpc2) | ../.. | n/a |
+=======
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
+>>>>>>> 35f9470 (use relative path for tests)
 
 ## Resources
 

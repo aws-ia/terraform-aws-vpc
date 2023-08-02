@@ -1,10 +1,12 @@
 data "aws_availability_zones" "current" {}
 
-module "vpc1" {
+module "vpc" {
+  # source  = "aws-ia/vpc/aws"
+  # version = ">= 4.2.0"
   source = "../.."
 
-  name       = "vpc-cw-logs"
-  cidr_block = "10.0.0.0/16"
+  name       = "flowlogs"
+  cidr_block = "10.0.0.0/20"
   az_count   = 2
 
   subnets = {
