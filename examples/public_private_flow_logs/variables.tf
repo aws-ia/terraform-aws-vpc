@@ -3,3 +3,13 @@ variable "aws_region" {
   type        = string
   default     = "eu-west-1"
 }
+
+variable "subnets" {
+  default = null
+}
+variable "az_count" {
+  default = null
+}
+variable "name" {
+  default = null
+}
