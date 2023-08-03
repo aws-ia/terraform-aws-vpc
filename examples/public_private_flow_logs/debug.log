@@ -1,0 +1,60 @@
+2023-08-03T12:26:36.533-0400 [INFO]  Terraform version: 1.5.0
+2023-08-03T12:26:36.533-0400 [DEBUG] using github.com/hashicorp/go-tfe v1.26.0
+2023-08-03T12:26:36.533-0400 [DEBUG] using github.com/hashicorp/hcl/v2 v2.16.2
+2023-08-03T12:26:36.533-0400 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.0
+2023-08-03T12:26:36.533-0400 [DEBUG] using github.com/zclconf/go-cty v1.12.2
+2023-08-03T12:26:36.533-0400 [INFO]  Go runtime version: go1.20.5
+2023-08-03T12:26:36.533-0400 [INFO]  CLI args: []string{"terraform", "fmt"}
+2023-08-03T12:26:36.533-0400 [DEBUG] Attempting to open CLI config file: /Users/dm/.terraformrc
+2023-08-03T12:26:36.533-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraformrc
+2023-08-03T12:26:36.534-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraform.d/credentials.tfrc.json
+2023-08-03T12:26:36.534-0400 [DEBUG] Explicit provider installation configuration is set
+2023-08-03T12:26:36.535-0400 [INFO]  CLI command args: []string{"fmt"}
+2023-08-03T12:26:41.344-0400 [INFO]  Terraform version: 1.5.0
+2023-08-03T12:26:41.344-0400 [DEBUG] using github.com/hashicorp/go-tfe v1.26.0
+2023-08-03T12:26:41.344-0400 [DEBUG] using github.com/hashicorp/hcl/v2 v2.16.2
+2023-08-03T12:26:41.344-0400 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.0
+2023-08-03T12:26:41.344-0400 [DEBUG] using github.com/zclconf/go-cty v1.12.2
+2023-08-03T12:26:41.344-0400 [INFO]  Go runtime version: go1.20.5
+2023-08-03T12:26:41.344-0400 [INFO]  CLI args: []string{"terraform", "fmt"}
+2023-08-03T12:26:41.344-0400 [DEBUG] Attempting to open CLI config file: /Users/dm/.terraformrc
+2023-08-03T12:26:41.344-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraformrc
+2023-08-03T12:26:41.344-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraform.d/credentials.tfrc.json
+2023-08-03T12:26:41.344-0400 [DEBUG] Explicit provider installation configuration is set
+2023-08-03T12:26:41.344-0400 [INFO]  CLI command args: []string{"fmt"}
+2023-08-03T12:27:06.967-0400 [INFO]  Terraform version: 1.5.0
+2023-08-03T12:27:06.967-0400 [DEBUG] using github.com/hashicorp/go-tfe v1.26.0
+2023-08-03T12:27:06.967-0400 [DEBUG] using github.com/hashicorp/hcl/v2 v2.16.2
+2023-08-03T12:27:06.967-0400 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.0
+2023-08-03T12:27:06.967-0400 [DEBUG] using github.com/zclconf/go-cty v1.12.2
+2023-08-03T12:27:06.967-0400 [INFO]  Go runtime version: go1.20.5
+2023-08-03T12:27:06.967-0400 [INFO]  CLI args: []string{"terraform", "fmt"}
+2023-08-03T12:27:06.967-0400 [DEBUG] Attempting to open CLI config file: /Users/dm/.terraformrc
+2023-08-03T12:27:06.967-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraformrc
+2023-08-03T12:27:06.968-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraform.d/credentials.tfrc.json
+2023-08-03T12:27:06.968-0400 [DEBUG] Explicit provider installation configuration is set
+2023-08-03T12:27:06.968-0400 [INFO]  CLI command args: []string{"fmt"}
+2023-08-03T12:27:20.124-0400 [INFO]  Terraform version: 1.5.0
+2023-08-03T12:27:20.124-0400 [DEBUG] using github.com/hashicorp/go-tfe v1.26.0
+2023-08-03T12:27:20.124-0400 [DEBUG] using github.com/hashicorp/hcl/v2 v2.16.2
+2023-08-03T12:27:20.124-0400 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.0
+2023-08-03T12:27:20.124-0400 [DEBUG] using github.com/zclconf/go-cty v1.12.2
+2023-08-03T12:27:20.124-0400 [INFO]  Go runtime version: go1.20.5
+2023-08-03T12:27:20.124-0400 [INFO]  CLI args: []string{"terraform", "fmt"}
+2023-08-03T12:27:20.124-0400 [DEBUG] Attempting to open CLI config file: /Users/dm/.terraformrc
+2023-08-03T12:27:20.124-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraformrc
+2023-08-03T12:27:20.124-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraform.d/credentials.tfrc.json
+2023-08-03T12:27:20.124-0400 [DEBUG] Explicit provider installation configuration is set
+2023-08-03T12:27:20.125-0400 [INFO]  CLI command args: []string{"fmt"}
+2023-08-03T12:27:32.456-0400 [INFO]  Terraform version: 1.5.0
+2023-08-03T12:27:32.457-0400 [DEBUG] using github.com/hashicorp/go-tfe v1.26.0
+2023-08-03T12:27:32.457-0400 [DEBUG] using github.com/hashicorp/hcl/v2 v2.16.2
+2023-08-03T12:27:32.457-0400 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.0
+2023-08-03T12:27:32.457-0400 [DEBUG] using github.com/zclconf/go-cty v1.12.2
+2023-08-03T12:27:32.457-0400 [INFO]  Go runtime version: go1.20.5
+2023-08-03T12:27:32.457-0400 [INFO]  CLI args: []string{"terraform", "fmt"}
+2023-08-03T12:27:32.457-0400 [DEBUG] Attempting to open CLI config file: /Users/dm/.terraformrc
+2023-08-03T12:27:32.457-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraformrc
+2023-08-03T12:27:32.457-0400 [INFO]  Loading CLI configuration from /Users/dm/.terraform.d/credentials.tfrc.json
+2023-08-03T12:27:32.457-0400 [DEBUG] Explicit provider installation configuration is set
+2023-08-03T12:27:32.457-0400 [INFO]  CLI command args: []string{"fmt"}
