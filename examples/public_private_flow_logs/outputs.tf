@@ -20,3 +20,8 @@ output "log_name" {
   description = "Name of the flow log."
   value       = module.vpc1.flow_log_attributes.tags["Name"]
 }
+
+output "vpc_attributes" {
+  description = "Output of all VPC attributes."
+  value       = module.vpc.vpc_attributes
+}
