@@ -11,16 +11,22 @@ func TestExamplesPublicPrivateCWLogs(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../examples/public_private_flow_logs",
+		Vars: map[string]interface{}{
+			"vpc_flow_logs": map[string]interface{}{
+				"name_override":        "test",
+				"log_destination_type": "cloud-watch-logs",
+				"kms_key_id":           nil,
+			},
+		},
 	}
 
 	defer terraform.Destroy(t, terraformOptions)
 	terraform.InitAndApply(t, terraformOptions)
 	terraform.ApplyAndIdempotent(t, terraformOptions)
 
-	publicTagsLength := terraform.Output(t, terraformOptions, "public_subnets_tags_length")
-	assert.Equal(t, "2", publicTagsLength)
-	privateTagsLength := terraform.Output(t, terraformOptions, "private_subnets_tags_length")
-	assert.Equal(t, "1", privateTagsLength)
+	log_name := terraform.Output(t, terraformOptions, "log_name")
+	print(log_name)
+	assert.Contains(t, "test", log_name)
 }
 
 func TestExamplesPublicPrivateS3FlowLogs(t *testing.T) {

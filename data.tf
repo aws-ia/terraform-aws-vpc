@@ -116,6 +116,8 @@ locals {
   # VPC LATTICE ############################################################
   # If var.vpc_lattice is defined (default = {}), the VPC association is created.
   lattice_association = length(keys(var.vpc_lattice)) > 0
+
+  log_name = var.vpc_flow_logs.name_override == "" ? var.name : var.vpc_flow_logs.name_override
 }
 
 data "aws_availability_zones" "current" {
