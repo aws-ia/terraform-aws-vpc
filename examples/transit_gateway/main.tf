@@ -21,7 +21,10 @@ resource "aws_ec2_managed_prefix_list" "example" {
 
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 4.3.1"
+  version = "= 4.4.0"
+
+  # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
+  #source = "../.."
 
   name                                 = "tgw"
   cidr_block                           = "10.0.0.0/16"

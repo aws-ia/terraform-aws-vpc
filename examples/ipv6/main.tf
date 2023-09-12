@@ -2,7 +2,10 @@
 # VPC module
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 4.3.1"
+  version = ">= 4.4.0"
+
+  # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
+  #source = "../.."
 
   name                                 = "vpc-ipv6-generated"
   cidr_block                           = "10.0.0.0/16"
