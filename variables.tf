@@ -17,7 +17,14 @@ variable "vpc_id" {
 
 variable "az_count" {
   type        = number
-  description = "Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z."
+  description = "Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z. Required if `azs` is not provided."
+  default     = null
+}
+
+variable "azs" {
+  type        = list(string)
+  description = "(Optional) A list of AZs to use. e.g. `azs = [\"us-east-1a\",\"us-east-1c\"]` Incompatible with `az_count`"
+  default     = null
 }
 
 variable "vpc_enable_dns_hostnames" {
