@@ -96,7 +96,7 @@ resource "aws_route_table_association" "public" {
 # Elastic IP - used in NAT gateways (if configured)
 resource "aws_eip" "nat" {
   for_each = toset(local.nat_configuration)
-  vpc      = true
+  domain   = "vpc"
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
