@@ -100,6 +100,9 @@ resource "aws_networkmanager_core_network" "core_network" {
   description       = "Core Network - VPC module"
   global_network_id = aws_networkmanager_global_network.global_network.id
 
+  create_base_policy  = true
+  base_policy_regions = values(var.cloud_wan_regions)
+
   tags = {
     Name = "Core Network - VPC module"
   }
