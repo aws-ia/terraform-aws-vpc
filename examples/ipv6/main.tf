@@ -2,7 +2,7 @@
 # VPC module
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = ">= 4.4.0"
+  version = "= 4.4.0"
 
   # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
   #source = "../.."

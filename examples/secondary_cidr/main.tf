@@ -2,7 +2,7 @@ data "aws_region" "current" {}
 
 module "secondary" {
   source  = "aws-ia/vpc/aws"
-  version = "= 4.3.0"
+  version = "= 4.4.0"
 
   # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
   #source = "../.."
@@ -15,17 +15,6 @@ module "secondary" {
   vpc_id             = var.vpc_id
 
   vpc_secondary_cidr_natgw = var.natgw_id_per_az
-
-  # If referencing another instantiation of this module, you can use the output natgw_id_per_az, example:
-  # vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az
-
-  # underly structure is:
-  # {
-  #   az : {
-  #     id : "nat-asdf"
-  #   }
-  # }
-  # but preferably you should just pass the module output natgw_id_per_az
 
   subnets = {
     private = {
