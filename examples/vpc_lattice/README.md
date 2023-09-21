@@ -26,7 +26,7 @@ This example shows how you can use this module to create a [VPC Lattice]() Servi
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | = 4.3.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | = 4.4.0 |
 
 ## Resources
 
