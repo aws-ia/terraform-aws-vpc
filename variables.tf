@@ -112,6 +112,7 @@ variable "subnets" {
   - `assign_ipv6_cidr` = (Optional|bool) **Cannot set if `ipv6_cidrs` is set.** If true, it will calculate a /64 block from the IPv6 VPC CIDR to set in the subnets.
   - `ipv6_cidrs`       = (Optional|list(string)) **Cannot set if `assign_ipv6_cidr` is set.** List of IPv6 CIDRs to set to subnets. The subnet size must use a /64 prefix length. Count of CIDRs defined must match quantity of azs in `az_count`.
   - `name_prefix`      = (Optional|String) A string prefix to use for the name of your subnet and associated resources. Subnet type key name is used if omitted (aka private, public, transit_gateway). Example `name_prefix = "private"` for `var.subnets.private` is redundant.
+  - `routes`           = (optional|list(map(string)) List of maps, where each map represents an `aws_route` resource. All `aws_route` attributes are supported for both the `destination` and `target` arguments.
   - `tags`             = (Optional|map(string)) Tags to set on the subnet and associated resources.
 
   **Any private subnet type options:**
@@ -160,6 +161,14 @@ variable "subnets" {
       ipv6_native      = true
       assign_ipv6_cidr = true
       connect_to_eigw  = true
+    }
+    # Additional routes
+    private = {
+      netmask                  = 24
+      routes                   = [{
+        destination_cidr_block = "0.0.0.0/0"
+        transit_gateway_id     = "tgw-01238768912345678"
+      }]
     }
     # Transit gateway subnets (dual-stack)
     transit_gateway = {
@@ -247,6 +256,24 @@ EOF
   validation {
     error_message = "Any subnet type `name_prefix` must not contain \"/\"."
     condition     = alltrue([for _, v in var.subnets : !can(regex("/", try(v.name_prefix, "")))])
+  }
+
+  # We check here if there exists at least one subnet that meets the following criteria:
+  # a. The subnet has a route with the destination CIDR block of "0.0.0.0/0".
+  # b. The subnet has the 'connect_to_public_natgw' attribute set to true.
+  validation {
+    error_message = "Route with CIDR '0.0.0.0/0' is mutually exclusive with 'connect_to_public_natgw'."
+    condition = !anytrue(
+      [
+        for name, subnet in var.subnets :
+        anytrue(
+          [
+            for route in lookup(subnet, "routes", []) :
+            lookup(route, "destination_cidr_block", "") == "0.0.0.0/0"
+          ]
+        ) && lookup(subnet, "connect_to_public_natgw", false)
+      ]
+    )
   }
 }
 
