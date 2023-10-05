@@ -28,7 +28,6 @@ At this point, only cloud-watch logs are support, pending: https://github.com/aw
 
 | Name | Type |
 |------|------|
-| [aws_ssm_parameter.foo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_availability_zones.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 
 ## Inputs

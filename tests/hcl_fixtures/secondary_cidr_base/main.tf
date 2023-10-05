@@ -3,7 +3,7 @@ module "vpc" {
 
   name       = "primary-az-vpc"
   cidr_block = "10.0.0.0/16"
-  az_count   = 2
+  az_count   = var.az_count
 
   subnets = {
     public = {
@@ -17,3 +17,4 @@ module "vpc" {
     }
   }
 }
+
