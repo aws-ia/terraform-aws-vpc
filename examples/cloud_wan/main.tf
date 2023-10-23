@@ -1,11 +1,11 @@
 
 # VPC module (North Virginia)
 module "nvirginia_vpc" {
-  #source  = "aws-ia/vpc/aws"
-  #version = "= 4.4.0"
+  source  = "aws-ia/vpc/aws"
+  version = "= 4.3.2"
 
   # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
-  source = "../.."
+  #source = "../.."
 
   providers = { aws = aws.awsnvirginia }
 
@@ -34,8 +34,7 @@ module "nvirginia_vpc" {
       netmask                = 28
       assign_ipv6_cidr       = true
       appliance_mode_support = true
-      require_acceptance     = true
-      accept_attachment      = true
+      require_acceptance     = false
 
       tags = {
         env = "prod"
@@ -47,7 +46,7 @@ module "nvirginia_vpc" {
 # VPC module (Ireland)
 module "ireland_vpc" {
   source  = "aws-ia/vpc/aws"
-  version = "= 4.3.0"
+  version = "= 4.3.2"
 
   # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
   #source = "../.."

@@ -22,8 +22,8 @@ At this point, only cloud-watch logs are support, pending: https://github.com/aw
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc1"></a> [vpc1](#module\_vpc1) | aws-ia/vpc/aws | = 4.4.0 |
-| <a name="module_vpc2"></a> [vpc2](#module\_vpc2) | aws-ia/vpc/aws | = 4.4.0 |
+| <a name="module_vpc1"></a> [vpc1](#module\_vpc1) | aws-ia/vpc/aws | = 4.3.2 |
+| <a name="module_vpc2"></a> [vpc2](#module\_vpc2) | aws-ia/vpc/aws | = 4.3.2 |
 
 ## Resources
 

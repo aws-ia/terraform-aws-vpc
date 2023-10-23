@@ -21,7 +21,7 @@ resource "aws_ec2_managed_prefix_list" "example" {
 
 module "vpc" {
   source  = "aws-ia/vpc/aws"
-  version = "= 4.4.0"
+  version = "= 4.3.2"
 
   # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
   #source = "../.."
