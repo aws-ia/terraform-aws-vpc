@@ -1,11 +1,7 @@
 data "aws_availability_zones" "current" {}
 
 module "vpc1" {
-  source  = "aws-ia/vpc/aws"
-  version = "= 4.3.2"
-
-  # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
-  #source = "../.."
+  source = "../.."
 
   name       = "vpc-cw-logs"
   cidr_block = "10.0.0.0/16"
@@ -33,11 +29,7 @@ module "vpc1" {
 }
 
 module "vpc2" {
-  source  = "aws-ia/vpc/aws"
-  version = "= 4.3.2"
-
-  # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
-  #source = "../.."
+  source = "../.."
 
   name       = "vpc-s3-logs"
   cidr_block = "10.0.0.0/16"

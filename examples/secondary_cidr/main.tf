@@ -1,11 +1,7 @@
 data "aws_region" "current" {}
 
 module "secondary" {
-  source  = "aws-ia/vpc/aws"
-  version = "= 4.3.2"
-
-  # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
-  #source = "../.."
+  source = "../.."
 
   name       = "secondary-cidr"
   az_count   = 2
