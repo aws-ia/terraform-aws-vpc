@@ -62,7 +62,7 @@ resource "aws_subnet" "public" {
   cidr_block                                     = can(local.calculated_subnets["public"][each.key]) ? local.calculated_subnets["public"][each.key] : null
   ipv6_cidr_block                                = can(local.calculated_subnets_ipv6["public"][each.key]) ? local.calculated_subnets_ipv6["public"][each.key] : null
   ipv6_native                                    = contains(local.subnets_with_ipv6_native, "public") ? true : false
-  map_public_ip_on_launch                        = local.public_ipv6only ? null : true
+  map_public_ip_on_launch                        = try(var.subnets.public.map_public_ip_on_launch, local.public_ipv6only ? null : true)
   assign_ipv6_address_on_creation                = local.public_ipv6only || local.public_dualstack ? true : null
   enable_resource_name_dns_aaaa_record_on_launch = local.public_ipv6only || local.public_dualstack ? true : false
 
@@ -419,6 +419,12 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
   appliance_mode_support                          = try(var.subnets.transit_gateway.transit_gateway_appliance_mode_support, "disable")
   dns_support                                     = try(var.subnets.transit_gateway.transit_gateway_dns_support, "enable")
   ipv6_support                                    = local.tgw_dualstack ? "enable" : "disable"
+
+  tags = merge(
+    { Name = "${var.name}-vpc_attachment" },
+    module.tags.tags_aws,
+    module.subnet_tags["transit_gateway"].tags_aws
+  )
 }
 
 # ---------- CORE NETWORK SUBNET CONFIGURATION ----------

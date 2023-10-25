@@ -1,6 +1,6 @@
 
 variable "aws_region" {
-  description = "AWS Regions to create in Cloud WAN's core network."
+  description = "AWS Region."
   type        = string
 
   default = "eu-west-2"

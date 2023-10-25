@@ -1,8 +1,7 @@
 
 # VPC module
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 4.3.0"
+  source = "../.."
 
   name       = "tgw"
   cidr_block = "10.0.0.0/24"
