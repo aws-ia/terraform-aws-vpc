@@ -28,7 +28,7 @@ This example shows how you can use this module with `core_network` subnets, and 
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ireland_vpc"></a> [ireland\_vpc](#module\_ireland\_vpc) | aws-ia/vpc/aws | = 4.3.2 |
+| <a name="module_ireland_vpc"></a> [ireland\_vpc](#module\_ireland\_vpc) | ../.. | n/a |
 | <a name="module_nvirginia_vpc"></a> [nvirginia\_vpc](#module\_nvirginia\_vpc) | ../.. | n/a |
 
 ## Resources

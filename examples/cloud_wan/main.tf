@@ -41,11 +41,7 @@ module "nvirginia_vpc" {
 
 # VPC module (Ireland)
 module "ireland_vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = "= 4.3.2"
-
-  # For testing purposes, uncomment the line below and comment the "source" and "version" lines above
-  #source = "../.."
+  source = "../.."
 
   providers = { aws = aws.awsireland }
 
