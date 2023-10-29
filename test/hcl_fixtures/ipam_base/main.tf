@@ -7,7 +7,7 @@ module "ipam" {
   top_cidr = ["172.0.0.0/8"]
 
   pool_configurations = {
-    "${data.aws_region.current.name}" = {
+    subpool = {
       description = "${data.aws_region.current.name} top level pool"
       cidr        = ["172.2.0.0/16"]
       locale      = data.aws_region.current.name

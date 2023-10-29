@@ -18,7 +18,7 @@ data "aws_networkmanager_core_network_policy_document" "policy" {
   segments {
     name                          = "prod"
     description                   = "Segment for production traffic"
-    require_attachment_acceptance = true
+    require_attachment_acceptance = false
   }
 
   segments {

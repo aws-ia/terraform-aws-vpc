@@ -1,5 +1,3 @@
-data "aws_availability_zones" "current" {}
-
 module "vpc" {
   source = "../../.."
 

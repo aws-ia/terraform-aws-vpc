@@ -10,19 +10,20 @@ At this point, only cloud-watch logs are support, pending: https://github.com/aw
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.73.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.73.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | >= 4.2.0 |
+| <a name="module_vpc1"></a> [vpc1](#module\_vpc1) | ../.. | n/a |
+| <a name="module_vpc2"></a> [vpc2](#module\_vpc2) | ../.. | n/a |
 
 ## Resources
 

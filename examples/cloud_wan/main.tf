@@ -1,8 +1,7 @@
 
 # VPC module (North Virginia)
 module "nvirginia_vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 4.2.0"
+  source = "../.."
 
   providers = { aws = aws.awsnvirginia }
 
@@ -31,8 +30,7 @@ module "nvirginia_vpc" {
       netmask                = 28
       assign_ipv6_cidr       = true
       appliance_mode_support = true
-      require_acceptance     = true
-      accept_attachment      = true
+      require_acceptance     = false
 
       tags = {
         env = "prod"
@@ -43,8 +41,7 @@ module "nvirginia_vpc" {
 
 # VPC module (Ireland)
 module "ireland_vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 4.2.0"
+  source = "../.."
 
   providers = { aws = aws.awsireland }
 
@@ -94,15 +91,10 @@ resource "aws_networkmanager_core_network" "core_network" {
   description       = "Core Network - VPC module"
   global_network_id = aws_networkmanager_global_network.global_network.id
 
+  create_base_policy   = true
+  base_policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
+
   tags = {
     Name = "Core Network - VPC module"
   }
-}
-
-# Core Network policy attachment
-resource "aws_networkmanager_core_network_policy_attachment" "core_network_policy_attachment" {
-  provider = aws.awsnvirginia
-
-  core_network_id = aws_networkmanager_core_network.core_network.id
-  policy_document = data.aws_networkmanager_core_network_policy_document.policy.json
 }

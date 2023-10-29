@@ -4,10 +4,9 @@ import (
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/likexian/gokit/assert"
 )
 
-func TestExamplesPublicPrivateCWLogs(t *testing.T) {
+func TestExamplesPublicPrivateFlowLogs(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../examples/public_private_flow_logs",
