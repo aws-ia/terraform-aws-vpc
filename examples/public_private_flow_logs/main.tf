@@ -23,6 +23,7 @@ module "vpc1" {
   }
 
   vpc_flow_logs = {
+    name_override        = "test"
     log_destination_type = "cloud-watch-logs"
     retention_in_days    = 180
   }
