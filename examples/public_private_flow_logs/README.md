@@ -39,5 +39,10 @@ At this point, only cloud-watch logs are support, pending: https://github.com/aw
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_log_name"></a> [log\_name](#output\_log\_name) | Name of the flow log. |
+| <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | Map of private subnet attributes grouped by az. |
+| <a name="output_private_subnets_tags_length"></a> [private\_subnets\_tags\_length](#output\_private\_subnets\_tags\_length) | Count of private subnet tags for a single az. |
+| <a name="output_public_subnets_tags_length"></a> [public\_subnets\_tags\_length](#output\_public\_subnets\_tags\_length) | Count of public subnet tags for a single az. |
 <!-- END_TF_DOCS -->
