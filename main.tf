@@ -490,7 +490,7 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
   tags = merge(
     { Name = "${var.name}-vpc_attachment" },
     module.tags.tags_aws,
-    module.subnet_tags["core_network"].tags_aws
+    try(module.subnet_tags["core_network"].tags_aws, {})
   )
 }
 
