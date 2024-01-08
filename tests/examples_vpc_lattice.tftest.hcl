@@ -1,6 +1,6 @@
 run "validate" {
-    command = apply
-    module {
-        source = "./examples/vpc_lattice"
-    }
+  command = apply
+  module {
+    source = "./examples/vpc_lattice"
+  }
 }

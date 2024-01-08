@@ -1,6 +1,6 @@
 run "validate" {
-    command = apply
-    module {
-        source = "./examples/ipv6"
-    }
+  command = apply
+  module {
+    source = "./examples/ipv6"
+  }
 }

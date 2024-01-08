@@ -48,16 +48,6 @@ variable "vpc_instance_tenancy" {
   type        = string
   description = "The allowed tenancy of instances launched into the VPC."
   default     = "default"
-
-  /*
-  Note:
-  Updating InstanceTenancy requires no replacement only if you are updating its value from "dedicated" to "default". Updating InstanceTenancy from "default" to "dedicated" requires replacement.
-  */
-
-  validation {
-    condition     = var.vpc_instance_tenancy == "default" || var.vpc_instance_tenancy == "dedicated"
-    error_message = "Invalid input, options: \"default\", or \"dedicated\"."
-  }
 }
 
 variable "vpc_ipv4_ipam_pool_id" {
