@@ -94,7 +94,7 @@ variable "vpc_egress_only_internet_gateway" {
 
 variable "subnets" {
   description = <<-EOF
-  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway", "core_network". Each Subnet type offers its own set of available arguments detailed below.
+  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway", "core_network". Each Subnet type offers its own set of available arguments detailed below. Subnets are calculated in lexicographical order of the keys in the map.
 
   **Attributes shared across subnet types:**
   - `cidrs`            = (Optional|list(string)) **Cannot set if `netmask` is set.** List of IPv4 CIDRs to set to subnets. Count of CIDRs defined must match quantity of azs in `az_count`.
