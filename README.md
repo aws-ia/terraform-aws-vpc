@@ -143,7 +143,7 @@ subnets = {
 
 ## Updating a VPC with new or removed subnets
 
-If using `netmask` or `assign_ipv6_cidr` to calculate subnets and you wish to either add or remove subnets (ex: adding / removing an AZ), you may have to change from using `netmask` / `assign_ipv6_cidr` for some subnets and set to explicit instead. Private subnets are always calculated before public.
+If using `netmask` or `assign_ipv6_cidr` to calculate subnets and you wish to either add or remove subnets (ex: adding / removing an AZ), you may have to change from using `netmask` / `assign_ipv6_cidr` for some subnets and set to explicit instead. Subnets are calculated in lexicographical order, meaning the subnet named "private" is calculated before "public".
 
 When changing to explicit cidrs, subnets are always ordered by AZ. `0` -> a, `1` -> b, etc.
 
