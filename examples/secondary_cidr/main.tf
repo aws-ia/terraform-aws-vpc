@@ -1,5 +1,7 @@
 data "aws_region" "current" {}
 
+data "aws_availability_zones" "available" {}
+
 data "aws_vpc" "selected" {
   tags = {
     Name = "primary-az-vpc"
@@ -18,7 +20,12 @@ module "secondary" {
   source = "../.."
 
   name       = "secondary-cidr"
-  az_count   = var.az_count
+  create_vpc = false
+
+  #   If the AZ calculation is done in the module when creating a secondary CIDR, it will not
+  #   be known until after applying, resulting in an error. Hence, we need to pass it here.
+  azs = slice(data.aws_availability_zones.available.names, 0, var.az_count)
+
   cidr_block = "10.2.0.0/16"
 
   vpc_secondary_cidr = true

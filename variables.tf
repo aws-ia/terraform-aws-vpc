@@ -15,9 +15,22 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "create_vpc" {
+  description = "Determines whether to create the VPC or not; defaults to enabling the creation."
+  default     = true
+  type        = bool
+}
+
 variable "az_count" {
   type        = number
+  default     = 0
   description = "Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z."
+}
+
+variable "azs" {
+  description = "A list of availability zones names"
+  type        = list(string)
+  default     = []
 }
 
 variable "vpc_enable_dns_hostnames" {
