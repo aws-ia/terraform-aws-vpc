@@ -23,7 +23,7 @@ module "calculate_subnets_ipv6" {
 # flow logs optionally enabled by standalone resource
 #tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
 resource "aws_vpc" "main" {
-  count = local.create_vpc ? 1 : 0
+  count = var.create_vpc ? 1 : 0
 
   cidr_block                       = var.cidr_block
   ipv4_ipam_pool_id                = var.vpc_ipv4_ipam_pool_id
@@ -45,7 +45,7 @@ resource "aws_vpc" "main" {
 
 # ---------- SECONDARY IPv4 CIDR BLOCK (if configured) ----------
 resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
-  count = (var.vpc_secondary_cidr && !local.create_vpc) ? 1 : 0
+  count = (var.vpc_secondary_cidr && !var.create_vpc) ? 1 : 0
 
   vpc_id            = var.vpc_id
   cidr_block        = local.cidr_block
