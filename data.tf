@@ -1,5 +1,5 @@
 locals {
-  azs = slice(data.aws_availability_zones.current.names, 0, var.az_count)
+  azs = length(var.azs) == 0 ? slice(data.aws_availability_zones.current.names, 0, var.az_count) : var.azs
 
   # references to module.calculate_subnets output
   calculated_subnets       = module.calculate_subnets.subnets_by_type
@@ -89,9 +89,7 @@ locals {
   # - get cidr block value from AWS IPAM
   # - create flow logs
 
-  # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
-  create_vpc = var.vpc_id == null ? true : false
-  vpc        = local.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
+  vpc        = var.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
   cidr_block = var.cidr_block == null ? local.vpc.cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
@@ -129,7 +127,7 @@ data "aws_availability_zones" "current" {
 
 # search for existing vpc with var.vpc_id if not creating
 data "aws_vpc" "main" {
-  count = local.create_vpc ? 0 : 1
+  count = var.create_vpc ? 0 : 1
   id    = var.vpc_id
 }
 
