@@ -136,14 +136,14 @@ data "aws_vpc" "main" {
 # awscc tags = module.tags.tags
 module "tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = var.tags
 }
 
 module "subnet_tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   for_each = local.subnet_keys_with_tags
 
@@ -152,7 +152,7 @@ module "subnet_tags" {
 
 module "vpc_lattice_tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = try(var.vpc_lattice.tags, {})
 }
