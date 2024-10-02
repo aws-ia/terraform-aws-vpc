@@ -419,6 +419,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
   appliance_mode_support                          = try(var.subnets.transit_gateway.transit_gateway_appliance_mode_support, "disable")
   dns_support                                     = try(var.subnets.transit_gateway.transit_gateway_dns_support, "enable")
   ipv6_support                                    = local.tgw_dualstack ? "enable" : "disable"
+  security_group_referencing_support              = try(var.subnets.transit_gateway.transit_gateway_security_group_referencing_support, "enable")
 
   tags = merge(
     { Name = "${var.name}-vpc_attachment" },

@@ -132,11 +132,12 @@ variable "subnets" {
 
   **transit_gateway subnet type options:**
   - All shared keys above
-  - `connect_to_public_natgw`                         = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
-  - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
-  - `transit_gateway_appliance_mode_support`          = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
-  - `transit_gateway_dns_support`                     = (Optional|string) DNS Support is used if you need the VPC to resolve public IPv4 DNS host names to private IPv4 addresses when queried from instances in another VPC attached to the transit gateway. Valid values: `enable` (default) and `disable`.
+  - `connect_to_public_natgw`                            = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `transit_gateway_default_route_table_association`    = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
+  - `transit_gateway_default_route_table_propagation`    = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
+  - `transit_gateway_appliance_mode_support`             = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
+  - `transit_gateway_dns_support`                        = (Optional|string) DNS Support is used if you need the VPC to resolve public IPv4 DNS host names to private IPv4 addresses when queried from instances in another VPC attached to the transit gateway. Valid values: `enable` (default) and `disable`.
+  - `transit_gateway_security_group_referencing_support` = (Optional|string) Security group referencing support enables you to simplify Security group management and control of instance-to-instance traffic across VPCs that are connected by Transit gateway. Valid values: `disable` and `enable` (default).
 
   **core_network subnet type options:**
   - All shared keys abovce
@@ -206,7 +207,7 @@ EOF
 
   # All var.subnets.transit_gateway valid keys
   validation {
-    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"transit_gateway_security_group_referencing_support\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
       "cidrs",
       "netmask",
@@ -218,6 +219,7 @@ EOF
       "transit_gateway_default_route_table_propagation",
       "transit_gateway_appliance_mode_support",
       "transit_gateway_dns_support",
+      "transit_gateway_security_group_referencing_support",
       "tags"
     ])) == 0
   }
