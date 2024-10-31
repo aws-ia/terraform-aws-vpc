@@ -90,7 +90,7 @@ locals {
   # - create flow logs
 
   vpc        = var.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
-  vpc_arn    = length(var.vpc_arn) > 0 ? var.vpc_arn : local.vpc.arn
+  vpc_arn    = var.vpc_arn == null || length(var.vpc_arn) <= 0 ? local.vpc.arn : var.vpc_arn
   cidr_block = var.cidr_block == null ? local.vpc.cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
