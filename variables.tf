@@ -265,11 +265,11 @@ variable "vpc_flow_logs" {
   description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
 
   type = object({
-    name_override   = optional(string, "")
-    log_destination = optional(string)
-    iam_role_arn    = optional(string)
-    kms_key_id      = optional(string)
-
+    name_override        = optional(string, "")
+    log_destination      = optional(string)
+    iam_role_arn         = optional(string)
+    kms_key_id           = optional(string)
+    log_format           = optional(string)
     log_destination_type = string
     retention_in_days    = optional(number)
     tags                 = optional(map(string))
