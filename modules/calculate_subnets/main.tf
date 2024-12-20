@@ -51,6 +51,5 @@ module "subnet_calculator" {
   version = "1.0.2"
 
   base_cidr_block = var.cidr
-  networks        = local.sorted_subnet_objects
+  networks        = var.optimize_subnet_cidr_ranges ? local.sorted_subnet_objects : local.calculated_subnet_objects
 }
-
