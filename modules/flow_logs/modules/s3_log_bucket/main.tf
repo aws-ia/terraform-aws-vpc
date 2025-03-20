@@ -35,6 +35,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "flow_logs" {
       storage_class = "STANDARD_IA"
     }
 
+    filter {
+      prefix = ""
+    }
+
     expiration {
       days = 60
     }
