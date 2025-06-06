@@ -270,15 +270,21 @@ variable "vpc_flow_logs" {
     iam_role_arn    = optional(string)
     kms_key_id      = optional(string)
 
-    log_destination_type = string
-    retention_in_days    = optional(number)
-    tags                 = optional(map(string))
-    traffic_type         = optional(string, "ALL")
+    log_destination_type               = string
+    retention_in_days                  = optional(number)
+    log_bucket_lifecycle_filter_prefix = optional(string, null)
+    tags                               = optional(map(string))
+    traffic_type                       = optional(string, "ALL")
     destination_options = optional(object({
       file_format                = optional(string, "plain-text")
       hive_compatible_partitions = optional(bool, false)
       per_hour_partition         = optional(bool, false)
-    }))
+      }),
+      {
+        file_format                = "plain-text"
+        hive_compatible_partitions = false
+        per_hour_partition         = false
+    })
   })
 
   default = {
