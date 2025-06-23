@@ -129,7 +129,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = local.vpc.id
 
   tags = merge(
-    { Name = var.name },
+    { Name = "${var.name}-igw" },
     module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
