@@ -41,7 +41,7 @@ resource "aws_flow_log" "main" {
   log_destination_type = var.flow_log_definition.log_destination_type
   traffic_type         = var.flow_log_definition.traffic_type
   vpc_id               = var.vpc_id
-
+  log_format           = var.flow_log_definition.log_format
   dynamic "destination_options" {
     for_each = var.flow_log_definition.log_destination_type == "s3" ? [true] : []
 

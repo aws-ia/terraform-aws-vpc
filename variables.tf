@@ -271,10 +271,12 @@ variable "vpc_flow_logs" {
     kms_key_id      = optional(string)
 
     log_destination_type               = string
+    log_format                         = optional(string)
     retention_in_days                  = optional(number)
     log_bucket_lifecycle_filter_prefix = optional(string, null)
     tags                               = optional(map(string))
     traffic_type                       = optional(string, "ALL")
+
     destination_options = optional(object({
       file_format                = optional(string, "plain-text")
       hive_compatible_partitions = optional(bool, false)
