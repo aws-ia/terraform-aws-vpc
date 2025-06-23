@@ -18,3 +18,8 @@ variable "tags" {
   type        = map(string)
   default     = null
 }
+
+variable "log_bucket_lifecycle_filter_prefix" {
+  description = "Prefix to use for the lifecycle transition rule in the flowlogs bucket"
+  default     = null
+}
