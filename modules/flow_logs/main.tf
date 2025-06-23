@@ -31,7 +31,8 @@ module "s3_log_bucket" {
   count  = (local.create_flow_log_destination && var.flow_log_definition.log_destination_type == "s3") ? 1 : 0
   source = "./modules/s3_log_bucket"
 
-  name = var.name
+  name                    = var.name
+  lifecycle_filter_prefix = var.log_bucket_lifecycle_filter_prefix
 }
 
 resource "aws_flow_log" "main" {
