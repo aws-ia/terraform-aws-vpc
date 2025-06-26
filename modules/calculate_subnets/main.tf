@@ -16,6 +16,30 @@ locals {
     }
   ]])
 
+  # map of subnet names to netmask values for looking up netmask by name
+  netmasks_for_subnets = { for subnet in local.calculated_subnet_objects : subnet.name => subnet.netmask }
+
+  # sorted list of netmasks from largest to smallest so we can efficiently use the ip address space
+  sorted_subnet_netmasks = reverse(distinct(sort([
+    for subnet in local.calculated_subnet_objects : format("%05d", subnet.netmask)
+  ])))
+
+  # list of subnet names sorted based on their netmask value (large to small)
+  sorted_subnet_names = compact(flatten([
+    for netmask in local.sorted_subnet_netmasks : [
+      for subnet in local.calculated_subnet_objects :
+      subnet.name if subnet.netmask == tonumber(netmask)
+    ]
+  ]))
+
+  # list of subnet the original calculated subnet objects, but sorted based on their netmask value (large to small)
+  sorted_subnet_objects = [
+    for name in local.sorted_subnet_names : {
+      name    = name
+      netmask = local.netmasks_for_subnets[name]
+    }
+  ]
+
   # map of explicit cidrs to az
   explicit_cidrs_grouped = { for _, type in local.types_with_explicit : type => zipmap(var.azs, var.subnets[type].cidrs[*]) }
 }
@@ -27,6 +51,5 @@ module "subnet_calculator" {
   version = "1.0.2"
 
   base_cidr_block = var.cidr
-  networks        = local.calculated_subnet_objects
+  networks        = var.optimize_subnet_cidr_ranges ? local.sorted_subnet_objects : local.calculated_subnet_objects
 }
-

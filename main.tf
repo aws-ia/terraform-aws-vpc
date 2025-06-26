@@ -7,7 +7,8 @@ module "calculate_subnets" {
   cidr = local.cidr_block
   azs  = local.azs
 
-  subnets = var.subnets
+  subnets                     = var.subnets
+  optimize_subnet_cidr_ranges = var.optimize_subnet_cidr_ranges
 }
 
 module "calculate_subnets_ipv6" {
