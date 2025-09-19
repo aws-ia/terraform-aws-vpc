@@ -23,7 +23,7 @@ This example shows how you can use this module to efficiently use the VPC CIDR r
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | aws-ia/vpc/aws | ~> 4.4 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources
 
@@ -40,7 +40,5 @@ This example shows how you can use this module to efficiently use the VPC CIDR r
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_private_subnets_tags_length"></a> [private\_subnets\_tags\_length](#output\_private\_subnets\_tags\_length) | Count of private subnet tags for a single az. |
+No outputs.
 <!-- END_TF_DOCS -->
