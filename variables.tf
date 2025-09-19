@@ -257,6 +257,12 @@ EOF
   }
 }
 
+variable "optimize_subnet_cidr_ranges" {
+  description = "Sort subnets to calculate by their netmask to efficiently use IP space."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags to apply to all resources."
   type        = map(string)

@@ -12,3 +12,9 @@ variable "cidr" {
   description = "CIDR value to use as base for calculating IP address prefixes."
   type        = string
 }
+
+variable "optimize_subnet_cidr_ranges" {
+  description = "Sort subnets to calculate by their netmask to efficiently use IP space."
+  type        = bool
+  default     = false
+}
