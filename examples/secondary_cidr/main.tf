@@ -1,29 +1,41 @@
 data "aws_region" "current" {}
 
+data "aws_availability_zones" "available" {}
+
+data "aws_vpc" "selected" {
+  tags = {
+    Name = "primary-az-vpc"
+  }
+}
+
+data "aws_nat_gateway" "default" {
+  vpc_id = data.aws_vpc.selected.id
+
+  tags = {
+    Name = "nat-primary-vpc-public-${data.aws_region.current.name}a"
+  }
+}
+
 module "secondary" {
-  # source  = "aws-ia/vpc/aws"
-  # version = ">= 3.0.2"
   source = "../.."
 
   name       = "secondary-cidr"
-  az_count   = 2
+  create_vpc = false
+
+  #   If the AZ calculation is done in the module when creating a secondary CIDR, it will not
+  #   be known until after applying, resulting in an error. Hence, we need to pass it here.
+  azs = slice(data.aws_availability_zones.available.names, 0, var.az_count)
+
   cidr_block = "10.2.0.0/16"
 
   vpc_secondary_cidr = true
-  vpc_id             = var.vpc_id
+  vpc_id             = data.aws_vpc.selected.id
 
-  vpc_secondary_cidr_natgw = var.natgw_id_per_az
-
-  # If referencing another instantiation of this module, you can use the output natgw_id_per_az, example:
-  # vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az
-
-  # underly structure is:
-  # {
-  #   az : {
-  #     id : "nat-asdf"
-  #   }
-  # }
-  # but preferably you should just pass the module output natgw_id_per_az
+  vpc_secondary_cidr_natgw = {
+    "${data.aws_region.current.name}a" = {
+      id = data.aws_nat_gateway.default.id
+    }
+  }
 
   subnets = {
     private = {

@@ -193,3 +193,8 @@ output "vpc_lattice_service_network_association" {
   value       = try(aws_vpclattice_service_network_vpc_association.vpc_lattice_service_network_association[0], null)
   description = "VPC Lattice Service Network VPC association. Full output of aws_vpclattice_service_network_vpc_association"
 }
+
+output "flow_log_attributes" {
+  description = "Flow Log information."
+  value       = try(module.flow_logs[0].flow_log, null)
+}

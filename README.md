@@ -96,12 +96,13 @@ subnets = {
   vpce = { netmask = 24}
 
   transit_gateway = {
-    netmask                                         = 28
-    assign_ipv6_cidr                                = true
-    transit_gateway_default_route_table_association = true
-    transit_gateway_default_route_table_propagation = true
-    transit_gateway_appliance_mode_support          = "enable"
-    transit_gateway_dns_support                     = "disable"
+    netmask                                            = 28
+    assign_ipv6_cidr                                   = true
+    transit_gateway_default_route_table_association    = true
+    transit_gateway_default_route_table_propagation    = true
+    transit_gateway_appliance_mode_support             = "enable"
+    transit_gateway_dns_support                        = "disable"
+    transit_gateway_security_group_referencing_support = "enable"
 
     tags = {
       subnet_type = "tgw"
@@ -143,7 +144,7 @@ subnets = {
 
 ## Updating a VPC with new or removed subnets
 
-If using `netmask` or `assign_ipv6_cidr` to calculate subnets and you wish to either add or remove subnets (ex: adding / removing an AZ), you may have to change from using `netmask` / `assign_ipv6_cidr` for some subnets and set to explicit instead. Private subnets are always calculated before public.
+If using `netmask` or `assign_ipv6_cidr` to calculate subnets and you wish to either add or remove subnets (ex: adding / removing an AZ), you may have to change from using `netmask` / `assign_ipv6_cidr` for some subnets and set to explicit instead. Subnets are calculated in lexicographical order, meaning the subnet named "private" is calculated before "public".
 
 When changing to explicit cidrs, subnets are always ordered by AZ. `0` -> a, `1` -> b, etc.
 
@@ -306,13 +307,13 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.27.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.27.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0.0 |
 
 ## Modules
 
@@ -380,6 +381,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="input_core_network"></a> [core\_network](#input\_core\_network) | AWS Cloud WAN's core network information - to create a VPC attachment. Required when `cloud_wan` subnet is defined. Two attributes are required: the `id` and `arn` of the resource. | <pre>object({<br>    id  = string<br>    arn = string<br>  })</pre> | <pre>{<br>  "arn": null,<br>  "id": null<br>}</pre> | no |
 | <a name="input_core_network_ipv6_routes"></a> [core\_network\_ipv6\_routes](#input\_core\_network\_ipv6\_routes) | Configuration of IPv6 route(s) to AWS Cloud WAN's core network.<br>For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network.<br>You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.<br>Example:<pre>core_network_ivp6_routes = {<br>  public  = "::/0"<br>  private = "pl-123"<br>}</pre> | `any` | `{}` | no |
 | <a name="input_core_network_routes"></a> [core\_network\_routes](#input\_core\_network\_routes) | Configuration of route(s) to AWS Cloud WAN's core network.<br>For each `public` and/or `private` subnets named in the `subnets` variable, optionally create routes from the subnet to the core network.<br>You can specify either a CIDR range or a prefix-list-id that you want routed to the core network.<br>Example:<pre>core_network_routes = {<br>  public  = "10.0.0.0/8"<br>  private = "pl-123"<br>}</pre> | `any` | `{}` | no |
+| <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | Determines whether to create the VPC or not; defaults to enabling the creation. | `bool` | `true` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources. | `map(string)` | `{}` | no |
 | <a name="input_transit_gateway_id"></a> [transit\_gateway\_id](#input\_transit\_gateway\_id) | Transit gateway id to attach the VPC to. Required when `transit_gateway` subnet is defined. | `string` | `null` | no |
 | <a name="input_transit_gateway_ipv6_routes"></a> [transit\_gateway\_ipv6\_routes](#input\_transit\_gateway\_ipv6\_routes) | Configuration of IPv6 route(s) to transit gateway.<br>For each `public` and/or `private` subnets named in the `subnets` variable,<br>Optionally create routes from the subnet to transit gateway. Specify the CIDR range or a prefix-list-id that you want routed to the transit gateway.<br>Example:<pre>transit_gateway_ipv6_routes = {<br>  public  = "::/0"<br>  private = "pl-123"<br>}</pre> | `any` | `{}` | no |
@@ -388,7 +390,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="input_vpc_egress_only_internet_gateway"></a> [vpc\_egress\_only\_internet\_gateway](#input\_vpc\_egress\_only\_internet\_gateway) | Set to use the Egress-only Internet gateway for all IPv6 traffic going to the Internet. | `bool` | `false` | no |
 | <a name="input_vpc_enable_dns_hostnames"></a> [vpc\_enable\_dns\_hostnames](#input\_vpc\_enable\_dns\_hostnames) | Indicates whether the instances launched in the VPC get DNS hostnames. If enabled, instances in the VPC get DNS hostnames; otherwise, they do not. Disabled by default for nondefault VPCs. | `bool` | `true` | no |
 | <a name="input_vpc_enable_dns_support"></a> [vpc\_enable\_dns\_support](#input\_vpc\_enable\_dns\_support) | Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range "plus two" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default. | `bool` | `true` | no |
-| <a name="input_vpc_flow_logs"></a> [vpc\_flow\_logs](#input\_vpc\_flow\_logs) | Whether or not to create VPC flow logs and which type. Options: "cloudwatch", "s3", "none". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf. | <pre>object({<br>    log_destination = optional(string)<br>    iam_role_arn    = optional(string)<br>    kms_key_id      = optional(string)<br><br>    log_destination_type = string<br>    retention_in_days    = optional(number)<br>    tags                 = optional(map(string))<br>    traffic_type         = optional(string, "ALL")<br>    destination_options = optional(object({<br>      file_format                = optional(string, "plain-text")<br>      hive_compatible_partitions = optional(bool, false)<br>      per_hour_partition         = optional(bool, false)<br>    }))<br>  })</pre> | <pre>{<br>  "log_destination_type": "none"<br>}</pre> | no |
+| <a name="input_vpc_flow_logs"></a> [vpc\_flow\_logs](#input\_vpc\_flow\_logs) | Whether or not to create VPC flow logs and which type. Options: "cloudwatch", "s3", "none". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf. | <pre>object({<br>    name_override   = optional(string, "")<br>    log_destination = optional(string)<br>    iam_role_arn    = optional(string)<br>    kms_key_id      = optional(string)<br><br>    log_destination_type = string<br>    retention_in_days    = optional(number)<br>    tags                 = optional(map(string))<br>    traffic_type         = optional(string, "ALL")<br>    destination_options = optional(object({<br>      file_format                = optional(string, "plain-text")<br>      hive_compatible_partitions = optional(bool, false)<br>      per_hour_partition         = optional(bool, false)<br>    }))<br>  })</pre> | <pre>{<br>  "log_destination_type": "none"<br>}</pre> | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID to use if not creating VPC. | `string` | `null` | no |
 | <a name="input_vpc_instance_tenancy"></a> [vpc\_instance\_tenancy](#input\_vpc\_instance\_tenancy) | The allowed tenancy of instances launched into the VPC. | `string` | `"default"` | no |
 | <a name="input_vpc_ipv4_ipam_pool_id"></a> [vpc\_ipv4\_ipam\_pool\_id](#input\_vpc\_ipv4\_ipam\_pool\_id) | Set to use IPAM to get an IPv4 CIDR block. | `string` | `null` | no |
@@ -396,7 +398,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="input_vpc_ipv6_cidr_block"></a> [vpc\_ipv6\_cidr\_block](#input\_vpc\_ipv6\_cidr\_block) | IPv6 CIDR range to assign to VPC if creating VPC. You need to use `vpc_ipv6_ipam_pool_id` and set explicitly the CIDR block to use, or derived from IPAM using using `vpc_ipv6_netmask_length`. | `string` | `null` | no |
 | <a name="input_vpc_ipv6_ipam_pool_id"></a> [vpc\_ipv6\_ipam\_pool\_id](#input\_vpc\_ipv6\_ipam\_pool\_id) | Set to use IPAM to get an IPv6 CIDR block. | `string` | `null` | no |
 | <a name="input_vpc_ipv6_netmask_length"></a> [vpc\_ipv6\_netmask\_length](#input\_vpc\_ipv6\_netmask\_length) | Set to use IPAM to get an IPv6 CIDR block using a specified netmask. Must be set with `var.vpc_ipv6_ipam_pool_id`. | `string` | `null` | no |
-| <a name="input_vpc_lattice"></a> [vpc\_lattice](#input\_vpc\_lattice) | Amazon VPC Lattice Service Network VPC association. You can only associate one Service Network to the VPC. This association also support Security Groups (more than 1).<br>This variable expects the following attributes:<br>- `service_network_identifier` = (Required\|string) The ID or ARN of the Service Network to associate. You must use the ARN if the Service Network and VPC resources are in different AWS Accounts.<br>- `security_group_ids          = (Optional|list(string)) The IDs of the security groups to attach to the association.<br>- `tags` =                     = (Optional|map(string)) Tags to set on the Lattice VPC association resource.<br>` | `any` | `{}` | no |
+| <a name="input_vpc_lattice"></a> [vpc\_lattice](#input\_vpc\_lattice) | Amazon VPC Lattice Service Network VPC association. You can only associate one Service Network to the VPC. This association also support Security Groups (more than 1).<br>This variable expects the following attributes:<br>- `service_network_identifier` = (Required\|string) The ID or ARN of the Service Network to associate. You must use the ARN if the Service Network and VPC resources are in different AWS Accounts.<br>- `security_group_ids`         = (Optional\|list(string)) The IDs of the security groups to attach to the association.<br>- `tags`                       = (Optional\|map(string)) Tags to set on the Lattice VPC association resource. | `any` | `{}` | no |
 | <a name="input_vpc_secondary_cidr"></a> [vpc\_secondary\_cidr](#input\_vpc\_secondary\_cidr) | If `true` the module will create a `aws_vpc_ipv4_cidr_block_association` and subnets for that secondary cidr. If using IPAM for both primary and secondary CIDRs, you may only call this module serially (aka using `-target`, etc). | `bool` | `false` | no |
 | <a name="input_vpc_secondary_cidr_natgw"></a> [vpc\_secondary\_cidr\_natgw](#input\_vpc\_secondary\_cidr\_natgw) | If attaching a secondary IPv4 CIDR instead of creating a VPC, you can map private/ tgw subnets to your public NAT GW with this argument. Simply pass the output `nat_gateway_attributes_by_az`, ex: `vpc_secondary_cidr_natgw = module.vpc.natgw_id_per_az`. If you did not build your primary with this module, you must construct a map { az : { id : nat-123asdb }} for each az. | `any` | `{}` | no |
 
@@ -408,6 +410,7 @@ Please see our [developer documentation](https://github.com/aws-ia/terraform-aws
 | <a name="output_core_network_attachment"></a> [core\_network\_attachment](#output\_core\_network\_attachment) | AWS Cloud WAN's core network attachment. Full output of aws\_networkmanager\_vpc\_attachment. |
 | <a name="output_core_network_subnet_attributes_by_az"></a> [core\_network\_subnet\_attributes\_by\_az](#output\_core\_network\_subnet\_attributes\_by\_az) | Map of all core\_network subnets containing their attributes.<br><br>Example:<pre>core_network_subnet_attributes_by_az = {<br>  "us-east-1a" = {<br>    "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"<br>    "assign_ipv6_address_on_creation" = false<br>    ...<br>    <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference><br>  }<br>  "us-east-1b" = {...)<br>}</pre> |
 | <a name="output_egress_only_internet_gateway"></a> [egress\_only\_internet\_gateway](#output\_egress\_only\_internet\_gateway) | Egress-only Internet gateway attributes. Full output of aws\_egress\_only\_internet\_gateway. |
+| <a name="output_flow_log_attributes"></a> [flow\_log\_attributes](#output\_flow\_log\_attributes) | Flow Log information. |
 | <a name="output_internet_gateway"></a> [internet\_gateway](#output\_internet\_gateway) | Internet gateway attributes. Full output of aws\_internet\_gateway. |
 | <a name="output_nat_gateway_attributes_by_az"></a> [nat\_gateway\_attributes\_by\_az](#output\_nat\_gateway\_attributes\_by\_az) | Map of nat gateway resource attributes by AZ.<br><br>Example:<pre>nat_gateway_attributes_by_az = {<br>  "us-east-1a" = {<br>    "allocation_id" = "eipalloc-0e8b20303eea88b13"<br>    "connectivity_type" = "public"<br>    "id" = "nat-0fde39f9550f4abb5"<br>    "network_interface_id" = "eni-0d422727088bf9a86"<br>    "private_ip" = "10.0.3.40"<br>    "public_ip" = <><br>    "subnet_id" = "subnet-0f11c92e439c8ab4a"<br>    "tags" = tomap({<br>      "Name" = "nat-my-public-us-east-1a"<br>    })<br>    "tags_all" = tomap({<br>      "Name" = "nat-my-public-us-east-1a"<br>    })<br>  }<br>  "us-east-1b" = { ... }<br>}</pre> |
 | <a name="output_natgw_id_per_az"></a> [natgw\_id\_per\_az](#output\_natgw\_id\_per\_az) | Map of nat gateway IDs for each resource. Will be duplicate ids if your var.subnets.public.nat\_gateway\_configuration = "single\_az".<br><br>Example:<pre>natgw_id_per_az = {<br>  "us-east-1a" = {<br>    "id" = "nat-0fde39f9550f4abb5"<br>  }<br>  "us-east-1b" = {<br>    "id" = "nat-0fde39f9550f4abb5"<br>   }<br>}</pre> |

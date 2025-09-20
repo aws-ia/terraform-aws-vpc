@@ -29,14 +29,18 @@ No requirements.
 
 | Name | Type |
 |------|------|
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_nat_gateway.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/nat_gateway) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [aws_vpc.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_natgw_id_per_az"></a> [natgw\_id\_per\_az](#input\_natgw\_id\_per\_az) | use the modules natgw\_id\_per\_az | `map(map(string))` | n/a | yes |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | vpc id to create secondary cidr on | `string` | n/a | yes |
+| <a name="input_az_count"></a> [az\_count](#input\_az\_count) | az count | `number` | `1` | no |
+| <a name="input_natgw_id_per_az"></a> [natgw\_id\_per\_az](#input\_natgw\_id\_per\_az) | use the modules natgw\_id\_per\_az | `map(map(string))` | `null` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | vpc id to create secondary cidr on | `string` | `null` | no |
 
 ## Outputs
 

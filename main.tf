@@ -7,7 +7,8 @@ module "calculate_subnets" {
   cidr = local.cidr_block
   azs  = local.azs
 
-  subnets = var.subnets
+  subnets                     = var.subnets
+  optimize_subnet_cidr_ranges = var.optimize_subnet_cidr_ranges
 }
 
 module "calculate_subnets_ipv6" {
@@ -23,7 +24,7 @@ module "calculate_subnets_ipv6" {
 # flow logs optionally enabled by standalone resource
 #tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
 resource "aws_vpc" "main" {
-  count = local.create_vpc ? 1 : 0
+  count = var.create_vpc ? 1 : 0
 
   cidr_block                       = var.cidr_block
   ipv4_ipam_pool_id                = var.vpc_ipv4_ipam_pool_id
@@ -45,7 +46,7 @@ resource "aws_vpc" "main" {
 
 # ---------- SECONDARY IPv4 CIDR BLOCK (if configured) ----------
 resource "aws_vpc_ipv4_cidr_block_association" "secondary" {
-  count = (var.vpc_secondary_cidr && !local.create_vpc) ? 1 : 0
+  count = (var.vpc_secondary_cidr && !var.create_vpc) ? 1 : 0
 
   vpc_id            = var.vpc_id
   cidr_block        = local.cidr_block
@@ -62,7 +63,7 @@ resource "aws_subnet" "public" {
   cidr_block                                     = can(local.calculated_subnets["public"][each.key]) ? local.calculated_subnets["public"][each.key] : null
   ipv6_cidr_block                                = can(local.calculated_subnets_ipv6["public"][each.key]) ? local.calculated_subnets_ipv6["public"][each.key] : null
   ipv6_native                                    = contains(local.subnets_with_ipv6_native, "public") ? true : false
-  map_public_ip_on_launch                        = local.public_ipv6only ? null : true
+  map_public_ip_on_launch                        = try(var.subnets.public.map_public_ip_on_launch, local.public_ipv6only ? null : true)
   assign_ipv6_address_on_creation                = local.public_ipv6only || local.public_dualstack ? true : null
   enable_resource_name_dns_aaaa_record_on_launch = local.public_ipv6only || local.public_dualstack ? true : false
 
@@ -96,7 +97,7 @@ resource "aws_route_table_association" "public" {
 # Elastic IP - used in NAT gateways (if configured)
 resource "aws_eip" "nat" {
   for_each = toset(local.nat_configuration)
-  vpc      = true
+  domain   = "vpc"
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
@@ -129,7 +130,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = local.vpc.id
 
   tags = merge(
-    { Name = var.name },
+    { Name = "${var.name}-igw" },
     module.tags.tags_aws,
     try(module.subnet_tags["public"].tags_aws, {})
   )
@@ -419,6 +420,13 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw" {
   appliance_mode_support                          = try(var.subnets.transit_gateway.transit_gateway_appliance_mode_support, "disable")
   dns_support                                     = try(var.subnets.transit_gateway.transit_gateway_dns_support, "enable")
   ipv6_support                                    = local.tgw_dualstack ? "enable" : "disable"
+  security_group_referencing_support              = try(var.subnets.transit_gateway.transit_gateway_security_group_referencing_support, "enable")
+
+  tags = merge(
+    { Name = "${var.name}-vpc_attachment" },
+    module.tags.tags_aws,
+    try(module.subnet_tags["transit_gateway"].tags_aws, {})
+  )
 }
 
 # ---------- CORE NETWORK SUBNET CONFIGURATION ----------
@@ -484,7 +492,7 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
   tags = merge(
     { Name = "${var.name}-vpc_attachment" },
     module.tags.tags_aws,
-    module.subnet_tags["core_network"].tags_aws
+    try(module.subnet_tags["core_network"].tags_aws, {})
   )
 }
 
@@ -502,7 +510,7 @@ module "flow_logs" {
 
   source = "./modules/flow_logs"
 
-  name                = var.name
+  name                = local.log_name
   flow_log_definition = var.vpc_flow_logs
   vpc_id              = local.vpc.id
 

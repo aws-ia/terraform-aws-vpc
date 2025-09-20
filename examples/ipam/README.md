@@ -9,18 +9,21 @@ No requirements.
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ipam_base_for_example_only"></a> [ipam\_base\_for\_example\_only](#module\_ipam\_base\_for\_example\_only) | ../../test/hcl_fixtures/ipam_base | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [aws_vpc_ipam_pool.test](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc_ipam_pool) | data source |
 
 ## Inputs
 

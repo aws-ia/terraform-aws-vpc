@@ -30,6 +30,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "flow_logs" {
   rule {
     id = "transition"
 
+    filter {
+      prefix = var.lifecycle_filter_prefix
+    }
+
     transition {
       days          = 30
       storage_class = "STANDARD_IA"

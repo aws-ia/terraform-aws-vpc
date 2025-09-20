@@ -90,9 +90,7 @@ locals {
   # - get cidr block value from AWS IPAM
   # - create flow logs
 
-  # # if var.vpc_id is passed, assume create = `false` and cidr comes from data.aws_vpc
-  create_vpc = var.vpc_id == null ? true : false
-  vpc        = local.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
+  vpc        = var.create_vpc ? aws_vpc.main[0] : data.aws_vpc.main[0]
   cidr_block = var.cidr_block == null ? local.vpc.cidr_block : var.cidr_block
 
   create_flow_logs = (var.vpc_flow_logs == null || var.vpc_flow_logs.log_destination_type == "none") ? false : true
@@ -117,6 +115,8 @@ locals {
   # VPC LATTICE ############################################################
   # If var.vpc_lattice is defined (default = {}), the VPC association is created.
   lattice_association = length(keys(var.vpc_lattice)) > 0
+
+  log_name = var.vpc_flow_logs.name_override == "" ? var.name : var.vpc_flow_logs.name_override
 }
 
 data "aws_availability_zones" "current" {
@@ -156,7 +156,7 @@ data "aws_availability_zones" "current" {
 
 # search for existing vpc with var.vpc_id if not creating
 data "aws_vpc" "main" {
-  count = local.create_vpc ? 0 : 1
+  count = var.create_vpc ? 0 : 1
   id    = var.vpc_id
 }
 
@@ -165,14 +165,14 @@ data "aws_vpc" "main" {
 # awscc tags = module.tags.tags
 module "tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = var.tags
 }
 
 module "subnet_tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   for_each = local.subnet_keys_with_tags
 
@@ -181,7 +181,7 @@ module "subnet_tags" {
 
 module "vpc_lattice_tags" {
   source  = "aws-ia/label/aws"
-  version = "0.0.5"
+  version = "0.0.6"
 
   tags = try(var.vpc_lattice.tags, {})
 }

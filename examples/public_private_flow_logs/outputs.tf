@@ -1,7 +1,3 @@
-output "public_subnets" {
-  description = "Map of public subnet attributes grouped by az."
-  value       = module.vpc.public_subnet_attributes_by_az
-}
 
 output "private_subnets" {
   description = "Map of private subnet attributes grouped by az."
@@ -18,4 +14,14 @@ output "public_subnets_tags_length" {
 output "private_subnets_tags_length" {
   description = "Count of private subnet tags for a single az."
   value       = length(module.vpc.private_subnet_attributes_by_az["private/${data.aws_availability_zones.current.names[0]}"].tags)
+}
+
+output "log_name" {
+  description = "Name of the flow log."
+  value       = module.vpc.flow_log_attributes.tags["Name"]
+}
+
+output "vpc_attributes" {
+  description = "Output of all VPC attributes."
+  value       = module.vpc.vpc_attributes
 }

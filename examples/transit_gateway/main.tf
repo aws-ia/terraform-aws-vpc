@@ -20,8 +20,7 @@ resource "aws_ec2_managed_prefix_list" "example" {
 }
 
 module "vpc" {
-  source  = "aws-ia/vpc/aws"
-  version = ">= 4.2.0"
+  source = "../.."
 
   name                                 = "tgw"
   cidr_block                           = "10.0.0.0/16"
@@ -52,13 +51,14 @@ module "vpc" {
       assign_ipv6_cidr = true
     }
     transit_gateway = {
-      netmask                                         = 28
-      assign_ipv6_cidr                                = true
-      connect_to_public_natgw                         = true
-      transit_gateway_default_route_table_association = true
-      transit_gateway_default_route_table_propagation = true
-      transit_gateway_appliance_mode_support          = "enable"
-      transit_gateway_dns_support                     = "disable"
+      netmask                                            = 28
+      assign_ipv6_cidr                                   = true
+      connect_to_public_natgw                            = true
+      transit_gateway_default_route_table_association    = true
+      transit_gateway_default_route_table_propagation    = true
+      transit_gateway_appliance_mode_support             = "enable"
+      transit_gateway_dns_support                        = "disable"
+      transit_gateway_security_group_referencing_support = "enable"
 
       tags = {
         subnet_type = "tgw"

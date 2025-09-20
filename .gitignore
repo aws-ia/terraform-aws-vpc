@@ -40,3 +40,5 @@ terraform.rc
 
 go.mod
 go.sum
+
+tftest

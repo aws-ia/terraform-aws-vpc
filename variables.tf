@@ -15,6 +15,12 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "create_vpc" {
+  description = "Determines whether to create the VPC or not; defaults to enabling the creation."
+  default     = true
+  type        = bool
+}
+
 variable "az_count" {
   type        = number
   description = "Searches region for # of AZs to use and takes a slice based on count. Assume slice is sorted a-z. Required if `azs` is not provided."
@@ -25,6 +31,12 @@ variable "azs" {
   type        = list(string)
   description = "(Optional) A list of AZs to use. e.g. `azs = [\"us-east-1a\",\"us-east-1c\"]` Incompatible with `az_count`"
   default     = null
+}
+
+variable "azs" {
+  description = "A list of availability zones names"
+  type        = list(string)
+  default     = []
 }
 
 variable "vpc_enable_dns_hostnames" {
@@ -55,16 +67,6 @@ variable "vpc_instance_tenancy" {
   type        = string
   description = "The allowed tenancy of instances launched into the VPC."
   default     = "default"
-
-  /*
-  Note:
-  Updating InstanceTenancy requires no replacement only if you are updating its value from "dedicated" to "default". Updating InstanceTenancy from "default" to "dedicated" requires replacement.
-  */
-
-  validation {
-    condition     = var.vpc_instance_tenancy == "default" || var.vpc_instance_tenancy == "dedicated"
-    error_message = "Invalid input, options: \"default\", or \"dedicated\"."
-  }
 }
 
 variable "vpc_ipv4_ipam_pool_id" {
@@ -111,7 +113,7 @@ variable "vpc_egress_only_internet_gateway" {
 
 variable "subnets" {
   description = <<-EOF
-  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway", "core_network". Each Subnet type offers its own set of available arguments detailed below.
+  Configuration of subnets to build in VPC. 1 Subnet per AZ is created. Subnet types are defined as maps with the available keys: "private", "public", "transit_gateway", "core_network". Each Subnet type offers its own set of available arguments detailed below. Subnets are calculated in lexicographical order of the keys in the map.
 
   **Attributes shared across subnet types:**
   - `cidrs`            = (Optional|list(string)) **Cannot set if `netmask` is set.** List of IPv4 CIDRs to set to subnets. Count of CIDRs defined must match quantity of azs in `az_count`.
@@ -132,14 +134,16 @@ variable "subnets" {
   - `nat_gateway_configuration` = (Optional|string) Determines if NAT Gateways should be created and in how many AZs. Valid values = `"none"`, `"single_az"`, `"all_azs"`. Default = "none". Must also set `var.subnets.private.connect_to_public_natgw = true`.
   - `connect_to_igw`            = (Optional|bool) Determines if the default route (0.0.0.0/0 or ::/0) is created in the public subnets with destination the Internet gateway. Defaults to `true`.
   - `ipv6_native`               = (Optional|bool) Indicates whether to create an IPv6-ony subnet. Either `var.assign_ipv6_cidr` or `var.ipv6_cidrs` should be defined to allocate an IPv6 CIDR block.
+  - `map_public_ip_on_launch`   = (Optional|bool) Specify true to indicate that instances launched into the subnet should be assigned a public IP address. Default to `false`.
 
   **transit_gateway subnet type options:**
   - All shared keys above
-  - `connect_to_public_natgw`                         = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `transit_gateway_default_route_table_association` = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
-  - `transit_gateway_default_route_table_propagation` = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
-  - `transit_gateway_appliance_mode_support`          = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
-  - `transit_gateway_dns_support`                     = (Optional|string) DNS Support is used if you need the VPC to resolve public IPv4 DNS host names to private IPv4 addresses when queried from instances in another VPC attached to the transit gateway. Valid values: `enable` (default) and `disable`.
+  - `connect_to_public_natgw`                            = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `transit_gateway_default_route_table_association`    = (Optional|bool) Boolean whether the VPC Attachment should be associated with the EC2 Transit Gateway association default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
+  - `transit_gateway_default_route_table_propagation`    = (Optional|bool) Boolean whether the VPC Attachment should propagate routes with the EC2 Transit Gateway propagation default route table. This cannot be configured or perform drift detection with Resource Access Manager shared EC2 Transit Gateways.
+  - `transit_gateway_appliance_mode_support`             = (Optional|string) Whether Appliance Mode is enabled. If enabled, a traffic flow between a source and a destination uses the same Availability Zone for the VPC attachment for the lifetime of that flow. Valid values: `disable` (default) and `enable`.
+  - `transit_gateway_dns_support`                        = (Optional|string) DNS Support is used if you need the VPC to resolve public IPv4 DNS host names to private IPv4 addresses when queried from instances in another VPC attached to the transit gateway. Valid values: `enable` (default) and `disable`.
+  - `transit_gateway_security_group_referencing_support` = (Optional|string) Security group referencing support enables you to simplify Security group management and control of instance-to-instance traffic across VPCs that are connected by Transit gateway. Valid values: `disable` and `enable` (default).
 
   **core_network subnet type options:**
   - All shared keys abovce
@@ -202,13 +206,14 @@ EOF
       "ipv6_native",
       "assign_ipv6_cidr",
       "ipv6_cidrs",
+      "map_public_ip_on_launch",
       "tags"
     ])) == 0
   }
 
   # All var.subnets.transit_gateway valid keys
   validation {
-    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"tags\"."
+    error_message = "Invalid key in transit_gateway subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"transit_gateway_default_route_table_association\", \"transit_gateway_default_route_table_propagation\", \"transit_gateway_appliance_mode_support\", \"transit_gateway_dns_support\", \"transit_gateway_security_group_referencing_support\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.transit_gateway, {})), [
       "cidrs",
       "netmask",
@@ -220,6 +225,7 @@ EOF
       "transit_gateway_default_route_table_propagation",
       "transit_gateway_appliance_mode_support",
       "transit_gateway_dns_support",
+      "transit_gateway_security_group_referencing_support",
       "tags"
     ])) == 0
   }
@@ -257,6 +263,12 @@ EOF
   }
 }
 
+variable "optimize_subnet_cidr_ranges" {
+  description = "Sort subnets to calculate by their netmask to efficiently use IP space."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags to apply to all resources."
   type        = map(string)
@@ -267,19 +279,28 @@ variable "vpc_flow_logs" {
   description = "Whether or not to create VPC flow logs and which type. Options: \"cloudwatch\", \"s3\", \"none\". By default creates flow logs to `cloudwatch`. Variable overrides null value types for some keys, defined in defaults.tf."
 
   type = object({
+    name_override   = optional(string, "")
     log_destination = optional(string)
     iam_role_arn    = optional(string)
     kms_key_id      = optional(string)
 
-    log_destination_type = string
-    retention_in_days    = optional(number)
-    tags                 = optional(map(string))
-    traffic_type         = optional(string, "ALL")
+    log_destination_type               = string
+    log_format                         = optional(string)
+    retention_in_days                  = optional(number)
+    log_bucket_lifecycle_filter_prefix = optional(string, null)
+    tags                               = optional(map(string))
+    traffic_type                       = optional(string, "ALL")
+
     destination_options = optional(object({
       file_format                = optional(string, "plain-text")
       hive_compatible_partitions = optional(bool, false)
       per_hour_partition         = optional(bool, false)
-    }))
+      }),
+      {
+        file_format                = "plain-text"
+        hive_compatible_partitions = false
+        per_hour_partition         = false
+    })
   })
 
   default = {
@@ -384,8 +405,8 @@ variable "vpc_lattice" {
   Amazon VPC Lattice Service Network VPC association. You can only associate one Service Network to the VPC. This association also support Security Groups (more than 1).
   This variable expects the following attributes:
   - `service_network_identifier` = (Required|string) The ID or ARN of the Service Network to associate. You must use the ARN if the Service Network and VPC resources are in different AWS Accounts.
-  - `security_group_ids          = (Optional|list(string)) The IDs of the security groups to attach to the association.
-  - `tags` =                     = (Optional|map(string)) Tags to set on the Lattice VPC association resource.
+  - `security_group_ids`         = (Optional|list(string)) The IDs of the security groups to attach to the association.
+  - `tags`                       = (Optional|map(string)) Tags to set on the Lattice VPC association resource.
 EOF
   type        = any
 
