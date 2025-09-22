@@ -6,7 +6,7 @@ data "aws_availability_zones" "current" {
 }
 
 module "vpc" {
-  source  = "../.."
+  source = "../.."
 
   name                        = "sorted-subnets"
   cidr_block                  = var.vpc_cidr
