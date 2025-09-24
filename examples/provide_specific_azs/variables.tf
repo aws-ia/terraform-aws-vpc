@@ -1,3 +1,11 @@
+
+variable "aws_region" {
+  description = "AWS Region."
+  type        = string
+
+  default = "us-east-1"
+}
+
 variable "azs" {
   type        = list(string)
   description = "A list of AZs to use. e.g. `azs = [\"us-east-1a\",\"us-east-1c\"]` Incompatible with `az_count`"

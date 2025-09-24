@@ -30,12 +30,6 @@ variable "az_count" {
 variable "azs" {
   type        = list(string)
   description = "(Optional) A list of AZs to use. e.g. `azs = [\"us-east-1a\",\"us-east-1c\"]` Incompatible with `az_count`"
-  default     = null
-}
-
-variable "azs" {
-  description = "A list of availability zones names"
-  type        = list(string)
   default     = []
 }
 

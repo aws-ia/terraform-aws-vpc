@@ -8,7 +8,10 @@ This example shows how you can use this module to deploy a VPC defining a list o
 
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
 
 ## Providers
 
@@ -28,7 +31,8 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_azs"></a> [azs](#input\_azs) | A list of AZs to use. e.g. `azs = ["us-east-1a","us-east-1c"]` Incompatible with `az_count` | `list(string)` | <pre>[<br>  "us-east-1a",<br>  "us-east-1c"<br>]</pre> | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"us-east-1"` | no |
+| <a name="input_azs"></a> [azs](#input\_azs) | A list of AZs to use. e.g. `azs = ["us-east-1a","us-east-1c"]` Incompatible with `az_count` | `list(string)` | <pre>[<br/>  "us-east-1a",<br/>  "us-east-1c"<br/>]</pre> | no |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | IPv4 CIDR range to assign to VPC if creating VPC or to associate as a secondary IPv6 CIDR. Overridden by var.vpc\_id output from data.aws\_vpc. | `string` | `"10.0.0.0/16"` | no |
 
 ## Outputs
