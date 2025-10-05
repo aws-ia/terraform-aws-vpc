@@ -1,85 +1,40 @@
-# Developer Documentation
+# Contributing Guidelines
 
-## Outputs Methodology
+Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional
+documentation, we greatly value feedback and contributions from our community.
 
-This module organizes outputs by creating output collections of grouped entire resources. The benefit of this is that, most likely, attributes users want access to are already present without having to create new `output {}` for each possible attribute. The [potential] downside is that you will have to extract it yourself using HCL logic. See the [outputs.tf](https://github.com/aws-ia/terraform-aws-vpc/outputs.tf) for examples.
-
-Our naming convetion attempts to make the output content clear. `route_table_attributes_by_type_by_az` is a nested map of route table resource attributes grouped by their subnet type then by the az.  Example:
-```terraform
-route_table_attributes_by_type_by_az = {
-  "private" = {
-    "us-east-1a" = {
-      "id" = "rtb-0e77040c0598df003"
-      "route_table_id" = "rtb-0e77040c0598df003"
-      "tags" = tolist([
-        {
-          "key" = "Name"
-          "value" = "private-us-east-1a"
-        },
-      ])
-      "vpc_id" = "vpc-033e054f49409592a"
-    }
-    "us-east-1b" = {
-      ...
-    }
-  "public" = { ... }
-```
-
-## Adding new subnet types
-
-*Note: All subnet types **MUST** accept both `cidrs` and `netmask` arguments.*
-
-1. Updates to variables.tf
-
-    1. Add new to `subnets` key variable validation:
-
-        ```terraform
-        validation {
-          error_message = "Only valid key values \"public\", \"private\", or \"transit_gateway\"."
-          condition = length(setsubtract(keys(var.subnets), [
-            "public",
-            "private",
-            "transit_gateway",
-            "<new type here>"
-          ])) == 0
-        }
-        ```
-
-    1. Specify keys allowed in new variable type map. Copy an existing one and edit the keys to match what you expect users to input:
-
-        ```terraform
-        # All var.subnets.public valid keys
-        validation {
-          error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"nat_gateway_configuration\", \"tags\"."
-          condition = length(setsubtract(keys(try(var.subnets.public, {})), [
-              "cidrs",
-              "netmask",
-              "name_prefix",
-              "nat_gateway_configuration",
-              "tags"
-          ])) == 0
-        }
-        ```
-
-   1. Include in description:
-
-      ```terraform
-        **private subnet type options:**
-          - All shared keys above
-          - `connect_to_public_natgw`  = (Optional|bool) <>
-      ```
-
-2. Write configuration code
-
-*Note: each for_each loop must account for if a user does not want to create the particular subnet type. Follow examples from other subnet types in main.tf*
-
-    * Create new `aws_subnet`
-    * Create new `aws_route_table`
-    * Create new `aws_route_table_association`
-    * Consider and create appropriate `aws_route`
+Please read through this document before submitting any issues or pull requests to ensure we have all the necessary
+information to effectively respond to your bug report or contribution.
 
 
-3. Create appropriate outputs
+## Reporting Bugs/Feature Requests
 
-    1. `output "<new subnet type>_subnet_attributes_by_az"`
-    1. add new type to `route_table_attributes_by_type_by_az`
+We welcome you to use the GitHub issue tracker to report bugs or suggest features.
+
+When filing an issue, please check existing open, or recently closed, issues to make sure somebody else hasn't already
+reported the issue. Please try to include as much information as you can. Details like these are incredibly useful:
+
+* A reproducible test case or series of steps
+* The version of our code being used
+* Any modifications you've made relevant to the bug
+* Anything unusual about your environment or deployment
+
+
+## Contributing via Pull Requests
+Contributions via pull requests are much appreciated. Before sending us a pull request, please ensure that:
+
+1. You are working against the latest source on the *master* branch.
+2. You check existing open, and recently merged, pull requests to make sure someone else hasn't addressed the problem already.
+3. You open an issue to discuss any significant work - we would hate for your time to be wasted.
+
+To send us a pull request, please:
+
+1. Fork the repository.
+2. Modify the source; please focus on the specific change you are contributing. If you also reformat all the code, it will be hard for us to focus on your change.
+3. Ensure local tests pass.
+4. Commit to your fork using clear commit messages.
+5. Send us a pull request, answering any default questions in the pull request interface.
+6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the conversation.
+
+GitHub provides additional document on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
+[creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
