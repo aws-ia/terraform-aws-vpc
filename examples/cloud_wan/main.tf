@@ -1,11 +1,10 @@
 
-# VPC module (North Virginia)
+# ---------- AMAZON VPC (North Virginia) ----------
 module "nvirginia_vpc" {
-  source = "../.."
-
+  source    = "../.."
   providers = { aws = aws.awsnvirginia }
 
-  name                                 = "nvirginia-vpc"
+  name                                 = "cwan-nvirginia-vpc"
   cidr_block                           = "10.0.0.0/24"
   vpc_assign_generated_ipv6_cidr_block = true
   az_count                             = 2
@@ -39,13 +38,12 @@ module "nvirginia_vpc" {
   }
 }
 
-# VPC module (Ireland)
+# ---------- AMAZON VPC (Ireland) ----------
 module "ireland_vpc" {
-  source = "../.."
-
+  source    = "../.."
   providers = { aws = aws.awsireland }
 
-  name                                 = "ireland-vpc"
+  name                                 = "cwan-ireland-vpc"
   cidr_block                           = "10.0.1.0/24"
   vpc_assign_generated_ipv6_cidr_block = true
   az_count                             = 2
@@ -77,14 +75,15 @@ module "ireland_vpc" {
   }
 }
 
-# Global Network
+# ---------- AWS CLOUD WAN RESOURCES ----------
+# Global network
 resource "aws_networkmanager_global_network" "global_network" {
   provider = aws.awsnvirginia
 
   description = "Global Network - VPC module"
 }
 
-# Core Network
+# Core network
 resource "aws_networkmanager_core_network" "core_network" {
   provider = aws.awsnvirginia
 

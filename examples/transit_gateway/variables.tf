@@ -1,14 +1,14 @@
 
 variable "aws_region" {
-  description = "AWS Regions to create in Cloud WAN's core network."
+  description = "AWS Region."
   type        = string
 
-  default = "eu-west-2"
+  default = "eu-west-1"
 }
 
 variable "prefixes" {
   type        = map(string)
-  description = "(optional) describe your variable"
+  description = "IPv4 prefixes."
 
   default = {
     primary  = "10.0.0.0/8",

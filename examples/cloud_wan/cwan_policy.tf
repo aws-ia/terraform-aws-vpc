@@ -5,12 +5,12 @@ data "aws_networkmanager_core_network_policy_document" "policy" {
     asn_ranges       = ["64515-64520"]
 
     edge_locations {
-      location = var.cloud_wan_regions.nvirginia
+      location = var.aws_regions.nvirginia
       asn      = 64515
     }
 
     edge_locations {
-      location = var.cloud_wan_regions.ireland
+      location = var.aws_regions.ireland
       asn      = 64516
     }
   }
@@ -32,32 +32,12 @@ data "aws_networkmanager_core_network_policy_document" "policy" {
     condition_logic = "or"
 
     conditions {
-      type     = "tag-value"
-      operator = "equals"
-      key      = "env"
-      value    = "prod"
+      type = "tag-exists"
+      key  = "env"
     }
-
     action {
-      association_method = "constant"
-      segment            = "prod"
-    }
-  }
-
-  attachment_policies {
-    rule_number     = 200
-    condition_logic = "or"
-
-    conditions {
-      type     = "tag-value"
-      operator = "equals"
-      key      = "env"
-      value    = "nonprod"
-    }
-
-    action {
-      association_method = "constant"
-      segment            = "nonprod"
+      association_method = "tag"
+      tag_value_of_key   = "env"
     }
   }
 }
