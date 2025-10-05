@@ -30,6 +30,7 @@ module "secondary" {
 
   vpc_secondary_cidr = true
   vpc_id             = data.aws_vpc.selected.id
+  vpc_arn            = data.aws_vpc.selected.arn
 
   vpc_secondary_cidr_natgw = {
     "${data.aws_region.current.name}a" = {

@@ -15,6 +15,12 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_arn" {
+  description = "VPC ARN to use if not creating VPC."
+  default     = null
+  type        = string
+}
+
 variable "create_vpc" {
   description = "Determines whether to create the VPC or not; defaults to enabling the creation."
   default     = true

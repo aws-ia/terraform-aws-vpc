@@ -482,7 +482,7 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
 
   core_network_id = var.core_network.id
   subnet_arns     = values(aws_subnet.cwan)[*].arn
-  vpc_arn         = local.vpc.arn
+  vpc_arn         = local.vpc_arn
 
   options {
     ipv6_support           = local.cwan_dualstack ? true : false
