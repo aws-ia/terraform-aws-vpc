@@ -30,7 +30,7 @@ variable "az_count" {
 variable "azs" {
   type        = list(string)
   description = "(Optional) A list of AZs to use. e.g. `azs = [\"us-east-1a\",\"us-east-1c\"]` Incompatible with `az_count`"
-  default     = []
+  default     = null
 }
 
 variable "vpc_enable_dns_hostnames" {
