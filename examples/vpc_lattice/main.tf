@@ -1,33 +1,25 @@
 
-# VPC module
+# ---------- AMAZON VPC ----------
 module "vpc" {
   source = "../.."
 
-  name       = "tgw"
+  name       = "vpclattice-example-vpc"
   cidr_block = "10.0.0.0/24"
   az_count   = 2
+
+  vpc_assign_generated_ipv6_cidr_block = true
 
   vpc_lattice = {
     service_network_identifier = aws_vpclattice_service_network.service_network.id
     security_group_ids         = [aws_security_group.security_group.id]
-    tags = {
-      vpc_lattice = true
-    }
   }
 
   subnets = {
-    workload = { netmask = 28 }
+    workload = {
+      netmask          = 28
+      assign_ipv6_cidr = true
+    }
   }
-
-  tags = {
-    vpc_module = true
-  }
-}
-
-# VPC Lattice Service Network
-resource "aws_vpclattice_service_network" "service_network" {
-  name      = "example-service-network"
-  auth_type = "NONE"
 }
 
 # Security Group
@@ -69,7 +61,8 @@ resource "aws_security_group" "security_group" {
   }
 }
 
-
-
-
-
+# ---------- VPC LATTICE SERVICE NETWORK ----------
+resource "aws_vpclattice_service_network" "service_network" {
+  name      = "example-service-network"
+  auth_type = "NONE"
+}

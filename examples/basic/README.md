@@ -1,7 +1,16 @@
 <!-- BEGIN_TF_DOCS -->
-# Create VPC with a CIDR from AWS IPAM
+# VPC module - Example: Basic VPC
 
-This example builds a VPC with a CIDR block from AWS IPAM. It builds public and private subnets in 3 availability zones, creates a nat gateway in each AZ and appropriately routes from each private to the nat gateway.
+This example builds an Amazon VPC with basic functionality:
+
+* Dual-stack VPC (IPv4 & IPv6)
+    * Egress-only Internet gateway configured.
+* 4 VPC subnets - 1 public (dual-stack), 3 private (IPv4-only, dual-stack, and IPv6-only)
+    * NAT gateways placed in all the public subnets.
+* Flow logs enabled (destination Amazon CloudWatch)
+* Routing:
+    * IPv4 egress enabled in public subnets (through Internet gateway) and private subnets (through NAT gateways)
+    * IPv6 egress enabled in private subnets (through Egress-only Internet gateway)
 
 ## Requirements
 
@@ -18,7 +27,6 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ipam"></a> [ipam](#module\_ipam) | aws-ia/ipam/aws | >= 2.0.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
 
 ## Resources

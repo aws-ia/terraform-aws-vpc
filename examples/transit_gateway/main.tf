@@ -1,13 +1,16 @@
+
 data "aws_availability_zones" "current" {}
 
-resource "aws_ec2_transit_gateway" "example" {
+# ---------- AWS TRANSIT GATEWAY ----------
+resource "aws_ec2_transit_gateway" "tgw" {
   description = "example"
 }
 
-resource "aws_ec2_managed_prefix_list" "example" {
+# ---------- MANAGED PREFIX LIST ----------
+resource "aws_ec2_managed_prefix_list" "prefix_list" {
   name           = "All VPC CIDR-s"
   address_family = "IPv4"
-  max_entries    = 5
+  max_entries    = length(var.prefixes)
 
   dynamic "entry" {
     for_each = var.prefixes
@@ -19,33 +22,26 @@ resource "aws_ec2_managed_prefix_list" "example" {
   }
 }
 
+# ---------- AMAZON VPC ----------
 module "vpc" {
   source = "../.."
 
-  name                                 = "tgw"
+  name                                 = "tgw-example-vpc"
   cidr_block                           = "10.0.0.0/16"
   vpc_assign_generated_ipv6_cidr_block = true
   az_count                             = 2
 
-  transit_gateway_id = aws_ec2_transit_gateway.example.id
+  transit_gateway_id = aws_ec2_transit_gateway.tgw.id
   transit_gateway_routes = {
-    public              = "10.0.0.0/8"
-    private_with_egress = "192.168.0.0/16"
-    private_dualstack   = aws_ec2_managed_prefix_list.example.id
+    private_ipv4      = "192.168.0.0/16"
+    private_dualstack = aws_ec2_managed_prefix_list.prefix_list.id
   }
   transit_gateway_ipv6_routes = {
     private_dualstack = "::/0"
   }
 
   subnets = {
-    public = {
-      netmask                   = 24
-      nat_gateway_configuration = "single_az"
-    }
-    private_with_egress = {
-      netmask                 = 24
-      connect_to_public_natgw = true
-    }
+    private_ipv4 = { netmask = 28 }
     private_dualstack = {
       netmask          = 24
       assign_ipv6_cidr = true
@@ -53,16 +49,11 @@ module "vpc" {
     transit_gateway = {
       netmask                                            = 28
       assign_ipv6_cidr                                   = true
-      connect_to_public_natgw                            = true
-      transit_gateway_default_route_table_association    = true
-      transit_gateway_default_route_table_propagation    = true
+      transit_gateway_default_route_table_association    = false
+      transit_gateway_default_route_table_propagation    = false
       transit_gateway_appliance_mode_support             = "enable"
       transit_gateway_dns_support                        = "disable"
       transit_gateway_security_group_referencing_support = "enable"
-
-      tags = {
-        subnet_type = "tgw"
-      }
     }
   }
 }

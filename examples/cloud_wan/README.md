@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-# Creating AWS Cloud WAN's VPC attachment
+# VPC module - Example: AWS Cloud WAN connectivity
 
 This example shows how you can use this module with `core_network` subnets, and AWS Cloud WAN's VPC attachment. This examples creates the following:
 
@@ -43,14 +43,9 @@ This example shows how you can use this module with `core_network` subnets, and 
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cloud_wan_regions"></a> [cloud\_wan\_regions](#input\_cloud\_wan\_regions) | AWS Regions to create in Cloud WAN's core network. | <pre>object({<br>    nvirginia = string<br>    ireland   = string<br>  })</pre> | <pre>{<br>  "ireland": "eu-west-1",<br>  "nvirginia": "us-east-1"<br>}</pre> | no |
+| <a name="input_aws_regions"></a> [aws\_regions](#input\_aws\_regions) | AWS Regions to create in Cloud WAN's core network. | <pre>object({<br/>    nvirginia = string<br/>    ireland   = string<br/>  })</pre> | <pre>{<br/>  "ireland": "eu-west-1",<br/>  "nvirginia": "us-east-1"<br/>}</pre> | no |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_core_network"></a> [core\_network](#output\_core\_network) | Core Network ID. |
-| <a name="output_core_network_vpc_attachments"></a> [core\_network\_vpc\_attachments](#output\_core\_network\_vpc\_attachments) | Core Network VPC attachments. |
-| <a name="output_global_network"></a> [global\_network](#output\_global\_network) | Global Network ID. |
-| <a name="output_vpcs"></a> [vpcs](#output\_vpcs) | VPCs created. |
+No outputs.
 <!-- END_TF_DOCS -->
