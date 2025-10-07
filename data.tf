@@ -100,8 +100,6 @@ locals {
   # Checking if public subnets are dual-stack or IPv6-only
   public_ipv6only  = can(var.subnets.public.ipv6_native)
   public_dualstack = !local.public_ipv6only && (can(var.subnets.public.assign_ipv6_cidr) || can(var.subnets.public.ipv6_cidrs))
-  private_ipv6only  = can(var.subnets.private.ipv6_native)
-  private_dualstack = !local.private_ipv6only && (can(var.subnets.private.assign_ipv6_cidr) || can(var.subnets.private.ipv6_cidrs))
   # Checking if transit_gateway subnets are dual-stack
   tgw_dualstack = (can(var.subnets.transit_gateway.assign_ipv6_cidr) || can(var.subnets.transit_gateway.ipv6_cidrs))
   # Checking if core_network subnets are dual-stack
