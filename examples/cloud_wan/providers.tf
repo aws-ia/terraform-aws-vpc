@@ -11,13 +11,13 @@ terraform {
 
 # Provider definition for N. Virginia Region
 provider "aws" {
-  region = var.cloud_wan_regions.nvirginia
+  region = var.aws_regions.nvirginia
   alias  = "awsnvirginia"
 }
 
 # Provider definition for Ireland Region
 provider "aws" {
-  region = var.cloud_wan_regions.ireland
+  region = var.aws_regions.ireland
   alias  = "awsireland"
 }
 

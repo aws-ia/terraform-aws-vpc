@@ -1,5 +1,5 @@
 
-variable "cloud_wan_regions" {
+variable "aws_regions" {
   description = "AWS Regions to create in Cloud WAN's core network."
   type = object({
     nvirginia = string

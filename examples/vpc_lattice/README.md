@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Creating Amazon VPC Lattice Service Network VPC Assocation
+# VPC module - Example: Amazon VPC Lattice
 
-This example shows how you can use this module to create a [VPC Lattice]() Service Network VPC association. The example creates:
+This example shows how you can use this module to create an [Amazon VPC Lattice](https://aws.amazon.com/vpc/lattice/) Service Network VPC association. The example creates:
 
 * VPC Lattice Service Network.
 * Security Group (allowing HTTP and HTTPS traffic from the local CIDR). Used to attach it to the VPC Lattice association
@@ -43,7 +43,5 @@ This example shows how you can use this module to create a [VPC Lattice]() Servi
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_vpc_lattice_service_network_association"></a> [vpc\_lattice\_service\_network\_association](#output\_vpc\_lattice\_service\_network\_association) | VPC Lattice Service Network VPC association. |
+No outputs.
 <!-- END_TF_DOCS -->
