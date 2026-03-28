@@ -131,6 +131,27 @@ output "rt_attributes_by_type_by_az" {
 EOF
 }
 
+output "eip_attributes_by_az" {
+  value       = try(aws_eip.nat, null)
+  description = <<-EOF
+  Map of Elastic IP resource attributes by Availability Zone. Useful for retrieving
+  the allocated public IP addresses of NAT Gateway EIPs, including when BYOIP is used.
+
+  Example:
+  ```
+  eip_attributes_by_az = {
+    "us-east-1a" = {
+      "id"               = "eipalloc-0e8b20303eea88b13"
+      "public_ip"        = "203.0.113.1"
+      "public_ipv4_pool" = "ipv4pool-ec2-xxxxxxxxxxxxxxxxx"
+      "domain"           = "vpc"
+      ...
+    }
+  }
+  ```
+EOF
+}
+
 output "nat_gateway_attributes_by_az" {
   value       = try(aws_nat_gateway.main, null)
   description = <<-EOF

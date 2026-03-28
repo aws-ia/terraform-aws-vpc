@@ -51,6 +51,54 @@ variable "vpc_secondary_cidr_natgw" {
   default     = {}
 }
 
+variable "nat_gateway_eip_options" {
+  description = <<-EOF
+  (Optional) Advanced options for Elastic IPs allocated to NAT Gateways.
+  Use this to configure BYOIP (Bring Your Own IP) pools for NAT Gateway egress.
+
+  Attributes:
+  - `public_ipv4_pool`  : (Optional) ID of an EC2 IPv4 address pool. For BYOIP, provide the
+                          pool ID returned by `aws ec2 describe-public-ipv4-pools`
+                          (e.g. `"ipv4pool-ec2-xxxxxxxxxxxxxxxxx"`). Leave null to use
+                          Amazon's default pool.
+  - `addresses_per_az`  : (Optional) Map of Availability Zone name to a specific IPv4 address
+                          to allocate from the pool. Use this to assign deterministic,
+                          per-AZ IPs from a BYOIP block.
+                          Example: `{ "us-east-1a" = "203.0.113.1", "us-east-1b" = "203.0.113.2" }`
+                          Addresses must already belong to the pool specified in `public_ipv4_pool`.
+                          AZs omitted from the map will receive any available address from the pool.
+
+  If this variable is not set (default), EIPs are allocated from Amazon's standard pool,
+  which is the existing behavior — fully backward compatible.
+
+  Example (BYOIP with per-AZ addresses):
+  ```
+  nat_gateway_eip_options = {
+    public_ipv4_pool = "ipv4pool-ec2-xxxxxxxxxxxxxxxxx"
+    addresses_per_az = {
+      "us-east-1a" = "203.0.113.1"
+      "us-east-1b" = "203.0.113.2"
+      "us-east-1c" = "203.0.113.3"
+    }
+  }
+  ```
+
+  Example (BYOIP pool only, AWS picks addresses):
+  ```
+  nat_gateway_eip_options = {
+    public_ipv4_pool = "ipv4pool-ec2-xxxxxxxxxxxxxxxxx"
+  }
+  ```
+  EOF
+
+  type = object({
+    public_ipv4_pool = optional(string)
+    addresses_per_az = optional(map(string), {})
+  })
+
+  default = null
+}
+
 variable "vpc_enable_dns_support" {
   type        = bool
   description = "Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range \"plus two\" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default."
