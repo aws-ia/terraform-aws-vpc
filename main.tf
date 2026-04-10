@@ -95,9 +95,18 @@ resource "aws_route_table_association" "public" {
 }
 
 # Elastic IP - used in NAT gateways (if configured)
+# Supports BYOIP via var.subnets.public.nat_gateway_eip_allocation: set public_ipv4_pool
+# and/or eip_addresses to allocate EIPs from a customer-owned IPv4 pool.
+# When nat_gateway_eip_allocation is not set (default), behaviour is unchanged.
 resource "aws_eip" "nat" {
   for_each = toset(local.nat_configuration)
   domain   = "vpc"
+
+  # BYOIP: optionally allocate from a specific pool and/or pin to a specific address.
+  # Both attributes are null when nat_gateway_eip_allocation is not set in public subnets,
+  # which preserves the existing default-pool behaviour.
+  public_ipv4_pool = try(var.subnets.public.nat_gateway_eip_allocation.public_ipv4_pool, null)
+  address          = try(var.subnets.public.nat_gateway_eip_allocation.eip_addresses[index(local.nat_configuration, each.key)], null)
 
   tags = merge(
     { Name = "nat-${local.subnet_names["public"]}-${each.key}" },
