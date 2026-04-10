@@ -51,54 +51,6 @@ variable "vpc_secondary_cidr_natgw" {
   default     = {}
 }
 
-variable "nat_gateway_eip_options" {
-  description = <<-EOF
-  (Optional) Advanced options for Elastic IPs allocated to NAT Gateways.
-  Use this to configure BYOIP (Bring Your Own IP) pools for NAT Gateway egress.
-
-  Attributes:
-  - `public_ipv4_pool`  : (Optional) ID of an EC2 IPv4 address pool. For BYOIP, provide the
-                          pool ID returned by `aws ec2 describe-public-ipv4-pools`
-                          (e.g. `"ipv4pool-ec2-xxxxxxxxxxxxxxxxx"`). Leave null to use
-                          Amazon's default pool.
-  - `addresses_per_az`  : (Optional) Map of Availability Zone name to a specific IPv4 address
-                          to allocate from the pool. Use this to assign deterministic,
-                          per-AZ IPs from a BYOIP block.
-                          Example: `{ "us-east-1a" = "203.0.113.1", "us-east-1b" = "203.0.113.2" }`
-                          Addresses must already belong to the pool specified in `public_ipv4_pool`.
-                          AZs omitted from the map will receive any available address from the pool.
-
-  If this variable is not set (default), EIPs are allocated from Amazon's standard pool,
-  which is the existing behavior — fully backward compatible.
-
-  Example (BYOIP with per-AZ addresses):
-  ```
-  nat_gateway_eip_options = {
-    public_ipv4_pool = "ipv4pool-ec2-xxxxxxxxxxxxxxxxx"
-    addresses_per_az = {
-      "us-east-1a" = "203.0.113.1"
-      "us-east-1b" = "203.0.113.2"
-      "us-east-1c" = "203.0.113.3"
-    }
-  }
-  ```
-
-  Example (BYOIP pool only, AWS picks addresses):
-  ```
-  nat_gateway_eip_options = {
-    public_ipv4_pool = "ipv4pool-ec2-xxxxxxxxxxxxxxxxx"
-  }
-  ```
-  EOF
-
-  type = object({
-    public_ipv4_pool = optional(string)
-    addresses_per_az = optional(map(string), {})
-  })
-
-  default = null
-}
-
 variable "vpc_enable_dns_support" {
   type        = bool
   description = "Indicates whether the DNS resolution is supported for the VPC. If enabled, queries to the Amazon provided DNS server at the 169.254.169.253 IP address, or the reserved IP address at the base of the VPC network range \"plus two\" succeed. If disabled, the Amazon provided DNS service in the VPC that resolves public DNS hostnames to IP addresses is not enabled. Enabled by default."
@@ -177,6 +129,10 @@ variable "subnets" {
   - `connect_to_igw`            = (Optional|bool) Determines if the default route (0.0.0.0/0 or ::/0) is created in the public subnets with destination the Internet gateway. Defaults to `true`.
   - `ipv6_native`               = (Optional|bool) Indicates whether to create an IPv6-ony subnet. Either `var.assign_ipv6_cidr` or `var.ipv6_cidrs` should be defined to allocate an IPv6 CIDR block.
   - `map_public_ip_on_launch`   = (Optional|bool) Specify true to indicate that instances launched into the subnet should be assigned a public IP address. Default to `false`.
+  - `nat_gateway_eip_allocation` = (Optional|object) Advanced EIP allocation options for NAT Gateways. Use to configure BYOIP (Bring Your Own IP) pools.
+                                    Attributes: `public_ipv4_pool` (Optional|string) EC2 IPv4 address pool ID (e.g. `"ipv4pool-ec2-xxxxxxxxxxxxxxxxx"`).
+                                    `eip_addresses` (Optional|list(string)) List of IPv4 addresses to allocate, one per AZ in the same order as the module's AZ list.
+                                    Must match the number of AZs when `nat_gateway_configuration = "all_azs"`, or provide a single address when `"single_az"`.
 
   **transit_gateway subnet type options:**
   - All shared keys above
@@ -202,6 +158,11 @@ variable "subnets" {
       netmask                   = 24
       assign_ipv6_cidr          = true
       nat_gateway_configuration = "single_az"
+      # Optional: BYOIP EIP allocation for NAT Gateways
+      # nat_gateway_eip_allocation = {
+      #   public_ipv4_pool = "ipv4pool-ec2-xxxxxxxxxxxxxxxxx"
+      #   eip_addresses    = ["203.0.113.1", "203.0.113.2", "203.0.113.3"] # one per AZ, in AZ order
+      # }
     }
     # IPv4 only subnet
     private = {
@@ -238,13 +199,14 @@ EOF
 
   # All var.subnets.public valid keys
   validation {
-    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_igw\", \"nat_gateway_configuration\", \"ipv6_native\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"tags\"."
+    error_message = "Invalid key in public subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_igw\", \"nat_gateway_configuration\", \"nat_gateway_eip_allocation\", \"ipv6_native\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.public, {})), [
       "cidrs",
       "netmask",
       "name_prefix",
       "connect_to_igw",
       "nat_gateway_configuration",
+      "nat_gateway_eip_allocation",
       "ipv6_native",
       "assign_ipv6_cidr",
       "ipv6_cidrs",
