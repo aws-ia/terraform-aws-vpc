@@ -477,6 +477,19 @@ resource "aws_route" "cwan_to_nat" {
 }
 
 # AWS Cloud WAN's Core Network VPC attachment
+#
+# `vpc_arn` is sourced via the data block (`data.aws_vpc.main[0].arn`) when
+# attaching to an externally-managed VPC. The Terraform planner can mark the
+# entire data-source object as `(known after apply)` whenever an unrelated
+# attribute of the VPC is updated, which in turn marks `vpc_arn` as changing
+# and forces this attachment to be replaced. Replacement here is destructive
+# -- it disconnects the VPC from the Cloud WAN core network and (when the
+# core network requires acceptance) needs manual re-approval. Ignoring drift
+# on `vpc_arn` is safe: an attached VPC's ARN cannot meaningfully change in
+# place; a different VPC would require deleting and recreating the
+# attachment intentionally.
+#
+# Resolves https://github.com/aws-ia/terraform-aws-vpc/issues/162.
 resource "aws_networkmanager_vpc_attachment" "cwan" {
   count = contains(local.subnet_keys, "core_network") ? 1 : 0
 
@@ -494,6 +507,10 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
     module.tags.tags_aws,
     try(module.subnet_tags["core_network"].tags_aws, {})
   )
+
+  lifecycle {
+    ignore_changes = [vpc_arn]
+  }
 }
 
 # Core Network's attachment acceptance (if required)
