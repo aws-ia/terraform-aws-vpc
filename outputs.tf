@@ -23,6 +23,13 @@ output "private_subnet_attributes_by_az" {
   description = <<-EOF
   Map of all private subnets containing their attributes.
 
+  This output includes **every** subnet defined under `var.subnets` that is
+  not `public`, `transit_gateway`, or `core_network`. That includes both
+  NAT-routed subnets (with `connect_to_public_natgw = true`) AND isolated
+  subnets that have no outbound route. Consumers that need subnets suitable
+  for compute workloads reachable to AWS APIs should prefer
+  `private_subnet_attributes_by_az_with_nat`.
+
   Example:
   ```
   private_subnet_attributes_by_az = {
@@ -33,6 +40,32 @@ output "private_subnet_attributes_by_az" {
       <all attributes of subnet: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet#attributes-reference>
     }
     "us-east-1b" = {...)
+  }
+  ```
+EOF
+}
+
+output "private_subnet_attributes_by_az_with_nat" {
+  value       = { for key, subnet in try(aws_subnet.private, {}) : key => subnet if contains(local.private_subnet_names_nat_routed, key) }
+  description = <<-EOF
+  Map of private subnets that are routed through a NAT gateway
+  (`connect_to_public_natgw = true`), keyed by `<subnet_name>/<az>`.
+
+  Use this output when deploying compute workloads that require outbound
+  internet or AWS API connectivity (Lambda functions calling DynamoDB, ECS
+  tasks calling STS, EKS pods pulling images, etc.). Subnets without a NAT
+  route are filtered out, preventing the failure mode described in
+  https://github.com/aws-ia/terraform-aws-vpc/issues/177 where workloads
+  silently land in isolated subnets and time out reaching AWS endpoints.
+
+  Example:
+  ```
+  private_subnet_attributes_by_az_with_nat = {
+    "private/us-east-1a" = {
+      "arn" = "arn:aws:ec2:us-east-1:<>:subnet/subnet-04a86315c4839b519"
+      ...
+    }
+    "private/us-east-1b" = {...}
   }
   ```
 EOF
