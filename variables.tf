@@ -16,9 +16,14 @@ variable "vpc_id" {
 }
 
 variable "vpc_arn" {
-  description = "VPC ARN to use if not creating VPC."
+  description = "VPC ARN to use if not creating VPC. Only used for the AWS Cloud WAN VPC attachment. Provide it when `var.create_vpc = false` to avoid reading the ARN from `data.aws_vpc`, whose value Terraform can mark as unknown at plan time when the VPC changes - forcing a replacement of the Cloud WAN VPC attachment. Defaults to the ARN obtained from `data.aws_vpc`."
   default     = null
   type        = string
+
+  validation {
+    condition     = var.vpc_arn == null || can(regex("^arn:aws[a-z-]*:ec2:[^:]*:[^:]*:vpc/vpc-", var.vpc_arn))
+    error_message = "The value of `var.vpc_arn` must be a valid Amazon VPC ARN, for example arn:aws:ec2:us-east-1:111122223333:vpc/vpc-1234567890abcdef0."
+  }
 }
 
 variable "create_vpc" {

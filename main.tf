@@ -494,6 +494,18 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
     module.tags.tags_aws,
     try(module.subnet_tags["core_network"].tags_aws, {})
   )
+
+  lifecycle {
+    precondition {
+      condition     = var.vpc_arn == null || !var.create_vpc
+      error_message = "The value of `var.vpc_arn` can only be provided when `var.create_vpc = false`."
+    }
+
+    precondition {
+      condition     = var.vpc_arn == null || try(endswith(var.vpc_arn, "vpc/${var.vpc_id}"), false)
+      error_message = "The value of `var.vpc_arn` does not correspond to the VPC provided in `var.vpc_id`."
+    }
+  }
 }
 
 # Core Network's attachment acceptance (if required)
