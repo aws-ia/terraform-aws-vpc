@@ -1,6 +1,12 @@
 locals {
-  # az_count has been provided slice based on az_count otherwise return those provided
-  azs = var.az_count != null ? slice(data.aws_availability_zones.current.names, 0, var.az_count) : data.aws_availability_zones.current.names
+  # `az_count` provided: take a slice of the region's AZs, sorted a-z as documented.
+  # `azs` provided: the data source is filtered down to those names, so reading `.names`
+  # returns them sorted and discards the order the caller passed. `preserve_azs_order`
+  # opts in to using the list as given, which is what callers whose zone-ids do not
+  # resolve to alphabetical zone-names need (see #189).
+  azs = var.az_count != null ? slice(data.aws_availability_zones.current.names, 0, var.az_count) : (
+    var.preserve_azs_order ? var.azs : data.aws_availability_zones.current.names
+  )
 
   # references to module.calculate_subnets output
   calculated_subnets       = module.calculate_subnets.subnets_by_type

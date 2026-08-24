@@ -44,6 +44,12 @@ variable "azs" {
   default     = null
 }
 
+variable "preserve_azs_order" {
+  type        = bool
+  description = "Use `var.azs` in the order it is given instead of the alphabetically sorted order returned by the availability zones data source. Subnet CIDRs are assigned in AZ order, so callers whose AZ list is not alphabetical (e.g. one derived from zone-ids, whose zone-name mapping is account-specific) need this to keep a stable AZ to CIDR mapping. Defaults to `false` to preserve the behavior of v4.7.0 and later. No effect when `az_count` is used."
+  default     = false
+}
+
 variable "vpc_enable_dns_hostnames" {
   type        = bool
   description = "Indicates whether the instances launched in the VPC get DNS hostnames. If enabled, instances in the VPC get DNS hostnames; otherwise, they do not. Disabled by default for nondefault VPCs."
