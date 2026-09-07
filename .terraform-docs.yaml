@@ -1,5 +1,6 @@
 formatter: markdown
 header-from: .header.md
+
 settings:
   anchor: true
   color: true

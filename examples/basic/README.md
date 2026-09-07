@@ -1,45 +1,68 @@
-<!-- BEGIN_TF_DOCS -->
-# VPC module - Example: Basic VPC
+# Web application VPC
 
-This example builds an Amazon VPC with basic functionality:
+This example creates a three-AZ VPC with public, private application, and isolated database subnet groups. Use it for a conventional dual-stack web application that needs controlled internet egress, gateway endpoints, and CloudWatch flow logs.
 
-* Dual-stack VPC (IPv4 & IPv6)
-    * Egress-only Internet gateway configured.
-* 4 VPC subnets - 1 public (dual-stack), 3 private (IPv4-only, dual-stack, and IPv6-only)
-    * NAT gateways placed in all the public subnets.
-* Flow logs enabled (destination Amazon CloudWatch)
-* Routing:
-    * IPv4 egress enabled in public subnets (through Internet gateway) and private subnets (through NAT gateways)
-    * IPv6 egress enabled in private subnets (through Egress-only Internet gateway)
+## What this demonstrates
 
-## Requirements
+- An Amazon-provided IPv6 CIDR selected by the caller-owned `amazon-ipv6` key.
+- Public, private, and isolated subnet roles with deterministic IPv4 allocation.
+- Single-AZ NAT for development, plus egress-only IPv6 routing and DNS64 for application subnets.
+- S3 and DynamoDB gateway endpoints associated through subnet routing declarations.
+- A module-owned CloudWatch log group and IAM role for VPC Flow Logs.
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
+## Relevant configuration
 
-## Providers
+The complete configuration is in [`main.tf`](./main.tf). The application subnet and endpoint declarations are the scenario-specific portion:
 
-No providers.
+```hcl
+subnets = {
+  app = {
+    role = "private"
+    ipv4 = { netmask = 22 }
+    ipv6 = {
+      secondary_cidr_key = "amazon-ipv6"
+      auto_assign        = true
+    }
+    routing = {
+      nat_gateway               = true
+      egress_only_igw           = true
+      dns64                     = true
+      s3_gateway_endpoint       = true
+      dynamodb_gateway_endpoint = true
+    }
+  }
 
-## Modules
+  database = {
+    role = "isolated"
+    ipv4 = { netmask = 24 }
+  }
+}
 
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | ../.. | n/a |
+nat_gateway = {
+  mode         = "single_az"
+  az           = "us-east-1a"
+  subnet_group = "public"
+}
+```
 
-## Resources
+## Prerequisites and cost
 
-No resources.
+- Terraform `>= 1.5` and AWS provider `>= 6.29`.
+- AWS credentials with permissions to create VPC networking, gateway endpoints, IAM resources, and CloudWatch Logs resources.
+- Replace the account ID and DynamoDB table ARNs in the endpoint policy before using this configuration outside a demonstration account.
+- The fixed NAT AZ must be available in the selected Region.
+- **Cost:** one public NAT Gateway, one public IPv4 address, CloudWatch Logs ingestion and retention, data processing, and regional data transfer can incur charges.
 
-## Inputs
+## Run
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS Region. | `string` | `"eu-west-1"` | no |
+```shell
+terraform init
+terraform validate
+terraform plan -out=tfplan
+terraform apply tfplan
+terraform output subnet_ids
+terraform output gateway_endpoints
+terraform destroy
+```
 
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
+The application group has resilient subnet placement but a single-AZ IPv4 egress dependency; choose `all_azs` or `regional` NAT for workloads that require a different availability model.

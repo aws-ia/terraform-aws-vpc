@@ -1,15 +1,12 @@
-# https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/module-inspection.md
-# borrowed & modified indefinitely from https://github.com/ksatirli/building-infrastructure-you-can-mostly-trust/blob/main/.tflint.hcl
-
 plugin "aws" {
-    enabled = true
-    version = "0.21.1"
-    source  = "github.com/terraform-linters/tflint-ruleset-aws"
+  enabled = true
+  version = "0.48.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-aws"
 }
 
 config {
-  module     = false
-  force      = false
+  call_module_type = "local"
+  force            = false
 }
 
 rule "terraform_required_providers" {
@@ -65,7 +62,8 @@ rule "terraform_workspace_remote" {
   enabled = true
 }
 
-# seems to be a bug when a resource is not created
+# Routes intentionally select their target through mutually-exclusive nullable
+# arguments, which the AWS ruleset cannot infer through locals.
 rule "aws_route_not_specified_target" {
   enabled = false
 }

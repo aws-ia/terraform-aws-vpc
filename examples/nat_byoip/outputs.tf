@@ -1,19 +1,34 @@
-output "byoip_pool_nat_gateway_ids" {
-  description = "Map of AZ to NAT Gateway ID for the BYOIP pool example."
-  value       = module.vpc_byoip_pool.nat_gateway_ids
+output "nat_gateway_ids" {
+  description = "NAT Gateway IDs for each EIP sourcing mode."
+  value = {
+    create     = module.create.nat_gateway_ids
+    byoip_pool = module.byoip_pool.nat_gateway_ids
+    existing   = module.existing.nat_gateway_ids
+    regional   = module.regional_existing.nat_gateway_ids
+  }
 }
 
-output "byoip_pool_nat_public_ips" {
-  description = "Map of AZ to NAT Gateway public IP for the BYOIP pool example."
-  value       = module.vpc_byoip_pool.nat_public_ips
+output "nat_eip_allocation_ids" {
+  description = "Effective EIP allocation IDs for each sourcing mode."
+  value = {
+    create     = module.create.nat_eip_allocation_ids
+    byoip_pool = module.byoip_pool.nat_eip_allocation_ids
+    existing   = module.existing.nat_eip_allocation_ids
+    regional   = module.regional_existing.nat_eip_allocation_ids
+  }
 }
 
-output "existing_eip_nat_gateway_ids" {
-  description = "Map of AZ to NAT Gateway ID for the existing-EIPs example."
-  value       = module.vpc_existing_eips.nat_gateway_ids
+output "nat_public_ips" {
+  description = "NAT Gateway public IPs for each sourcing mode."
+  value = {
+    create     = module.create.nat_public_ips
+    byoip_pool = module.byoip_pool.nat_public_ips
+    existing   = module.existing.nat_public_ips
+    regional   = module.regional_existing.nat_public_ips
+  }
 }
 
-output "existing_eip_nat_public_ips" {
-  description = "Map of AZ to NAT Gateway public IP for the existing-EIPs example."
-  value       = module.vpc_existing_eips.nat_public_ips
+output "regional_nat_gateway_route_table_id" {
+  description = "AWS-managed route table ID of the Regional NAT Gateway."
+  value       = module.regional_existing.regional_nat_gateway_route_table_id
 }

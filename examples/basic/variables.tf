@@ -1,7 +1,5 @@
-
 variable "aws_region" {
+  description = "AWS Region in which to create the example VPC."
   type        = string
-  description = "AWS Region."
-
-  default = "eu-west-1"
+  default     = "us-east-1"
 }

@@ -1,83 +1,112 @@
-name: CI - Lint & Validate
+name: v5 Terraform CI
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - v5
   push:
-    branches: [main]
+    branches:
+      - v5
 
 permissions:
   contents: read
 
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
+  quality:
+    name: fmt, TFLint, and tests
+    runs-on: macos-15
+    timeout-minutes: 30
+
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
+      - name: Set up Terraform 1.15.8
         uses: hashicorp/setup-terraform@v3
         with:
+          terraform_version: 1.15.8
           terraform_wrapper: false
 
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v4
+      - name: Set up TFLint 0.63.1
+        uses: terraform-linters/setup-tflint@v5
         with:
-          tflint_version: v0.53.0
-          tflint_wrapper: false
+          tflint_version: v0.63.1
 
-      - name: Init TFLint
-        run: tflint --init --config .tflint.hcl
+      - name: Set up terraform-docs 0.24.0
+        env:
+          TERRAFORM_DOCS_VERSION: "0.24.0"
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            arm64) archive_arch="arm64" ;;
+            x86_64) archive_arch="amd64" ;;
+            *) echo "Unsupported runner architecture: $(uname -m)" >&2; exit 1 ;;
+          esac
+          archive="terraform-docs-v${TERRAFORM_DOCS_VERSION}-darwin-${archive_arch}.tar.gz"
+          release_url="https://github.com/terraform-docs/terraform-docs/releases/download/v${TERRAFORM_DOCS_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$release_url/$archive"
+          curl --fail --location --silent --show-error --output checksums.txt \
+            "$release_url/terraform-docs-v${TERRAFORM_DOCS_VERSION}.sha256sum"
+          grep "  $archive$" checksums.txt | shasum -a 256 --check
+          tar -xzf "$archive" terraform-docs
+          sudo install terraform-docs /usr/local/bin/terraform-docs
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive .
+
+      - name: Check static content contracts
+        run: scripts/check-content.sh
+
+      - name: Check README Usage initialization
+        run: scripts/test-readme-usage.sh
+
+      - name: Initialize TFLint plugins
+        run: tflint --init
 
       - name: Run TFLint
-        run: tflint --config "$GITHUB_WORKSPACE/.tflint.hcl" --recursive
+        run: tflint --recursive
 
-      - name: Setup terraform-docs
-        uses: jaxxstorm/action-install-gh-release@v2.1.0
-        with:
-          repo: terraform-docs/terraform-docs
-          tag: v0.19.0
+      - name: Initialize module
+        run: terraform init -backend=false -lockfile=readonly
 
-      - name: Check docs are up to date
+      - name: Validate module
+        run: terraform validate -no-color
+
+      - name: Verify fail-closed negative plans
+        run: ./scripts/test-negative-plans.sh
+
+      - name: Verify production migration handoff
+        run: ./scripts/test-migration-handoff.sh
+
+      - name: Verify IPv6 association importer shapes
+        run: ./scripts/test-ipv6-import-shape.sh
+
+      - name: Validate examples
+        shell: bash
         run: |
-          terraform-docs --config .terraform-docs.yaml .
-          if ! git diff --exit-code README.md; then
-            echo "::error::README.md is out of date. Run 'terraform-docs .' locally and commit."
-            exit 1
-          fi
+          set -euo pipefail
+          for example in basic enterprise hub migration-from-v4 nat_byoip ipam dual_stack existing_vpc secure_isolated private_nat inspection_egress centralized_endpoints_dns; do
+            terraform -chdir="examples/${example}" init -backend=false -lockfile=readonly
+            terraform -chdir="examples/${example}" validate -no-color
+          done
 
-  validate:
-    name: Validate (${{ matrix.target }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - root
-          - examples/basic
-          - examples/advanced
-          - examples/ipam
-          - examples/transit_gateway
-          - examples/cloud_wan
-          - examples/vpc_lattice
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Verify archived module and examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive_dir="$(mktemp -d)"
+          trap 'rm -rf "$archive_dir"' EXIT
+          git archive --format=tar HEAD | tar -xf - -C "$archive_dir"
+          terraform -chdir="$archive_dir" init -backend=false -lockfile=readonly
+          terraform -chdir="$archive_dir" validate -no-color
+          for example in basic enterprise hub migration-from-v4 nat_byoip ipam dual_stack existing_vpc secure_isolated private_nat inspection_egress centralized_endpoints_dns; do
+            terraform -chdir="$archive_dir/examples/${example}" init -backend=false -lockfile=readonly
+            terraform -chdir="$archive_dir/examples/${example}" validate -no-color
+          done
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_wrapper: false
-
-      - name: Terraform Init
-        working-directory: ${{ matrix.target == 'root' && '.' || matrix.target }}
-        run: terraform init -backend=false
-
-      - name: Terraform Validate
-        working-directory: ${{ matrix.target == 'root' && '.' || matrix.target }}
-        run: terraform validate
+      - name: Run complete plan-only test suite
+        run: terraform test -no-color
