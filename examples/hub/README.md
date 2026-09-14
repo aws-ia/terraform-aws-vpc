@@ -5,7 +5,7 @@ This example creates a three-AZ dual-stack hub with AZ-specific routes to existi
 ## What this demonstrates
 
 - Caller-owned `east` and `west` keys independently identify two TGW attachments and their selected route destinations.
-- A `core_network` subnet group creates a Cloud WAN attachment and explicitly accepts it after AWS reports it pending.
+- A caller-keyed `core_network_attachments` entry selects the `cwan` subnet group and explicitly owns its attachment acceptance.
 - Generic typed routes target an existing VPC peering connection without changing the attachment model.
 - Top-level `routes` select one existing GWLB endpoint per AZ through `target.ids_by_az`, demonstrating late-bound zonal service insertion.
 - Existing Elastic IPs provide manual Regional NAT addresses across three AZs and remain caller-owned.
@@ -28,13 +28,17 @@ subnets = {
       auto_assign        = true
       cidr_index         = 4
     }
-    core_network_options = {
-      id                 = var.core_network_id
-      arn                = var.core_network_arn
-      appliance_mode     = false
-      require_acceptance = true
-      accept_attachment  = true
-    }
+  }
+}
+
+core_network_attachments = {
+  vpc = {
+    subnet_group       = "cwan"
+    id                 = var.core_network_id
+    arn                = var.core_network_arn
+    appliance_mode     = false
+    require_acceptance = true
+    accept_attachment  = true
   }
 }
 
@@ -122,7 +126,7 @@ terraform apply tfplan
 terraform output transit_gateway_attachment_ids
 terraform output public_nat_gateway_evidence
 terraform output zonal_route_evidence
-terraform output core_network_attachment_id
+terraform output core_network_attachment_ids
 terraform destroy -var-file=hub.tfvars
 ```
 

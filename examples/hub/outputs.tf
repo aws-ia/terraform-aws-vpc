@@ -93,6 +93,11 @@ output "core_network_attachment_id" {
   value       = module.vpc.core_network_attachment_id
 }
 
+output "core_network_attachment_ids" {
+  description = "Cloud WAN VPC attachment IDs by caller-owned key."
+  value       = module.vpc.core_network_attachment_ids
+}
+
 output "flow_log_ids" {
   description = "Hub VPC Flow Log IDs by stable flow-log key."
   value       = module.vpc.flow_log_ids

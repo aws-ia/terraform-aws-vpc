@@ -193,3 +193,37 @@ resource "aws_route" "cwan_ipv6" {
 
   depends_on = [terraform_data.core_network_readiness]
 }
+
+resource "aws_route" "cwan_attachment" {
+  for_each = local.routes_cwan_attachments
+
+  route_table_id             = each.value.route_table_id
+  destination_cidr_block     = startswith(each.value.destination, "pl-") ? null : each.value.destination
+  destination_prefix_list_id = startswith(each.value.destination, "pl-") ? each.value.destination : null
+  core_network_arn           = each.value.core_network_arn
+
+  depends_on = [
+    terraform_data.injected_route_table_identity_validation,
+    terraform_data.isolated_injected_route_table_validation,
+    terraform_data.route_table_routing_compatibility_validation,
+    terraform_data.attachment_contract_validation,
+    terraform_data.core_network_readiness,
+  ]
+}
+
+resource "aws_route" "cwan_attachment_ipv6" {
+  for_each = local.routes_cwan_attachments_ipv6
+
+  route_table_id              = each.value.route_table_id
+  destination_ipv6_cidr_block = startswith(each.value.destination, "pl-") ? null : each.value.destination
+  destination_prefix_list_id  = startswith(each.value.destination, "pl-") ? each.value.destination : null
+  core_network_arn            = each.value.core_network_arn
+
+  depends_on = [
+    terraform_data.injected_route_table_identity_validation,
+    terraform_data.isolated_injected_route_table_validation,
+    terraform_data.route_table_routing_compatibility_validation,
+    terraform_data.attachment_contract_validation,
+    terraform_data.core_network_readiness,
+  ]
+}

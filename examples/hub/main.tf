@@ -64,8 +64,8 @@ module "vpc" {
           east = ["2001:db8:100::/48"]
         }
         # Route workload traffic to Cloud WAN from a non-attachment group.
-        core_network      = ["100.64.0.0/10"]
-        core_network_ipv6 = ["2001:db8:200::/48"]
+        core_network_attachments      = { vpc = ["100.64.0.0/10"] }
+        core_network_attachments_ipv6 = { vpc = ["2001:db8:200::/48"] }
       }
       routes = {
         security-services = {
@@ -95,13 +95,17 @@ module "vpc" {
         cidr_index = 65 # 10.1.24.96/28+, outside all explicit ranges
       }
       ipv6 = { secondary_cidr_key = "amazon-ipv6", auto_assign = true, cidr_index = 4 }
-      core_network_options = {
-        id                 = var.core_network_id
-        arn                = var.core_network_arn
-        appliance_mode     = false
-        require_acceptance = true
-        accept_attachment  = true
-      }
+    }
+  }
+
+  core_network_attachments = {
+    vpc = {
+      subnet_group       = "cwan"
+      id                 = var.core_network_id
+      arn                = var.core_network_arn
+      appliance_mode     = false
+      require_acceptance = true
+      accept_attachment  = true
     }
   }
 

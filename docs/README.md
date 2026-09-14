@@ -9,13 +9,13 @@ Use these guides to choose and compose the v5 contracts. The root [README](../RE
 | [Addressing and Availability Zones](addressing.md) | Primary and secondary CIDRs, IPAM, IPv6, subnet allocation, AZ stability, and caller-owned address keys. |
 | [Subnets and routing](subnets-and-routing.md) | Subnet roles, route-table ownership, fail-closed isolation, generic and late-bound zonal routes, and gateway endpoints. |
 | [NAT Gateway](nat-gateway.md) | Zonal and Regional NAT placement, public/private connectivity, Elastic IP ownership, and cost trade-offs. |
-| [Attachments](attachments.md) | Plural Transit Gateway attachments, Cloud WAN acceptance, VPC Lattice, and destination routing. |
+| [Attachments](attachments.md) | Plural Transit Gateway and Cloud WAN attachments, acceptance, VPC Lattice, and destination routing. |
 | [Security and operations](security-and-operations.md) | Default-resource adoption, network ACLs, VPC Block Public Access, DHCP options, Flow Logs, and tags. |
 | [Outputs](outputs.md) | Stable Tier 1 composition, temporary Tier 2 migration aliases, and the Tier 3 escape hatch. |
 
 ## Input map
 
-The module exposes exactly 15 top-level inputs. Start in the guide named in the final column, then use the generated input table in the root README for the complete type and default.
+The module exposes 16 top-level inputs. Start in the guide named in the final column, then use the generated input table in the root README for the complete type and default.
 
 | Input | Responsibility | Guide |
 | --- | --- | --- |
@@ -25,6 +25,7 @@ The module exposes exactly 15 top-level inputs. Start in the guide named in the 
 | `availability_zones` | Explicit production AZ names or development-only count selection. | [Addressing](addressing.md) |
 | `calculated_subnet_az_capacity` | Number of AZ slots reserved per calculated subnet group; keep the creation-time value to avoid renumbering established subnets. | [Addressing](addressing.md) |
 | `transit_gateway_attachments` | Plural caller-keyed Transit Gateway VPC attachments. | [Attachments](attachments.md) |
+| `core_network_attachments` | Plural caller-keyed Cloud WAN VPC attachments and acceptance ownership. | [Attachments](attachments.md) |
 | `subnets` | Subnet identity, roles, address allocation, route tables, routes, and network ACLs. | [Subnets and routing](subnets-and-routing.md) |
 | `routes` | Late-bound scalar or AZ-specific routes for targets produced by VPC consumers. | [Subnets and routing](subnets-and-routing.md) |
 | `nat_gateway` | NAT topology, ownership, connectivity, and Elastic IP sourcing. | [NAT Gateway](nat-gateway.md) |

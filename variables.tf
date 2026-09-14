@@ -405,6 +405,69 @@ variable "transit_gateway_attachments" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
+# CLOUD WAN ATTACHMENTS — plural, caller-keyed create-or-inject
+# ─────────────────────────────────────────────────────────────────────────────
+
+variable "core_network_attachments" {
+  nullable    = false
+  description = <<-EOT
+    Cloud WAN VPC attachments keyed by caller-owned state identity (up to five
+    per VPC). Each entry selects a subnet_group with role core_network and
+    independently supports attachment and accepter create-or-inject ownership.
+    Routes under subnets[*].routing.core_network_attachments and its _ipv6
+    variant select these keys. ARN defaults to the current account/partition;
+    supply the owner ARN for a shared Core Network.
+
+    Do not combine with the deprecated subnets[*].core_network_options adapter,
+    which retains the historical 'vpc' resource key until its removal in v6.
+  EOT
+  type = map(object({
+    subnet_group               = string
+    id                         = string
+    arn                        = optional(string)
+    create                     = optional(bool, true)
+    attachment_id              = optional(string)
+    appliance_mode             = optional(bool, false)
+    require_acceptance         = optional(bool, false)
+    accept_attachment          = optional(bool, false)
+    create_accepter            = optional(bool, true)
+    accepter_id                = optional(string)
+    dns_support                = optional(bool)
+    security_group_referencing = optional(bool)
+    routing_policy_label       = optional(string)
+    tags                       = optional(map(string), {})
+  }))
+  default = {}
+
+  validation {
+    condition = length(var.core_network_attachments) <= 5 && alltrue([
+      for key in keys(var.core_network_attachments) : can(regex("^[a-z0-9][a-z0-9_-]*$", key))
+    ])
+    error_message = "core_network_attachments supports at most five stable lowercase keys without '/'."
+  }
+
+  validation {
+    condition = alltrue([
+      for attachment in values(var.core_network_attachments) :
+      can(regex("\\S", attachment.subnet_group)) && can(regex("\\S", attachment.id)) &&
+      (attachment.create ? attachment.attachment_id == null : can(regex("\\S", attachment.attachment_id)))
+    ])
+    error_message = "Each Cloud WAN attachment requires non-empty subnet_group/id and either create=true with attachment_id=null or create=false with a non-empty attachment_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for attachment in values(var.core_network_attachments) :
+      (!attachment.accept_attachment || attachment.require_acceptance) &&
+      (attachment.create_accepter ? attachment.accepter_id == null : (
+        !attachment.accept_attachment || can(regex("\\S", attachment.accepter_id))
+      ))
+    ])
+    error_message = "Cloud WAN accept_attachment=true requires require_acceptance=true. Accepter creation requires accepter_id=null; injected acceptance requires create_accepter=false and a non-empty accepter_id."
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SUBNETS — typed with explicit roles and co-located routing
 #
 # STATE KEY CONTRACT:
@@ -445,7 +508,8 @@ variable "subnets" {
       - public: N groups allowed (e.g. DMZ, edge, GWLB)
       - transit_gateway: N groups allowed; each plural attachment selects one group,
         and several attachments may intentionally reuse the same attachment subnets
-      - core_network: limited to 1 group (Cloud WAN attachment adapter is singular)
+      - core_network: N groups allowed; each top-level core_network_attachments
+        entry selects one group. Embedded core_network_options is deprecated (v6).
 
     Set `manage_route_table = false` plus `route_table_key` and `route_table_id`
     to inject an existing route table. `route_table_key` is caller-owned, immutable
@@ -565,8 +629,10 @@ variable "subnets" {
       transit_gateway_ipv6             = optional(list(string))          # DEPRECATED singular adapter
       transit_gateway_attachments      = optional(map(list(string)), {}) # attachment key => IPv4 CIDR/prefix-list destinations
       transit_gateway_attachments_ipv6 = optional(map(list(string)), {}) # attachment key => IPv6 CIDR/prefix-list destinations
-      core_network                     = optional(list(string))          # list of CIDRs/prefix-list IDs to route via CWAN
-      core_network_ipv6                = optional(list(string))          # list of IPv6 CIDRs/prefix-list IDs
+      core_network                     = optional(list(string))          # DEPRECATED singular adapter
+      core_network_ipv6                = optional(list(string))          # DEPRECATED singular adapter
+      core_network_attachments         = optional(map(list(string)), {}) # attachment key => IPv4 CIDR/prefix-list destinations
+      core_network_attachments_ipv6    = optional(map(list(string)), {}) # attachment key => IPv6 CIDR/prefix-list destinations
       s3_gateway_endpoint              = optional(bool, false)
       dynamodb_gateway_endpoint        = optional(bool, false)
     }), {})
@@ -601,7 +667,7 @@ variable "subnets" {
       security_group_referencing      = optional(bool, true) # Requires provider >= 5.69
     }))
 
-    # ── Core Network (Cloud WAN) attachment options ──
+    # ── DEPRECATED Core Network singleton adapter; removed in v6 ──
     core_network_options = optional(object({
       id                 = string
       arn                = optional(string) # Optional: auto-derived from id if omitted
@@ -678,13 +744,6 @@ variable "subnets" {
     error_message = "Subnet and route-table name formats must be null or non-empty and may use only {vpc}, {group}, and {az}."
   }
 
-  # Multiple public groups and Transit Gateway attachments are allowed. Cloud
-  # WAN remains singleton because its VPC attachment boundary is still singular.
-  validation {
-    condition     = length([for k, v in var.subnets : k if v.role == "core_network"]) <= 1
-    error_message = "At most one subnet group may have role 'core_network' (AWS API: 1 Core Network attachment per VPC)."
-  }
-
   validation {
     condition = alltrue([
       for k, v in var.subnets :
@@ -722,11 +781,10 @@ variable "subnets" {
   }
 
   validation {
-    condition = alltrue([
-      for k, v in var.subnets :
-      v.role != "core_network" || v.core_network_options != null
-    ])
-    error_message = "Subnets with role 'core_network' must provide core_network_options."
+    condition = length([
+      for key, subnet in var.subnets : key if subnet.core_network_options != null
+    ]) <= 1
+    error_message = "The deprecated subnets[*].core_network_options adapter may be configured on at most one subnet group. Use top-level core_network_attachments for multiple attachments."
   }
 
   # Extended isolated validation: prohibit ALL routing including TGW/CWAN.
@@ -744,7 +802,9 @@ variable "subnets" {
         alltrue([for destinations in values(try(v.routing.transit_gateway_attachments, {})) : length(destinations) == 0]) &&
         alltrue([for destinations in values(try(v.routing.transit_gateway_attachments_ipv6, {})) : length(destinations) == 0]) &&
         length(coalesce(try(v.routing.core_network, null), [])) == 0 &&
-        length(coalesce(try(v.routing.core_network_ipv6, null), [])) == 0
+        length(coalesce(try(v.routing.core_network_ipv6, null), [])) == 0 &&
+        alltrue([for destinations in values(v.routing.core_network_attachments) : length(destinations) == 0]) &&
+        alltrue([for destinations in values(v.routing.core_network_attachments_ipv6) : length(destinations) == 0])
       ) : true
     ])
     error_message = "Isolated subnets must not route to Internet, NAT, EIGW, TGW, or Cloud WAN. S3/DynamoDB gateway endpoint routes remain allowed."
@@ -758,7 +818,7 @@ variable "subnets" {
           coalesce(try(subnet.routing.transit_gateway_ipv6, null), []),
           coalesce(try(subnet.routing.core_network, null), []),
           coalesce(try(subnet.routing.core_network_ipv6, null), []),
-        ], values(try(subnet.routing.transit_gateway_attachments, {})), values(try(subnet.routing.transit_gateway_attachments_ipv6, {}))) : length(destinations) == length(distinct(destinations))
+        ], values(try(subnet.routing.transit_gateway_attachments, {})), values(try(subnet.routing.transit_gateway_attachments_ipv6, {})), values(subnet.routing.core_network_attachments), values(subnet.routing.core_network_attachments_ipv6)) : length(destinations) == length(distinct(destinations))
       ]
     ]))
     error_message = "TGW and Cloud WAN destination lists must not contain duplicates within a subnet group."
@@ -1118,7 +1178,8 @@ variable "subnets" {
       for k, v in var.subnets : [
         for destination in concat(
           coalesce(try(v.routing.transit_gateway, null), []),
-          coalesce(try(v.routing.core_network, null), [])
+          coalesce(try(v.routing.core_network, null), []),
+          flatten(values(v.routing.core_network_attachments)),
         ) : (can(cidrhost(destination, 0)) && !strcontains(destination, ":")) || can(regex("^pl-[0-9a-f]+$", destination))
       ]
     ]))
@@ -1130,7 +1191,8 @@ variable "subnets" {
       for k, v in var.subnets : [
         for destination in concat(
           coalesce(try(v.routing.transit_gateway_ipv6, null), []),
-          coalesce(try(v.routing.core_network_ipv6, null), [])
+          coalesce(try(v.routing.core_network_ipv6, null), []),
+          flatten(values(v.routing.core_network_attachments_ipv6)),
         ) : (can(cidrhost(destination, 0)) && strcontains(destination, ":")) || can(regex("^pl-[0-9a-f]+$", destination))
       ]
     ]))

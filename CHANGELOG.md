@@ -10,6 +10,7 @@ All notable changes to this module are documented in this file. The format follo
 - Caller-keyed secondary IPv4 and IPv6 associations, including static, Amazon-provided, IPAM, and create-or-inject ownership modes.
 - Deterministic subnet allocation with explicit AZ CIDRs, calculated netmasks, optional pinned CIDR indices, subnet IPAM, dual-stack, and IPv6-native modes.
 - Plural Transit Gateway attachments with caller-owned keys, typed IPv4/IPv6 destination maps, and up to five distinct TGWs per VPC.
+- Plural Cloud WAN attachments with caller-owned keys, per-attachment options/tags and acceptance ownership, keyed IPv4/IPv6 and prefix-list routes, and ID maps; supports up to five attachments per VPC.
 - Cloud WAN attachment acceptance controls, generic typed routes, S3 and DynamoDB gateway endpoints, per-group network ACLs, default-resource adoption, Regional VPC Block Public Access, and DHCP option sets.
 - Late-bound top-level routes with scalar or AZ-specific targets for composing endpoint-producing modules without dependency cycles.
 - Zonal public/private NAT and public Regional NAT with module-created, BYOIP, existing, automatic, and injected address or Gateway ownership options where supported.
@@ -18,7 +19,7 @@ All notable changes to this module are documented in this file. The format follo
 
 ### Changed
 
-- Replaced the v4 flat and loosely typed interface with 14 typed top-level inputs and explicit create-or-inject selectors.
+- Replaced the v4 flat and loosely typed interface with 16 typed top-level inputs and explicit create-or-inject selectors.
 - Made caller-owned map keys durable Terraform state identity for secondary CIDRs, subnet groups, route tables, routes, attachments, endpoints, Flow Logs, exclusions, and ACL rules.
 - Co-located subnet role, addressing, route-table ownership, routing, public options, network ACLs, and attachment options under each subnet group.
 - Made explicit Availability Zone names and AZ-keyed CIDRs the recommended persistent-environment contract; count-based AZ discovery is development-only.
@@ -31,6 +32,7 @@ All notable changes to this module are documented in this file. The format follo
 
 - v4-compatible Tier 2 full-object outputs; they remain during 5.x for staged consumer migration and are scheduled for removal in 6.0.
 - The singular `subnets[*].transit_gateway_options`, `routing.transit_gateway`, and `routing.transit_gateway_ipv6` adapters; use `transit_gateway_attachments` and keyed plural route maps.
+- The singular `subnets[*].core_network_options`, `routing.core_network`, `routing.core_network_ipv6`, and scalar Cloud WAN ID outputs; use `core_network_attachments` and keyed routes/outputs. The adapter retains existing resource addresses until removal in v6.
 - Pre-release group-keyed output aliases named `*_by_role`; use `*_by_group` or `*_by_semantic_role` outputs.
 
 ### Removed
