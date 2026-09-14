@@ -299,8 +299,20 @@ locals {
       transit_gateway_attachments_ipv6 = try(cfg.routing.transit_gateway_attachments_ipv6, {})
       core_network                     = try(cfg.routing.core_network, null)
       core_network_ipv6                = try(cfg.routing.core_network_ipv6, null)
-      s3_gateway_endpoint              = try(cfg.routing.s3_gateway_endpoint, false)
-      dynamodb_gateway_endpoint        = try(cfg.routing.dynamodb_gateway_endpoint, false)
+      # Canonical CIDRs are physical route identity. Normalize before shared-table
+      # aggregation so equivalent IPv6 spellings cannot create competing routes.
+      core_network_attachments = {
+        for key, destinations in cfg.routing.core_network_attachments : key => distinct([
+          for destination in destinations : try(cidrsubnet(destination, 0, 0), destination)
+        ])
+      }
+      core_network_attachments_ipv6 = {
+        for key, destinations in cfg.routing.core_network_attachments_ipv6 : key => distinct([
+          for destination in destinations : try(cidrsubnet(destination, 0, 0), destination)
+        ])
+      }
+      s3_gateway_endpoint       = try(cfg.routing.s3_gateway_endpoint, false)
+      dynamodb_gateway_endpoint = try(cfg.routing.dynamodb_gateway_endpoint, false)
     }
   }
 
@@ -318,7 +330,9 @@ locals {
         )
         core_network = (
           length(coalesce(routing.core_network, [])) > 0 ||
-          length(coalesce(routing.core_network_ipv6, [])) > 0
+          length(coalesce(routing.core_network_ipv6, [])) > 0 ||
+          anytrue([for destinations in values(routing.core_network_attachments) : length(destinations) > 0]) ||
+          anytrue([for destinations in values(routing.core_network_attachments_ipv6) : length(destinations) > 0])
         )
         s3_gateway_endpoint       = routing.s3_gateway_endpoint
         dynamodb_gateway_endpoint = routing.dynamodb_gateway_endpoint
@@ -781,6 +795,14 @@ locals {
         }
         core_network      = distinct(flatten([for group in groups : coalesce(local.resolved_routing[group].core_network, [])]))
         core_network_ipv6 = distinct(flatten([for group in groups : coalesce(local.resolved_routing[group].core_network_ipv6, [])]))
+        core_network_attachments = {
+          for attachment_key in distinct(flatten([for group in groups : keys(local.resolved_routing[group].core_network_attachments)])) :
+          attachment_key => distinct(flatten([for group in groups : lookup(local.resolved_routing[group].core_network_attachments, attachment_key, [])]))
+        }
+        core_network_attachments_ipv6 = {
+          for attachment_key in distinct(flatten([for group in groups : keys(local.resolved_routing[group].core_network_attachments_ipv6)])) :
+          attachment_key => distinct(flatten([for group in groups : lookup(local.resolved_routing[group].core_network_attachments_ipv6, attachment_key, [])]))
+        }
       }
       routes   = merge([for group in groups : var.subnets[group].routes]...)
       has_ipv6 = anytrue([for group in groups : var.subnets[group].ipv6 != null])
@@ -999,7 +1021,7 @@ locals {
   # Normalize every opinionated route to its physical destination and target.
   # Resource addresses remain unchanged; this collection exists only to reject
   # ambiguous tables before AWS sees duplicate or isolation-breaking routes.
-  route_intents_by_table = {
+  raw_route_intents_by_table = {
     for key, rt in local.route_table_targets : key => concat(
       rt.routing.internet_gateway ? [{ destination = "ipv4:0.0.0.0/0", target = "igw" }] : [],
       rt.routing.internet_gateway && rt.has_ipv6 ? [{ destination = "ipv6:::/0", target = "igw" }] : [],
@@ -1030,20 +1052,50 @@ locals {
           }
         ]
       ]),
+      # Include the route surface/family so the same physical destination cannot
+      # be owned twice (singular + keyed, or a prefix list in both families).
       [for dest in distinct(coalesce(rt.routing.core_network, [])) : {
         destination = startswith(dest, "pl-") ? "prefix:${dest}" : "ipv4:${dest}"
-        target      = "cwan"
+        target      = "cwan:${coalesce(local.singular_cwan_route_key, "missing")}:singular:${dest}"
       }],
       [for dest in distinct(coalesce(rt.routing.core_network_ipv6, [])) : {
         destination = startswith(dest, "pl-") ? "prefix:${dest}" : "ipv6:${dest}"
-        target      = "cwan"
+        target      = "cwan:${coalesce(local.singular_cwan_route_key, "missing")}:singular6:${dest}"
       }],
+      flatten([
+        for attachment_key, destinations in rt.routing.core_network_attachments : [
+          for dest in distinct(destinations) : {
+            destination = startswith(dest, "pl-") ? "prefix:${dest}" : "ipv4:${dest}"
+            target      = "cwan:${attachment_key}:plural"
+          }
+        ]
+      ]),
+      flatten([
+        for attachment_key, destinations in rt.routing.core_network_attachments_ipv6 : [
+          for dest in distinct(destinations) : {
+            destination = startswith(dest, "pl-") ? "prefix:${dest}" : "ipv6:${dest}"
+            target      = "cwan:${attachment_key}:plural6"
+          }
+        ]
+      ]),
       [for route in values(rt.routes) : {
         destination = "${route.destination.type == "ipv4_cidr" ? "ipv4" : route.destination.type == "ipv6_cidr" ? "ipv6" : "prefix"}:${route.destination.value}"
         target      = "${route.target.type}:${route.target.id}"
       }],
       lookup(local.top_level_route_intents_by_table, key, []),
     )
+  }
+  # Compare physical destinations across all routing surfaces, without changing
+  # the historical state addresses of legacy routes. Prefix-list IDs pass through.
+  route_intents_by_table = {
+    for key, intents in local.raw_route_intents_by_table : key => [
+      for intent in intents : merge(intent, {
+        destination = try(
+          "${substr(intent.destination, 0, 5)}${cidrsubnet(substr(intent.destination, 5, -1), 0, 0)}",
+          intent.destination,
+        )
+      })
+    ]
   }
   route_destination_conflicts = {
     for key, intents in local.route_intents_by_table : key => [
@@ -1081,18 +1133,19 @@ locals {
       anytrue([for destinations in values(local.resolved_routing[group].transit_gateway_attachments_ipv6) : length(destinations) > 0]) ||
       length(coalesce(local.resolved_routing[group].core_network, [])) > 0 ||
       length(coalesce(local.resolved_routing[group].core_network_ipv6, [])) > 0 ||
+      anytrue([for destinations in values(local.resolved_routing[group].core_network_attachments) : length(destinations) > 0]) ||
+      anytrue([for destinations in values(local.resolved_routing[group].core_network_attachments_ipv6) : length(destinations) > 0]) ||
       length(var.subnets[group].routes) > 0
     ])
   }
 
   # ─── Core Network ARN resolution ────────────────────────────────────────
-  core_network_arn = try([
-    for name, cfg in var.subnets : coalesce(
-      try(cfg.core_network_options.arn, null),
-      "arn:${data.aws_partition.current[0].partition}:networkmanager::${data.aws_caller_identity.current[0].account_id}:core-network/${cfg.core_network_options.id}"
+  core_network_arns_by_attachment = {
+    for key, attachment in local.effective_core_network_attachments : key => coalesce(
+      attachment.options.arn,
+      "arn:${data.aws_partition.current[0].partition}:networkmanager::${data.aws_caller_identity.current[0].account_id}:core-network/${attachment.options.id}"
     )
-    if cfg.role == "core_network"
-  ][0], null)
+  }
 
   # ─── Route Sets ─────────────────────────────────────────────────────────
   # Each route set is keyed by stable route-table identity plus destination.
@@ -1203,25 +1256,51 @@ locals {
     ]
   ])...)
 
-  routes_cwan = local.core_network_arn != null ? merge([
+  routes_cwan = local.singular_cwan_route_key != null ? merge([
     for key, rt in local.route_table_targets : {
       for dest in coalesce(rt.routing.core_network, []) :
       "${key}/cwan/${replace(dest, "/", "-")}" => {
         route_table_id   = rt.route_table_id
         destination      = dest
-        core_network_arn = local.core_network_arn
+        core_network_arn = local.core_network_arns_by_attachment[local.singular_cwan_route_key]
       }
     } if rt.routing.core_network != null
   ]...) : {}
 
-  routes_cwan_ipv6 = local.core_network_arn != null ? merge([
+  routes_cwan_ipv6 = local.singular_cwan_route_key != null ? merge([
     for key, rt in local.route_table_targets : {
       for dest in coalesce(rt.routing.core_network_ipv6, []) :
       "${key}/cwan6/${replace(dest, "/", "-")}" => {
         route_table_id   = rt.route_table_id
         destination      = dest
-        core_network_arn = local.core_network_arn
+        core_network_arn = local.core_network_arns_by_attachment[local.singular_cwan_route_key]
       }
     } if rt.routing.core_network_ipv6 != null
   ]...) : {}
+
+  routes_cwan_attachments = merge(flatten([
+    for key, rt in local.route_table_targets : [
+      for attachment_key, destinations in rt.routing.core_network_attachments : {
+        for dest in destinations :
+        "${key}/cwan/${attachment_key}/${replace(dest, "/", "-")}" => {
+          route_table_id   = rt.route_table_id
+          destination      = dest
+          core_network_arn = try(local.core_network_arns_by_attachment[attachment_key], null)
+        }
+      }
+    ]
+  ])...)
+
+  routes_cwan_attachments_ipv6 = merge(flatten([
+    for key, rt in local.route_table_targets : [
+      for attachment_key, destinations in rt.routing.core_network_attachments_ipv6 : {
+        for dest in destinations :
+        "${key}/cwan6/${attachment_key}/${replace(dest, "/", "-")}" => {
+          route_table_id   = rt.route_table_id
+          destination      = dest
+          core_network_arn = try(local.core_network_arns_by_attachment[attachment_key], null)
+        }
+      }
+    ]
+  ])...)
 }

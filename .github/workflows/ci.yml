@@ -76,6 +76,9 @@ jobs:
       - name: Validate module
         run: terraform validate -no-color
 
+      - name: Verify Cloud WAN route validation ordering
+        run: bash scripts/test-cloudwan-route-ordering.sh
+
       - name: Verify fail-closed negative plans
         run: ./scripts/test-negative-plans.sh
 

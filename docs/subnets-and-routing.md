@@ -28,9 +28,9 @@ Subnet resources also support create or inject ownership. `create = false` requi
 | `private` | Optional NAT, egress-only gateway, TGW, Cloud WAN, and service routing. |
 | `isolated` | No Internet, NAT, egress-only gateway, TGW, Cloud WAN, or generic routes. S3 and DynamoDB gateway endpoints are allowed. |
 | `transit_gateway` | Dedicated attachment subnets selected by one or more TGW attachments. |
-| `core_network` | Dedicated subnets for the single Cloud WAN VPC attachment. |
+| `core_network` | Dedicated subnets selected by Cloud WAN VPC attachments. |
 
-Multiple groups may share a role. At most one group may use `core_network` because the Cloud WAN attachment boundary is singular.
+Multiple groups may share any role. Top-level `core_network_attachments` entries select their attachment subnet group; only the deprecated embedded Cloud WAN adapter is limited to one group.
 
 ## Managed and injected route tables
 
@@ -87,7 +87,8 @@ Routing is co-located with each subnet group:
 | `dns64` | Enables DNS64 and creates `64:ff9b::/96` routing through NAT; requires a compatible NAT path. |
 | `transit_gateway_attachments` | Map of TGW attachment key to IPv4 CIDR or prefix-list destinations. |
 | `transit_gateway_attachments_ipv6` | Map of TGW attachment key to IPv6 CIDR or prefix-list destinations. |
-| `core_network` / `core_network_ipv6` | Destination lists routed to the Cloud WAN attachment. |
+| `core_network_attachments` / `core_network_attachments_ipv6` | Destination lists keyed by Cloud WAN attachment. |
+| `core_network` / `core_network_ipv6` | Deprecated lists requiring exactly one effective Cloud WAN attachment. |
 | `s3_gateway_endpoint` / `dynamodb_gateway_endpoint` | Associates the effective route table with the selected gateway endpoint. |
 
 Destination lists must be unique within the group. `isolated` groups reject all general egress and transit fields, even when a list is supplied through a plural attachment key.
@@ -117,7 +118,7 @@ Destination types are `ipv4_cidr`, `ipv6_cidr`, and `prefix_list`. Target types 
 
 Use top-level `routes` when the route target is produced by a resource or module that consumes this VPC's subnet or route-table outputs. This dependency direction supports service-insertion modules such as AWS Network Firewall or Gateway Load Balancer, which can create one endpoint per AZ after receiving the VPC topology. Keep targets that are already available to the VPC module under `subnets.<group>.routes` so routing intent remains co-located with the subnet group.
 
-Use the attachment-aware `transit_gateway_attachments`, `transit_gateway_attachments_ipv6`, `core_network`, and `core_network_ipv6` fields for TGW and Cloud WAN routes. Those surfaces coordinate attachment identity and readiness; top-level `routes` is for the generic target types documented above.
+Use the attachment-aware `transit_gateway_attachments`, `transit_gateway_attachments_ipv6`, `core_network_attachments`, and `core_network_attachments_ipv6` fields for TGW and Cloud WAN routes. Those surfaces coordinate attachment identity and readiness; top-level `routes` is for the generic target types documented above.
 
 ```hcl
 routes = {

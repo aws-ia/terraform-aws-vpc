@@ -413,13 +413,23 @@ output "transit_gateway_attachment_id" {
   value       = local.transit_gateway_attachment_id
 }
 
+output "core_network_attachment_ids" {
+  description = "Cloud WAN VPC attachment IDs (created or injected) by caller-owned key. The deprecated adapter uses key 'vpc'. Shape: map(attachment_key, attachment_id)."
+  value       = local.core_network_attachment_ids
+}
+
+output "core_network_attachment_accepter_ids" {
+  description = "Cloud WAN accepter IDs (created or injected) by attachment key. Contains only attachments with accept_attachment=true. Shape: map(attachment_key, accepter_id)."
+  value       = local.core_network_accepter_ids
+}
+
 output "core_network_attachment_id" {
-  description = "Cloud WAN Core Network VPC attachment ID, or null when the role is absent."
+  description = "DEPRECATED: scalar Cloud WAN attachment ID when exactly one attachment exists, otherwise null. Use core_network_attachment_ids. Removed in v6."
   value       = local.core_network_attachment_id
 }
 
 output "core_network_attachment_accepter_id" {
-  description = "Cloud WAN attachment accepter ID (created or injected), or null when acceptance is not managed."
+  description = "DEPRECATED: scalar Cloud WAN accepter ID when exactly one attachment exists and acceptance is managed, otherwise null. Use core_network_attachment_accepter_ids. Removed in v6."
   value       = local.core_network_accepter_id
 }
 
@@ -537,8 +547,8 @@ output "egress_only_internet_gateway" {
 }
 
 output "core_network_attachment" {
-  description = "DEPRECATED: v4-compatible full Cloud WAN attachment object. Use core_network_attachment_id. Removed in v6."
-  value       = try(aws_networkmanager_vpc_attachment.this["vpc"], null)
+  description = "DEPRECATED: v4-compatible full Cloud WAN attachment object for the legacy adapter only. Use core_network_attachment_ids. Removed in v6."
+  value       = local.legacy_core_network_group != null ? try(aws_networkmanager_vpc_attachment.this["vpc"], null) : null
 }
 
 output "vpc_lattice_service_network_association" {
@@ -643,19 +653,21 @@ output "resources" {
     dhcp_options                       = aws_vpc_dhcp_options.this
     dhcp_options_associations          = aws_vpc_dhcp_options_association.this
     routes = {
-      igw_ipv4            = aws_route.igw_ipv4
-      igw_ipv6            = aws_route.igw_ipv6
-      nat                 = aws_route.nat
-      nat64               = aws_route.nat64
-      eigw                = aws_route.eigw
-      custom              = aws_route.custom
-      top_level           = aws_route.top_level
-      tgw                 = aws_route.tgw
-      tgw_ipv6            = aws_route.tgw_ipv6
-      tgw_attachment      = aws_route.tgw_attachment
-      tgw_attachment_ipv6 = aws_route.tgw_attachment_ipv6
-      cwan                = aws_route.cwan
-      cwan_ipv6           = aws_route.cwan_ipv6
+      igw_ipv4             = aws_route.igw_ipv4
+      igw_ipv6             = aws_route.igw_ipv6
+      nat                  = aws_route.nat
+      nat64                = aws_route.nat64
+      eigw                 = aws_route.eigw
+      custom               = aws_route.custom
+      top_level            = aws_route.top_level
+      tgw                  = aws_route.tgw
+      tgw_ipv6             = aws_route.tgw_ipv6
+      tgw_attachment       = aws_route.tgw_attachment
+      tgw_attachment_ipv6  = aws_route.tgw_attachment_ipv6
+      cwan                 = aws_route.cwan
+      cwan_ipv6            = aws_route.cwan_ipv6
+      cwan_attachment      = aws_route.cwan_attachment
+      cwan_attachment_ipv6 = aws_route.cwan_attachment_ipv6
     }
   }
 }

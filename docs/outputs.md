@@ -139,12 +139,20 @@ locals {
   nat_ids                       = module.vpc.nat_gateway_ids
   internet_gateway_id            = module.vpc.internet_gateway_id
   tgw_attachment_ids             = module.vpc.transit_gateway_attachment_ids
+  cwan_attachment_ids            = module.vpc.core_network_attachment_ids
+  cwan_accepter_ids              = module.vpc.core_network_attachment_accepter_ids
   vpc_ipv6_cidr_blocks           = module.vpc.vpc_ipv6_cidr_blocks
   secondary_ipv4_association_ids = module.vpc.secondary_ipv4_cidr_association_ids
   secondary_ipv6_association_ids = module.vpc.secondary_ipv6_cidr_association_ids
   audit_flow_log_id              = module.vpc.flow_log_ids["audit"]
 }
 ```
+
+Cloud WAN attachment IDs include both created and injected entries. Its accepter
+ID map includes only attachments with `accept_attachment = true`. The deprecated
+scalar Cloud WAN IDs return `null` for multiple attachments; the deprecated full
+`core_network_attachment` object is available only through the embedded adapter.
+See [Cloud WAN migration](attachments.md#migrating-the-cloud-wan-singleton-adapter).
 
 Optional singleton handles return `null`; optional collections return `{}`. Test the documented shape rather than catching arbitrary errors with `try`:
 
